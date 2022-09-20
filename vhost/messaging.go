@@ -25,7 +25,7 @@ func RegisterPackage(uri string, c chan *usr.Message) error {
 }
 
 func CreateMessage(event, sender string, content any) *usr.Message {
-	msg := &usr.Message{event, sender, nil}
+	msg := &usr.Message{Event: event, Sender: sender, Content: nil}
 	if content != nil {
 		AddContent(msg, content)
 	}
@@ -54,9 +54,9 @@ func SendResponse(msg *usr.Message) {
 }
 
 func SendErrorResponse(sender string) {
-	SendResponse(&usr.Message{usr.ErrorEvent, sender, nil})
+	SendResponse(&usr.Message{Event: usr.ErrorEvent, Sender: sender, Content: nil})
 }
 
 func SendAckResponse(sender string) {
-	SendResponse(&usr.Message{usr.ACKEvent, sender, nil})
+	SendResponse(&usr.Message{Event: usr.ACKEvent, Sender: sender, Content: nil})
 }

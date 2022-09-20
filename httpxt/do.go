@@ -86,9 +86,7 @@ func isHttpResponseMessage(buf []byte) bool {
 
 func createFileResponse(req *http.Request) (*http.Response, error) {
 	path := req.URL.Path
-	if strings.HasPrefix(path, "/") {
-		path = path[1:]
-	}
+	path = strings.TrimPrefix(path, "/")
 	buf, err := fs.ReadFile(fsys, path)
 	if err != nil {
 		if strings.Contains(err.Error(), "file does not exist") {
