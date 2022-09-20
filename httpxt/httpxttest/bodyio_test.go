@@ -2,10 +2,11 @@ package httpxttest
 
 import (
 	"fmt"
-	"http-boost/httpxt/internal"
 	"net/http"
 	"net/http/httptest"
 	"strings"
+
+	"github.com/idiomatic-go/common-lib/httpxt/internal"
 )
 
 func ExampleRequest() {
