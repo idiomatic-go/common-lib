@@ -9,7 +9,6 @@ import (
 	"io/fs"
 	"net/http"
 	"strings"
-	//"io/fs"
 )
 
 //go:embed resource/*
