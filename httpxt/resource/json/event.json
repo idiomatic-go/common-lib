@@ -1,0 +1,17 @@
+{
+    "customerId": "C1",
+    "events": [
+        {
+            "transaction": "invoice",
+            "status": "created",
+            "createDate": "2022-08-25",
+            "logEventId": "0001"
+        },
+        {
+            "transaction": "payment",
+            "status": "created",
+            "createDate": "2022-08-26",
+            "logEventId": "0002"
+        }
+    ]
+}
