@@ -1,9 +1,9 @@
 package httpxt
 
 import (
-	"common-lib/httpxt/usr"
 	"context"
 	"fmt"
+	"github.com/idiomatic-go/common-lib/httpxt/usr"
 	"io"
 	"net/http"
 	"strconv"
