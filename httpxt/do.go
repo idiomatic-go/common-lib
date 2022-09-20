@@ -3,8 +3,6 @@ package httpxt
 import (
 	"bufio"
 	"bytes"
-	"common-lib/httpxt/internal"
-	"common-lib/httpxt/usr"
 	"crypto/tls"
 	"errors"
 	"fmt"
@@ -14,6 +12,9 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	internal "github.com/idiomatic-go/common-lib/httpxt/internal"
+	usr "github.com/idiomatic-go/common-lib/httpxt/usr"
 )
 
 func init() {
