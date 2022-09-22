@@ -5,7 +5,17 @@ import (
 	"time"
 )
 
-// Timer - a simple timer with a notification.
+func NewStopChannel() chan struct{} {
+	return make(chan struct{}, 1)
+}
+
+func StopTimer(c chan struct{}) {
+	if c != nil {
+		close(c)
+	}
+}
+
+// Timer - a simple timer with notification.
 // Note.: Create a stop channel with a minimum capacity of 1, otherwise, the Timer will block waiting on
 //        the stop channel
 func Timer(repeat bool, interval time.Duration, stop chan struct{}, fn usr.Notify) {
@@ -15,19 +25,19 @@ func Timer(repeat bool, interval time.Duration, stop chan struct{}, fn usr.Notif
 		if stop != nil {
 			select {
 			case <-stop:
-				LogDebug("timer : stopped")
+				LogDebug("%s\n", "timer : stopped")
 				return
 			default:
 			}
 		}
 		select {
 		case <-ticker.C:
-			LogDebug("timer : notify")
+			LogDebug("%s\n", "timer : notify")
 			if fn != nil {
 				fn()
 			}
 			if !repeat {
-				LogDebug("timer : finished")
+				LogDebug("%s\n", "timer : finished")
 				return
 			}
 		default:
