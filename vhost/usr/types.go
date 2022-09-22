@@ -81,3 +81,6 @@ type Response struct {
 	Status  any
 	Content any
 }
+
+// Timer
+type Notify func()
