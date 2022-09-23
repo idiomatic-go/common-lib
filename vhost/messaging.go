@@ -24,6 +24,17 @@ func RegisterPackage(uri string, c chan *usr.Message) error {
 	return nil
 }
 
+func UnregisterPackage(uri string) {
+	if uri == "" {
+		return
+	}
+	entry := directory[uri]
+	if entry != nil {
+		close(entry.c)
+		directory[uri] = nil
+	}
+}
+
 func CreateMessage(event, sender string, content any) *usr.Message {
 	msg := &usr.Message{Event: event, Sender: sender, Content: nil}
 	if content != nil {
