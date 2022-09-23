@@ -2,7 +2,6 @@ package util
 
 import (
 	"hash/fnv"
-	"reflect"
 	"sync"
 	"sync/atomic"
 )
@@ -20,6 +19,10 @@ func CreateVersionedEntity(entity any, fn GetVersion) *VersionedEntity {
 	get := fn
 	if get == nil {
 		get = func(entity any) string { return "" }
+	}
+	// Dereference as all helper functions can use the underlying struct
+	if IsPointer(entity) {
+		entity = Copy(entity)
 	}
 	ve := &VersionedEntity{hash: 0, entity: nil, fn: get}
 	ve.Set(entity)
@@ -51,10 +54,9 @@ func (v *VersionedEntity) Get() any {
 		return nil
 	}
 	v.mu.RLock()
-	t := reflect.Indirect(reflect.ValueOf(v.entity))
+	c := Copy(v.entity)
 	v.mu.RUnlock()
-	i := t.Interface()
-	return i
+	return c
 }
 
 // GetVersion - get the version string
