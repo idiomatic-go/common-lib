@@ -11,25 +11,40 @@ func Copy(i any) any {
 	return t.Interface()
 }
 
-func IsPointer(i any) bool {
-	if i == nil {
+func IsNillable(a any) bool {
+	return IsPointer(a) || IsPointerType(a)
+}
+
+func IsPointer(a any) bool {
+	if a == nil {
 		return false
 	}
-	if reflect.TypeOf(i).Kind() != reflect.Pointer {
+	if reflect.TypeOf(a).Kind() != reflect.Pointer {
 		return false
 	}
 	return true
 }
 
-// IsNil - determine if the interface{} holds is nil
-func IsNil(i any) bool {
-	if i == nil {
-		return true
-	}
-	if !IsPointer(i) {
+func IsPointerType(a any) bool {
+	if a == nil {
 		return false
 	}
-	return reflect.ValueOf(i).IsNil()
+	switch reflect.ValueOf(a).Kind() {
+	case reflect.Chan, reflect.Func, reflect.Interface, reflect.Map:
+		return true
+	}
+	return false
+}
+
+// IsNil - determine if the interface{} holds is nil
+func IsNil(a any) bool {
+	if a == nil {
+		return true
+	}
+	if !IsNillable(a) {
+		return false
+	}
+	return reflect.ValueOf(a).IsNil()
 }
 
 // IsSerializable - determine if any can be serialized
