@@ -14,7 +14,6 @@ import (
 	"time"
 
 	internal "github.com/idiomatic-go/common-lib/httpxt/internal"
-	usr "github.com/idiomatic-go/common-lib/httpxt/usr"
 )
 
 func init() {
@@ -25,9 +24,9 @@ func init() {
 		transport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 		transport.MaxIdleConns = 200
 		transport.MaxIdleConnsPerHost = 100
-		usr.Client = &http.Client{Transport: transport, Timeout: time.Second * 5}
+		Client = &http.Client{Transport: transport, Timeout: time.Second * 5}
 	} else {
-		usr.Client = &http.Client{Transport: http.DefaultTransport, Timeout: time.Second * 5}
+		Client = &http.Client{Transport: http.DefaultTransport, Timeout: time.Second * 5}
 	}
 }
 
@@ -40,13 +39,13 @@ func Do(req *http.Request) (resp *http.Response, err error) {
 	if req == nil {
 		return nil, errors.New("invalid argument: Request is nil")
 	}
-	var traceFinish usr.HttpTraceFinish
-	if usr.TraceStart != nil {
-		traceFinish = usr.TraceStart(req)
+	var traceFinish HttpTraceFinish
+	if TraceStart != nil {
+		traceFinish = TraceStart(req)
 	}
 	switch req.URL.Scheme {
 	case "http", "https":
-		resp, err = usr.Client.Do(req)
+		resp, err = Client.Do(req)
 	case "file":
 		if fsys == nil {
 			return nil, fmt.Errorf("no file system mounted")

@@ -2,18 +2,16 @@ package vhost
 
 import (
 	"fmt"
-
-	"github.com/idiomatic-go/common-lib/vhost/usr"
 )
 
 type entry struct {
 	uri string
-	c   chan *usr.Message
+	c   chan Message
 }
 
 var directory = make(map[string]*entry)
 
-func RegisterPackage(uri string, c chan *usr.Message) error {
+func RegisterPackage(uri string, c chan Message) error {
 	if uri == "" {
 		return fmt.Errorf("invalid argument : uri is empty")
 	}
@@ -35,22 +33,22 @@ func UnregisterPackage(uri string) {
 	}
 }
 
-func CreateMessage(event, sender string, content any) *usr.Message {
-	msg := &usr.Message{Event: event, Sender: sender, Content: nil}
+func CreateMessage(event, sender string, content any) Message {
+	msg := Message{Event: event, Sender: sender, Content: nil}
 	if content != nil {
-		AddContent(msg, content)
+		AddContent(&msg, content)
 	}
 	return msg
 }
 
-func AddContent(msg *usr.Message, content any) {
+func AddContent(msg *Message, content any) {
 	if msg == nil || content == nil {
 		return
 	}
 	msg.Content = append(msg.Content, content)
 }
 
-func SendMessage(uri string, msg *usr.Message) error {
+func SendMessage(uri string, msg Message) error {
 	e := directory[uri]
 	if e == nil {
 		return fmt.Errorf("invalid argument : %v", uri)
@@ -60,14 +58,14 @@ func SendMessage(uri string, msg *usr.Message) error {
 }
 
 // Response processing
-func SendResponse(msg *usr.Message) {
+func SendResponse(msg Message) {
 	resp <- msg
 }
 
 func SendErrorResponse(sender string) {
-	SendResponse(&usr.Message{Event: usr.ErrorEvent, Sender: sender, Content: nil})
+	SendResponse(Message{Event: ErrorEvent, Sender: sender, Content: nil})
 }
 
 func SendAckResponse(sender string) {
-	SendResponse(&usr.Message{Event: usr.ACKEvent, Sender: sender, Content: nil})
+	SendResponse(Message{Event: ACKEvent, Sender: sender, Content: nil})
 }

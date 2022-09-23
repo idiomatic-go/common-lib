@@ -3,7 +3,6 @@ package httpxt
 import (
 	"context"
 	"fmt"
-	"github.com/idiomatic-go/common-lib/httpxt/usr"
 	"io"
 	"net/http"
 	"strconv"
@@ -240,7 +239,7 @@ func inject(s pseudoSpan, req *http.Request) {
 	fmt.Printf("inject()\n")
 }
 
-func tracingStart(req *http.Request) usr.HttpTraceFinish {
+func tracingStart(req *http.Request) HttpTraceFinish {
 	span, _ := startSpanFromContext(req.Context(), fmt.Sprintf("getRequest : %v", req.URL.Path))
 	span.SetTag("http.url", req.URL.String())
 	span.SetTag("http.method", req.Method)
@@ -274,10 +273,10 @@ func ExampleTraceOutput() {
 }
 
 func ExampleTracingSuccess() {
-	usr.OverrideHttpTracing(tracingStart)
+	OverrideHttpTracing(tracingStart)
 	req, _ := http.NewRequest("", "echo://www.google.com/search", nil)
 	Do(req)
-	usr.OverrideHttpTracing(nil)
+	OverrideHttpTracing(nil)
 
 	//Output:
 	// startSpanFromContext() : [getRequest : /search]
@@ -290,10 +289,10 @@ func ExampleTracingSuccess() {
 }
 
 func ExampleTracingErrors() {
-	usr.OverrideHttpTracing(tracingStart)
+	OverrideHttpTracing(tracingStart)
 	req, _ := http.NewRequest("", "echo://www.google.com?httpError=true", nil)
 	Do(req)
-	usr.OverrideHttpTracing(nil)
+	OverrideHttpTracing(nil)
 
 	//Output:
 	// startSpanFromContext() : [getRequest : ]

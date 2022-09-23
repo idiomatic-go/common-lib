@@ -1,8 +1,6 @@
-package usr
+package vhost
 
-import (
-	"context"
-)
+import "context"
 
 // Environment
 const (
@@ -70,7 +68,7 @@ type Credentials func() (username string, password string)
 // Startup
 type Envelope struct {
 	Uri string
-	Msg *Message
+	Msg Message
 }
 
 // Polling

@@ -2,23 +2,20 @@ package vhost
 
 import (
 	"time"
-
-	"github.com/idiomatic-go/common-lib/vhost/internal"
-	"github.com/idiomatic-go/common-lib/vhost/usr"
 )
 
 // Response methods
-var resp chan *usr.Message
-var q *internal.Queue
+var resp chan Message
+var q *Queue
 
 func init() {
-	resp = make(chan *usr.Message, 100)
-	q = internal.CreateQueue()
+	resp = make(chan Message, 100)
+	q = CreateQueue()
 	go receive(q)
 }
 
 // Virtual host startup
-func Startup(timeout int, msgs map[string]usr.Envelope) bool {
+func Startup(timeout int, msgs map[string]Envelope) bool {
 	packages := len(directory)
 	if packages == 0 {
 		return true
@@ -28,13 +25,13 @@ func Startup(timeout int, msgs map[string]usr.Envelope) bool {
 		if msgs != nil {
 			e, ok := msgs[k]
 			if ok {
-				e.Msg.Event = usr.StartupEvent
-				e.Msg.Sender = usr.HostSender
+				e.Msg.Event = StartupEvent
+				e.Msg.Sender = HostSender
 				SendMessage(k, e.Msg)
 				continue
 			}
 		}
-		SendMessage(k, CreateMessage(usr.StartupEvent, usr.HostSender, nil))
+		SendMessage(k, CreateMessage(StartupEvent, HostSender, nil))
 	}
 	time.Sleep(time.Second * time.Duration(timeout))
 	if q.IsErrorEvent() {
@@ -54,7 +51,7 @@ func Startup(timeout int, msgs map[string]usr.Envelope) bool {
 	return valid
 }
 
-func receive(q *internal.Queue) {
+func receive(q *Queue) {
 	for {
 		select {
 		case msg, open := <-resp:

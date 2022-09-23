@@ -1,13 +1,11 @@
-package internal
+package vhost
 
 import (
 	"sync"
-
-	"github.com/idiomatic-go/common-lib/vhost/usr"
 )
 
 type Queue struct {
-	msgs []*usr.Message
+	msgs []Message
 	mu   sync.Mutex
 }
 
@@ -25,7 +23,7 @@ func (q *Queue) IsErrorEvent() bool {
 	q.mu.Lock()
 	defer q.mu.Unlock()
 	for _, m := range q.msgs {
-		if usr.ErrorEvent == m.Event {
+		if ErrorEvent == m.Event {
 			return true
 		}
 	}
@@ -52,12 +50,10 @@ func (q *Queue) Count() int {
 	return len(q.msgs)
 }
 
-func (q *Queue) Enqueue(msg *usr.Message) {
-	if msg != nil {
-		q.mu.Lock()
-		q.msgs = append(q.msgs, msg)
-		q.mu.Unlock()
-	}
+func (q *Queue) Enqueue(msg Message) {
+	q.mu.Lock()
+	q.msgs = append(q.msgs, msg)
+	q.mu.Unlock()
 }
 
 /*

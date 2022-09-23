@@ -3,11 +3,9 @@ package util
 import (
 	"github.com/idiomatic-go/common-lib/vhost"
 	"time"
-
-	"github.com/idiomatic-go/common-lib/vhost/usr"
 )
 
-func PollingDo(resp chan *usr.Response, respPolling time.Duration, stop chan struct{}, stopPolling time.Duration, fn usr.Do) {
+func PollingDo(resp chan Response, respPolling time.Duration, stop chan struct{}, stopPolling time.Duration, fn Do) {
 	stopTick := time.NewTicker(stopPolling)
 	respTick := time.NewTicker(respPolling)
 

@@ -3,32 +3,30 @@ package vhost
 import (
 	"os"
 	"strings"
-
-	"github.com/idiomatic-go/common-lib/vhost/usr"
 )
 
-//var IsDevEnv usr.EnvValid = func() bool {
-//	return IsEnvMatch(usr.RUNTIME_ENV, usr.DEV_ENV)
+//var IsDevEnv EnvValid = func() bool {
+//	return IsEnvMatch(RUNTIME_ENV, DEV_ENV)
 //}
 
-var IsReviewEnv usr.EnvValid = func() bool {
-	return IsEnvMatch(usr.REVIEW_ENV)
+var IsReviewEnv EnvValid = func() bool {
+	return IsEnvMatch(REVIEW_ENV)
 }
 
-var IsTestEnv usr.EnvValid = func() bool {
-	return IsEnvMatch(usr.TEST_ENV)
+var IsTestEnv EnvValid = func() bool {
+	return IsEnvMatch(TEST_ENV)
 }
 
-var IsStageEnv usr.EnvValid = func() bool {
-	return IsEnvMatch(usr.STAGE_ENV)
+var IsStageEnv EnvValid = func() bool {
+	return IsEnvMatch(STAGE_ENV)
 }
 
-var IsProdEnv usr.EnvValid = func() bool {
-	return IsEnvMatch(usr.PROD_ENV)
+var IsProdEnv EnvValid = func() bool {
+	return IsEnvMatch(PROD_ENV)
 }
 
 func IsEnvMatch(val string) bool {
-	target := os.Getenv(usr.RuntimeEnvKey)
+	target := os.Getenv(RuntimeEnvKey)
 	if len(target) == 0 || !strings.EqualFold(target, val) {
 		return false
 	}
@@ -36,7 +34,7 @@ func IsEnvMatch(val string) bool {
 }
 
 func init() {
-	usr.IsDevEnv = func() bool {
-		return IsEnvMatch(usr.DEV_ENV)
+	IsDevEnv = func() bool {
+		return IsEnvMatch(DEV_ENV)
 	}
 }

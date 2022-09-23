@@ -1,8 +1,6 @@
-package usr
+package httpxt
 
-import (
-	"net/http"
-)
+import "net/http"
 
 // Http
 var Client *http.Client

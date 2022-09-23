@@ -3,16 +3,15 @@ package vhost_test
 import (
 	"fmt"
 	"github.com/idiomatic-go/common-lib/vhost"
-	"github.com/idiomatic-go/common-lib/vhost/usr"
 	"os"
 )
 
 func ExampleDevEnv() {
-	fmt.Println(usr.IsDevEnv())
-	os.Setenv(usr.RuntimeEnvKey, "dev")
-	fmt.Println(usr.IsDevEnv())
-	os.Setenv(usr.RuntimeEnvKey, "devrrr")
-	fmt.Println(usr.IsDevEnv())
+	fmt.Println(vhost.IsDevEnv())
+	os.Setenv(vhost.RuntimeEnvKey, "dev")
+	fmt.Println(vhost.IsDevEnv())
+	os.Setenv(vhost.RuntimeEnvKey, "devrrr")
+	fmt.Println(vhost.IsDevEnv())
 
 	// Output:
 	// false
@@ -21,12 +20,12 @@ func ExampleDevEnv() {
 }
 
 func ExampleDevEnvOverride() {
-	usr.IsDevEnv = func() bool { return false }
-	fmt.Println(usr.IsDevEnv())
-	os.Setenv(usr.RuntimeEnvKey, "dev")
-	fmt.Println(usr.IsDevEnv())
-	os.Setenv(usr.RuntimeEnvKey, "devrrr")
-	fmt.Println(usr.IsDevEnv())
+	vhost.IsDevEnv = func() bool { return false }
+	fmt.Println(vhost.IsDevEnv())
+	os.Setenv(vhost.RuntimeEnvKey, "dev")
+	fmt.Println(vhost.IsDevEnv())
+	os.Setenv(vhost.RuntimeEnvKey, "devrrr")
+	fmt.Println(vhost.IsDevEnv())
 
 	// Output:
 	// false
@@ -36,9 +35,9 @@ func ExampleDevEnvOverride() {
 
 func ExampleProdEnv() {
 	fmt.Println(vhost.IsProdEnv())
-	os.Setenv(usr.RuntimeEnvKey, "prod")
+	os.Setenv(vhost.RuntimeEnvKey, "prod")
 	fmt.Println(vhost.IsProdEnv())
-	os.Setenv(usr.RuntimeEnvKey, "production")
+	os.Setenv(vhost.RuntimeEnvKey, "production")
 	fmt.Println(vhost.IsProdEnv())
 
 	// Output:
@@ -49,9 +48,9 @@ func ExampleProdEnv() {
 
 func ExampleReviewEnv() {
 	fmt.Println(vhost.IsReviewEnv())
-	os.Setenv(usr.RuntimeEnvKey, "review")
+	os.Setenv(vhost.RuntimeEnvKey, "review")
 	fmt.Println(vhost.IsReviewEnv())
-	os.Setenv(usr.RuntimeEnvKey, "revvrrr")
+	os.Setenv(vhost.RuntimeEnvKey, "revvrrr")
 	fmt.Println(vhost.IsReviewEnv())
 
 	// Output:
@@ -62,9 +61,9 @@ func ExampleReviewEnv() {
 
 func ExampleStageEnv() {
 	fmt.Println(vhost.IsStageEnv())
-	os.Setenv(usr.RuntimeEnvKey, "stage")
+	os.Setenv(vhost.RuntimeEnvKey, "stage")
 	fmt.Println(vhost.IsStageEnv())
-	os.Setenv(usr.RuntimeEnvKey, "")
+	os.Setenv(vhost.RuntimeEnvKey, "")
 	fmt.Println(vhost.IsStageEnv())
 
 	// Output:
@@ -75,9 +74,9 @@ func ExampleStageEnv() {
 
 func ExampleTestEnv() {
 	fmt.Println(vhost.IsTestEnv())
-	os.Setenv(usr.RuntimeEnvKey, "test")
+	os.Setenv(vhost.RuntimeEnvKey, "test")
 	fmt.Println(vhost.IsTestEnv())
-	os.Setenv(usr.RuntimeEnvKey, "atvrrr")
+	os.Setenv(vhost.RuntimeEnvKey, "atvrrr")
 	fmt.Println(vhost.IsTestEnv())
 
 	// Output:

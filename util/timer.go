@@ -2,7 +2,6 @@ package util
 
 import (
 	"github.com/idiomatic-go/common-lib/vhost"
-	"github.com/idiomatic-go/common-lib/vhost/usr"
 	"time"
 )
 
@@ -19,7 +18,7 @@ func StopTimer(c chan struct{}) {
 // Timer - a simple timer with notification.
 // Note.: Create a stop channel with a minimum capacity of 1, otherwise, the Timer will block waiting on
 //        the stop channel
-func Timer(repeat bool, interval time.Duration, stop chan struct{}, fn usr.Notify) {
+func Timer(repeat bool, interval time.Duration, stop chan struct{}, fn Notify) {
 	ticker := time.NewTicker(interval)
 
 	for {
