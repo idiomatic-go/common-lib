@@ -1,12 +1,13 @@
-package vhost
+package util
 
 import (
+	"github.com/idiomatic-go/common-lib/vhost"
 	"github.com/idiomatic-go/common-lib/vhost/usr"
 	"time"
 )
 
 func ExampleOneTickNoClose() {
-	usr.ToggleDebugLogging(true)
+	usr.ToggleDebug(true)
 	go Timer(false, time.Millisecond*500, nil, nil)
 	time.Sleep(time.Second * time.Duration(2))
 
@@ -16,7 +17,7 @@ func ExampleOneTickNoClose() {
 }
 
 func _ExampleMultiTicksAndClose() {
-	usr.ToggleDebugLogging(true)
+	usr.ToggleDebug(true)
 	c := NewStopChannel()
 	go Timer(true, time.Millisecond*500, c, nil)
 	time.Sleep(time.Second * time.Duration(3))
@@ -34,9 +35,9 @@ func _ExampleMultiTicksAndClose() {
 }
 
 func _ExampleMultiTicksAndCloseWithEcho() {
-	usr.ToggleDebugLogging(true)
+	usr.ToggleDebug(true)
 	c := NewStopChannel()
-	go Timer(true, time.Millisecond*500, c, func() { LogDebug("%s\n", "notify") })
+	go Timer(true, time.Millisecond*500, c, func() { vhost.LogDebug("%s\n", "notify") })
 	time.Sleep(time.Second * time.Duration(2))
 	StopTimer(c)
 	time.Sleep(time.Second * time.Duration(1))

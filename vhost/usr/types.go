@@ -32,14 +32,14 @@ func OverrideIsDevEnv(fn EnvValid) {
 	}
 }
 
-// Logging
+// Debug flag
 var Debug = false
 
-func ToggleDebugLogging(v bool) {
+func ToggleDebug(v bool) {
 	Debug = v
 }
 
-// Overridable
+// DebugFmt Overridable
 type DebugFmt func(specifier string, v ...any)
 
 type DefaultFmt func(v ...any)

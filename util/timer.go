@@ -1,6 +1,7 @@
-package vhost
+package util
 
 import (
+	"github.com/idiomatic-go/common-lib/vhost"
 	"github.com/idiomatic-go/common-lib/vhost/usr"
 	"time"
 )
@@ -25,19 +26,19 @@ func Timer(repeat bool, interval time.Duration, stop chan struct{}, fn usr.Notif
 		if stop != nil {
 			select {
 			case <-stop:
-				LogDebug("%s\n", "timer : stopped")
+				vhost.LogDebug("%s\n", "timer : stopped")
 				return
 			default:
 			}
 		}
 		select {
 		case <-ticker.C:
-			LogDebug("%s\n", "timer : notify")
+			vhost.LogDebug("%s\n", "timer : notify")
 			if fn != nil {
 				fn()
 			}
 			if !repeat {
-				LogDebug("%s\n", "timer : finished")
+				vhost.LogDebug("%s\n", "timer : finished")
 				return
 			}
 		default:
