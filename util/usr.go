@@ -2,8 +2,9 @@ package util
 
 import "context"
 
-// Timer
-type Notify func()
+// Dispatch types
+type Dispatch func()
+type DispatchStatus func() error
 
 type Do func(ctx context.Context) Response
 
