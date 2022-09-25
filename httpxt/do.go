@@ -30,7 +30,7 @@ func init() {
 	}
 }
 
-func DoWithStatus(req *http.Request) *ResponseStatus {
+func DoStatus(req *http.Request) *ResponseStatus {
 	status := ResponseStatus{}
 	if req == nil {
 		status.RequestErr = errors.New("invalid argument: Request is nil")
