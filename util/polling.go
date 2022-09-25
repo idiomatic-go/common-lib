@@ -1,7 +1,6 @@
 package util
 
 import (
-	"github.com/idiomatic-go/common-lib/vhost"
 	"time"
 )
 
@@ -21,7 +20,7 @@ func PollingDo(resp chan Response, respPolling time.Duration, stop chan struct{}
 			case <-stopTick.C:
 				select {
 				case <-stop:
-					vhost.LogDebug("polling : closed")
+					LogDebug("polling : closed")
 					return
 				default:
 				}

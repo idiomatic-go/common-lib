@@ -8,78 +8,74 @@ import (
 	"net/url"
 )
 
-// Response status
-type ResponseStatus struct {
-	HttpErr   error
-	Response  *http.Response
-	RequestID string
+func (r *ResponseStatus) IsError() bool {
+	return r.HttpErr != nil || r.RequestErr != nil || r.UnmarshalErr != nil || r.BodyIOErr != nil
 }
 
-func (c *ResponseStatus) IsError() bool {
-	return c.HttpErr != nil
+func (r *ResponseStatus) IsContent() bool {
+	return r.Response != nil && r.Response.Body != nil && r.Response.StatusCode != http.StatusNoContent
 }
 
-func (c *ResponseStatus) IsContent() bool {
-	return c.Response != nil && c.Response.Body != nil && c.Response.StatusCode != http.StatusNoContent
+func (r *ResponseStatus) IsSuccess() bool {
+	return r.Response != nil && (r.Response.StatusCode >= http.StatusOK && r.Response.StatusCode < http.StatusMultipleChoices)
 }
 
-func (c *ResponseStatus) IsSuccess() bool {
-	return c.Response != nil && (c.Response.StatusCode >= http.StatusOK && c.Response.StatusCode < http.StatusMultipleChoices)
+func (r *ResponseStatus) IsClientError() bool {
+	return r.Response != nil && (r.Response.StatusCode >= http.StatusBadRequest && r.Response.StatusCode < http.StatusInternalServerError)
 }
 
-func (c *ResponseStatus) IsClientError() bool {
-	return c.Response != nil && (c.Response.StatusCode >= http.StatusBadRequest && c.Response.StatusCode < http.StatusInternalServerError)
+func (r *ResponseStatus) IsServerError() bool {
+	return r.Response != nil && (r.Response.StatusCode >= http.StatusInternalServerError && r.Response.StatusCode <= 599)
 }
 
-func (c *ResponseStatus) IsServerError() bool {
-	return c.Response != nil && (c.Response.StatusCode >= http.StatusInternalServerError && c.Response.StatusCode <= 599)
-}
-
-func (c *ResponseStatus) StatusCode() int {
-	if c.Response == nil {
+func (r *ResponseStatus) StatusCode() int {
+	if r.Response == nil {
 		return 0
 	}
-	return c.Response.StatusCode
+	return r.Response.StatusCode
 }
 
-func (c *ResponseStatus) Url() *url.URL {
-	if c.Response == nil || c.Response.Request == nil || c.Response.Request.URL == nil {
+func (r *ResponseStatus) Url() *url.URL {
+	if r.Response == nil || r.Response.Request == nil || r.Response.Request.URL == nil {
 		return &url.URL{}
 	}
-	return c.Response.Request.URL
+	return r.Response.Request.URL
 }
 
-func (c *ResponseStatus) ReadBody() ([]byte, error) {
-	if !c.IsContent() {
-		return nil, errors.New("invalid argument: interface{} is nil")
+func (r *ResponseStatus) ReadBody() []byte {
+	if !r.IsContent() {
+		return nil
 	}
-	defer c.Response.Body.Close()
-	return io.ReadAll(c.Response.Body)
+	defer r.Response.Body.Close()
+	var bytes []byte
+	bytes, r.BodyIOErr = io.ReadAll(r.Response.Body)
+	return bytes
 }
 
-func (c *ResponseStatus) UnmarshalJson(i interface{}) (body []byte, err error) {
+func (r *ResponseStatus) UnmarshalJson(i interface{}) ([]byte, error) {
 	if i == nil {
 		return nil, errors.New("invalid argument: interface{} is nil")
 	}
-	body, err = c.ReadBody()
-	if err != nil {
-		return nil, err
+	body := r.ReadBody()
+	if r.BodyIOErr != nil {
+		return nil, nil
 	}
-	err = json.Unmarshal(body, i)
-	if err != nil {
-		return body, err
+	r.UnmarshalErr = json.Unmarshal(body, i)
+	if r.UnmarshalErr != nil {
+		return body, nil
 	}
 	return nil, nil
 }
 
 // DecodeJson is used when you want to read directly from a stream. This should be used when
 // the requested content may be very large in size, as this uses less memory
-func (c *ResponseStatus) DecodeJson(i interface{}) error {
+func (r *ResponseStatus) DecodeJson(i interface{}) error {
 	if i == nil {
 		return errors.New("invalid argument: interface{} is nil")
 	}
-	if !c.IsContent() {
-		return errors.New("invalid argument: no content is available")
+	if !r.IsContent() {
+		return nil
 	}
-	return json.NewDecoder(c.Response.Body).Decode(i)
+	r.UnmarshalErr = json.NewDecoder(r.Response.Body).Decode(i)
+	return nil
 }

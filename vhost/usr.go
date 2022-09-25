@@ -1,7 +1,5 @@
 package vhost
 
-import "context"
-
 // Environment
 const (
 	DEV_ENV    = "DEV"
@@ -30,24 +28,6 @@ func OverrideIsDevEnv(fn EnvValid) {
 	}
 }
 
-// Debug flag
-var Debug = false
-
-func ToggleDebug(v bool) {
-	Debug = v
-}
-
-// DebugFmt Overridable
-type DebugFmt func(specifier string, v ...any)
-
-type DefaultFmt func(v ...any)
-
-type ContextDefaultFmt func(ctx context.Context, v ...any)
-
-type SpecifiedFmt func(specifier string, v ...any)
-
-type ContextSpecifiedFmt func(ctx context.Context, specifier string, v ...any)
-
 // Messaging
 const (
 	StartupEvent  = "event:startup"
@@ -69,13 +49,4 @@ type Credentials func() (username string, password string)
 type Envelope struct {
 	Uri string
 	Msg Message
-}
-
-// Polling
-type Do func(context.Context) *Response
-
-type Response struct {
-	Error   error
-	Status  any
-	Content any
 }

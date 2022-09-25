@@ -1,6 +1,8 @@
 package vhost
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func ExampleCreateMessage() {
 	msg := CreateMessage("event", "sender", "content")

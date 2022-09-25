@@ -20,3 +20,13 @@ var TraceStart HttpTraceStart
 func OverrideHttpTracing(fn HttpTraceStart) {
 	TraceStart = fn
 }
+
+// Response status
+type ResponseStatus struct {
+	BodyIOErr    error
+	UnmarshalErr error
+	RequestErr   error
+	HttpErr      error
+	Response     *http.Response
+	RequestID    string
+}

@@ -1,6 +1,7 @@
 package vhost
 
 import (
+	"github.com/idiomatic-go/common-lib/util"
 	"time"
 )
 
@@ -43,7 +44,7 @@ func Startup(timeout int, msgs map[string]Envelope) bool {
 		valid = false
 		for k := range directory {
 			if !q.Exists(k) {
-				LogPrintf("Missing startup message response from : %v", k)
+				util.LogPrintf("Missing startup message response from : %v", k)
 			}
 		}
 	}

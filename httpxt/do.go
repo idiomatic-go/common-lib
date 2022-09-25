@@ -30,9 +30,10 @@ func init() {
 	}
 }
 
-func DoWithStatus(req *http.Request) (status ResponseStatus) {
+func DoWithStatus(req *http.Request) *ResponseStatus {
+	status := ResponseStatus{}
 	status.Response, status.HttpErr = Do(req)
-	return status
+	return &status
 }
 
 func Do(req *http.Request) (resp *http.Response, err error) {
