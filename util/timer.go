@@ -17,7 +17,7 @@ func StopTimer(c chan struct{}) {
 // Timer - a simple timer with notification.
 // Note.: Create a stop channel with a minimum capacity of 1, otherwise, the Timer will block waiting on
 //        the stop channel
-func Timer(repeat bool, interval time.Duration, stop chan struct{}, fn Dispatch) {
+func Timer(repeat bool, interval time.Duration, stop chan struct{}, handler Dispatch) {
 	ticker := time.NewTicker(interval)
 
 	for {
@@ -32,8 +32,8 @@ func Timer(repeat bool, interval time.Duration, stop chan struct{}, fn Dispatch)
 		select {
 		case <-ticker.C:
 			LogDebug("%s\n", "timer : notify")
-			if fn != nil {
-				fn()
+			if handler != nil {
+				handler()
 			}
 			if !repeat {
 				LogDebug("%s\n", "timer : finished")
