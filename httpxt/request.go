@@ -16,3 +16,26 @@ func ReadCookies(req *http.Request) map[string]*http.Cookie {
 	}
 	return jar
 }
+
+func AddHeaders(req *http.Request, header http.Header) {
+	if req == nil || header == nil {
+		return
+	}
+	for key, element := range header {
+		req.Header.Add(key, createValue(element))
+	}
+}
+
+func createValue(v []string) string {
+	if v == nil {
+		return ""
+	}
+	var value string
+	for i, item := range v {
+		if i > 0 {
+			value += ","
+		}
+		value += item
+	}
+	return value
+}

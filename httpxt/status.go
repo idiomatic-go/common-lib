@@ -33,6 +33,10 @@ func (r *ResponseStatus) IsSuccess() bool {
 	return r.Response != nil && (r.Response.StatusCode >= http.StatusOK && r.Response.StatusCode < http.StatusMultipleChoices)
 }
 
+func (r *ResponseStatus) IsRetriable() bool {
+	return !r.IsError() && r.IsServerError()
+}
+
 func (r *ResponseStatus) IsClientError() bool {
 	return r.Response != nil && (r.Response.StatusCode >= http.StatusBadRequest && r.Response.StatusCode < http.StatusInternalServerError)
 }
