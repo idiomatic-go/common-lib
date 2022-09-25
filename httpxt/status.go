@@ -9,7 +9,20 @@ import (
 )
 
 func (r *ResponseStatus) IsError() bool {
-	return r.HttpErr != nil || r.RequestErr != nil || r.UnmarshalErr != nil || r.BodyIOErr != nil
+	return r.RequestErr != nil || r.HttpErr != nil || r.BodyIOErr != nil || r.UnmarshalErr != nil
+}
+
+func (r *ResponseStatus) FirstError() error {
+	if r.RequestErr != nil {
+		return r.RequestErr
+	}
+	if r.HttpErr != nil {
+		return r.HttpErr
+	}
+	if r.BodyIOErr != nil {
+		return r.HttpErr
+	}
+	return r.UnmarshalErr
 }
 
 func (r *ResponseStatus) IsContent() bool {
