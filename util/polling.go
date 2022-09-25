@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-func PollingDo(resp chan Response, respPolling time.Duration, stop chan struct{}, stopPolling time.Duration, fn Do) {
+func PollingDo(resp chan Response, respPolling time.Duration, stop chan struct{}, stopPolling time.Duration, fn DoPoll) {
 	stopTick := time.NewTicker(stopPolling)
 	respTick := time.NewTicker(respPolling)
 
