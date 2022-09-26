@@ -12,7 +12,7 @@ func init() {
 }
 
 var LogDebug DebugFmt = func(specifier string, v ...any) {
-	if Debug {
+	if debug {
 		fmt.Printf(specifier, v)
 	}
 }
@@ -34,7 +34,6 @@ var LogPrintf SpecifiedFmt = func(specifier string, v ...any) {
 }
 
 var LogContextPrint ContextDefaultFmt = func(ctx context.Context, v ...any) {
-	//requestId := ContextRequestId(ctx)
 	u := []any{ContextRequestId(ctx)}
 	log.Print(append(u, v))
 }

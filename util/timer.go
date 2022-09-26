@@ -19,6 +19,7 @@ func StopTimer(c chan struct{}) {
 //        the stop channel
 func Timer(repeat bool, interval time.Duration, stop chan struct{}, handler Niladic) {
 	ticker := time.NewTicker(interval)
+	defer ticker.Stop()
 
 	for {
 		if stop != nil {
