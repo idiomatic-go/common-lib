@@ -17,7 +17,7 @@ func StopTimer(c chan struct{}) {
 // Timer - a simple timer with notification.
 // Note.: Create a stop channel with a minimum capacity of 1, otherwise, the Timer will block waiting on
 //        the stop channel
-func Timer(repeat bool, interval time.Duration, stop chan struct{}, handler Dispatch) {
+func Timer(repeat bool, interval time.Duration, stop chan struct{}, handler Niladic) {
 	ticker := time.NewTicker(interval)
 
 	for {

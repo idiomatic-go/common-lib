@@ -2,15 +2,10 @@ package util
 
 import "context"
 
-// Dispatch types
-type Dispatch func()
-type DispatchStatus func() error
-
-type DoPoll func(ctx context.Context) Response
-
-type Response struct {
-	content string
-}
+// Niladic - types for functions that have no parameters
+type Niladic func()
+type NiladicStatus func() error
+type NiladicResponse func() any
 
 // Debug flag
 var Debug = false

@@ -4,17 +4,16 @@ import (
 	"time"
 )
 
-func PollingDo(resp chan Response, respPolling time.Duration, stop chan struct{}, stopPolling time.Duration, fn DoPoll) {
+func Polling(resp chan any, respPolling time.Duration, stop chan struct{}, stopPolling time.Duration, handler NiladicResponse) {
 	stopTick := time.NewTicker(stopPolling)
 	respTick := time.NewTicker(respPolling)
 
-	// One call before waiting
-	resp <- fn(nil)
+	// Warmup
+	resp <- handler()
 	for {
-		// Using seperate select statements because if both of the ticks ocurred at the same time, one tick would be
-		// ignored possibly leading to starvation of the close message.
-		// Go documentation states that the selection of a case statement is indeterminate when both cases are asserted at
-		// the same time.
+		// Using separate select statements to avoid starvation of the close message.
+		// Go documentation states that the selection of a case statement is indeterminate when more than one case
+		// is asserted.
 		if stop != nil {
 			select {
 			case <-stopTick.C:
@@ -29,8 +28,8 @@ func PollingDo(resp chan Response, respPolling time.Duration, stop chan struct{}
 		}
 		select {
 		case <-respTick.C:
-			if fn != nil {
-				resp <- fn(nil)
+			if handler != nil {
+				resp <- handler()
 			}
 		default:
 		}
