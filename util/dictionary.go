@@ -8,18 +8,18 @@ const (
 	DictionaryValueNotFound = DictionaryValue(-1)
 )
 
-type ReverseDictionary struct {
+type InvertedDictionary struct {
 	threadSafe   bool
 	m            map[string]DictionaryValue
 	currentValue DictionaryValue
 	mu           sync.RWMutex
 }
 
-func CreateReverseDictionary(threadSafe bool) *ReverseDictionary {
-	return &ReverseDictionary{threadSafe: threadSafe, m: make(map[string]DictionaryValue, 1), currentValue: DictionaryValueNotFound}
+func CreateInvertedDictionary(threadSafe bool) *InvertedDictionary {
+	return &InvertedDictionary{threadSafe: threadSafe, m: make(map[string]DictionaryValue, 1), currentValue: DictionaryValueNotFound}
 }
 
-func (d *ReverseDictionary) IsEmpty() bool {
+func (d *InvertedDictionary) IsEmpty() bool {
 	if d.threadSafe {
 		d.mu.RLock()
 		defer d.mu.RUnlock()
@@ -27,7 +27,7 @@ func (d *ReverseDictionary) IsEmpty() bool {
 	return d.currentValue == DictionaryValueNotFound
 }
 
-func (d *ReverseDictionary) Lookup(key string) DictionaryValue {
+func (d *InvertedDictionary) Lookup(key string) DictionaryValue {
 	if d.threadSafe {
 		d.mu.RLock()
 		defer d.mu.RUnlock()
@@ -38,7 +38,7 @@ func (d *ReverseDictionary) Lookup(key string) DictionaryValue {
 	return DictionaryValueNotFound
 }
 
-func (d *ReverseDictionary) Add(key string) DictionaryValue {
+func (d *InvertedDictionary) Add(key string) DictionaryValue {
 	v := d.Lookup(key)
 	if v != DictionaryValueNotFound {
 		return v

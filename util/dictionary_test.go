@@ -2,8 +2,8 @@ package util
 
 import "fmt"
 
-func ExampleReverseDictionary() {
-	dict := CreateReverseDictionary(false)
+func ExampleInvertedDictionary() {
+	dict := CreateInvertedDictionary(false)
 	fmt.Printf("Empty : %v\n", dict.IsEmpty())
 	val := dict.Lookup("")
 	fmt.Printf("Lookup [''] : %v\n\n", val)
