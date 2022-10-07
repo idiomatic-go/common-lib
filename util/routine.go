@@ -3,7 +3,7 @@ package util
 import "time"
 
 // InvokeRoutine - a routine that invokes a handler based on a timer.
-func InvokeRoutine(repeat bool, interval time.Duration, handler Niladic, close *ClosableChannel) {
+func InvokeRoutine(repeat bool, interval time.Duration, handler Func, close *ClosableChannel) {
 	if handler == nil {
 		return
 	}
@@ -37,7 +37,7 @@ func InvokeRoutine(repeat bool, interval time.Duration, handler Niladic, close *
 }
 
 // ExchangeRoutine - A routine that implements channeled request-response semantics.
-func ExchangeRoutine(handler NiladicResponse, resp *ResponseChannel, close *ClosableChannel) {
+func ExchangeRoutine(handler FuncResponse, resp *ResponseChannel, close *ClosableChannel) {
 	if resp == nil || handler == nil {
 		return
 	}

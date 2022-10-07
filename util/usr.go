@@ -2,14 +2,14 @@ package util
 
 import "context"
 
-// Niladic - type for functions with no parameters
-type Niladic func()
+// Func - type for niladic functions, functions with no parameters
+type Func func()
 
-// NiladicStatus - type for functions with no parameters and a return status
-type NiladicStatus func() error
+// FuncStatus - type for functions with no parameters and a return status
+type FuncStatus func() error
 
-// NiladicResponse - type for functions with no parameters and a return response
-type NiladicResponse func() any
+// FuncResponse - type for functions with no parameters and a return response
+type FuncResponse func() any
 
 // Debug - variable
 var debug = false
