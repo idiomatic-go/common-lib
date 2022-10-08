@@ -57,6 +57,14 @@ func SendMessage(uri string, msg Message) error {
 	return nil
 }
 
+func SendStartupMessage(uri string) error {
+	return SendMessage(uri, Message{Event: StartupEvent, Sender: uri})
+}
+
+func SendShutdownMessage(uri string) error {
+	return SendMessage(uri, Message{Event: ShutdownEvent, Sender: uri})
+}
+
 // Response processing
 func SendResponse(msg Message) {
 	resp <- msg
