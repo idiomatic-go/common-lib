@@ -1,6 +1,8 @@
 package util
 
-import "fmt"
+import (
+	"fmt"
+)
 
 var intEqual IsEqual = func(key, val any) bool {
 	if key == nil || val == nil {
