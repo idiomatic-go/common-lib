@@ -43,7 +43,7 @@ type Message struct {
 	Content []any
 }
 
-type Credentials func() (username string, password string)
+type Credentials func() (username string, password string, err error)
 
 // Startup
 type Envelope struct {
