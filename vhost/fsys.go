@@ -4,27 +4,27 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"github.com/idiomatic-go/common-lib/util"
 	"io/fs"
 	"strings"
 )
 
 const (
 	//token = byte(' ')
-	eol     = byte('\n')
-	comment = "//"
-	space   = " "
+	eol       = byte('\n')
+	comment   = "//"
+	delimiter = ":"
+	root      = "resource"
 )
 
-type VariableLookup = func(name string) (value string, err error)
+type LookupVariable = func(name string) (value string, err error)
+
+var lookupTest = func(name string) (string, error) { return "test", nil }
 
 var fsys fs.FS
-var dir = "resource"
 
-func MountFS(f fs.FS, directory string) {
+func MountFS(f fs.FS) {
 	fsys = f
-	if len(directory) > 0 {
-		dir = directory
-	}
 }
 
 func ReadFile(path string) ([]byte, error) {
@@ -34,15 +34,25 @@ func ReadFile(path string) ([]byte, error) {
 	if fsys == nil {
 		return nil, errors.New("invalid argument : file system has not been mounted")
 	}
-	s, err := ExpandTemplate(path, variableLookup)
+	s, err := util.ExpandTemplate(path, lookupEnv)
 	if err != nil {
 		return nil, err
 	}
-	return fs.ReadFile(fsys, s)
+	buf, err1 := fs.ReadFile(fsys, root+"/"+s)
+	// If no error or there was no template, then return
+	if err1 == nil || s == path {
+		return buf, err1
+	}
+	// Override to determine if a template was used.
+	s, err1 = util.ExpandTemplate(path, lookupTest)
+	if err1 != nil {
+		return nil, err1
+	}
+	return fs.ReadFile(fsys, root+"/"+s)
 }
 
-func ReadMap(name string) (map[string]string, error) {
-	buf, err := ReadFile(name)
+func ReadMap(path string) (map[string]string, error) {
+	buf, err := ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
@@ -55,15 +65,25 @@ func ParseBuffer(buf []byte) (map[string]string, error) {
 		return m, nil
 	}
 	buffer := bytes.NewBuffer(buf)
-	var line string
+	var line []byte //string
 	var err error
-	for line, err = buffer.ReadString(eol); err != nil; {
-		k, v, err0 := ParseLine(line)
+	var text string
+	for line, err = buffer.ReadBytes('\n'); ; {
+		l := len(line)
+		if line[l-2] == byte('\r') {
+			text = string(line[:l-2])
+		} else {
+			text = string(line[:l-1])
+		}
+		k, v, err0 := ParseLine(text)
 		if err0 != nil {
 			return m, err0
 		}
 		if len(k) > 0 {
 			m[k] = v
+		}
+		if err != nil && err.Error() == "EOF" {
+			break
 		}
 	}
 	return m, nil
@@ -77,21 +97,16 @@ func ParseLine(line string) (string, string, error) {
 	if len(line) == 0 || strings.HasPrefix(line, comment) {
 		return "", "", nil
 	}
-	i := strings.Index(line, space)
+	i := strings.Index(line, delimiter)
 	if i == -1 {
-		return "", "", fmt.Errorf("invalid argument : line does not contain the space ' ' delimeter : [%v]", line)
+		return "", "", fmt.Errorf("invalid argument : line does not contain the ':' delimeter : [%v]", line)
 	}
-	//key := line[:i]
-	//val := line[i+1:]
-	//m[strings.TrimSpace(key)] = strings.TrimLeft(val, " ")
-	return strings.TrimSpace(line[:i]), strings.TrimLeft(line[i:], " "), nil
+	key := line[:i]
+	val := line[i+1:]
+	return strings.TrimSpace(key), strings.TrimLeft(val, " "), nil
 }
 
-func ExpandTemplate(path string, lookup VariableLookup) (string, error) {
-	return path, nil
-}
-
-func variableLookup(name string) (string, error) {
+var lookupEnv LookupVariable = func(name string) (string, error) {
 	switch name {
 	case ENV_TEMPLATE_VAR:
 		return GetEnv(), nil

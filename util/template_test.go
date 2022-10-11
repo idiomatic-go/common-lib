@@ -48,6 +48,12 @@ func ExampleExpandTemplateInvalid() {
 	fmt.Printf("Path Input  : %v\n", s)
 	fmt.Printf("Path Output : %v %v\n", path, err0)
 
+	// Mismatched delimiters - embedded begin delimiter
+	s = "resources/test-file-name{env}and{next{}{last}.txt"
+	path, err0 = ExpandTemplate(s, lookupVariable)
+	fmt.Printf("Path Input  : %v\n", s)
+	fmt.Printf("Path Output : %v %v\n", path, err0)
+
 	//Output:
 	// Path Input  : test
 	// Path Output : invalid argument : VariableLookup() is nil
