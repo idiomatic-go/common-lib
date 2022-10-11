@@ -5,6 +5,10 @@ import (
 	"strings"
 )
 
+func GetEnv() string {
+	return os.Getenv(RuntimeEnvKey)
+}
+
 //var IsDevEnv EnvValid = func() bool {
 //	return IsEnvMatch(RUNTIME_ENV, DEV_ENV)
 //}

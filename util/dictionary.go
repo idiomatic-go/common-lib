@@ -1,51 +1,51 @@
 package util
 
-import "sync"
-
 type DictionaryValue int32
 
 const (
 	DictionaryValueNotFound = DictionaryValue(-1)
 )
 
+// InvertedDictionary - used for inverted content, where key = string, value = id.
+////                    The im is used for normal lookups key = id, value = string
 type InvertedDictionary struct {
-	threadSafe   bool
 	m            map[string]DictionaryValue
+	im           map[DictionaryValue]string
 	currentValue DictionaryValue
-	mu           sync.RWMutex
 }
 
-func CreateInvertedDictionary(threadSafe bool) *InvertedDictionary {
-	return &InvertedDictionary{threadSafe: threadSafe, m: make(map[string]DictionaryValue, 1), currentValue: DictionaryValueNotFound}
+func CreateInvertedDictionary() *InvertedDictionary {
+	return &InvertedDictionary{m: make(map[string]DictionaryValue, 1), im: nil, currentValue: DictionaryValueNotFound}
 }
 
 func (d *InvertedDictionary) IsEmpty() bool {
-	if d.threadSafe {
-		d.mu.RLock()
-		defer d.mu.RUnlock()
-	}
 	return d.currentValue == DictionaryValueNotFound
 }
 
 func (d *InvertedDictionary) Lookup(key string) DictionaryValue {
-	if d.threadSafe {
-		d.mu.RLock()
-		defer d.mu.RUnlock()
-	}
 	if v, ok := d.m[key]; ok {
 		return v
 	}
 	return DictionaryValueNotFound
 }
 
+func (d *InvertedDictionary) InverseLookup(value DictionaryValue) (string, bool) {
+	if d.im == nil {
+		d.im = make(map[DictionaryValue]string, 1)
+		for k, v := range d.m {
+			d.im[v] = k
+		}
+	}
+	if key, ok := d.im[value]; ok {
+		return key, true
+	}
+	return "", false
+}
+
 func (d *InvertedDictionary) Add(key string) DictionaryValue {
 	v := d.Lookup(key)
 	if v != DictionaryValueNotFound {
 		return v
-	}
-	if d.threadSafe {
-		d.mu.Lock()
-		defer d.mu.Unlock()
 	}
 	d.currentValue++
 	d.m[key] = d.currentValue

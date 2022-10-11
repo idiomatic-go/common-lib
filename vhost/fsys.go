@@ -15,6 +15,8 @@ const (
 	space   = " "
 )
 
+type VariableLookup = func(name string) (value string, err error)
+
 var fsys fs.FS
 var dir = "resource"
 
@@ -25,14 +27,18 @@ func MountFS(f fs.FS, directory string) {
 	}
 }
 
-func ReadFile(name string) ([]byte, error) {
-	if len(name) == 0 {
-		return nil, errors.New("invalid argument : file name is empty")
+func ReadFile(path string) ([]byte, error) {
+	if path == "" {
+		return nil, errors.New("invalid argument : path is empty")
 	}
 	if fsys == nil {
 		return nil, errors.New("invalid argument : file system has not been mounted")
 	}
-	return fs.ReadFile(fsys, dir+"/"+name)
+	s, err := ExpandTemplate(path, variableLookup)
+	if err != nil {
+		return nil, err
+	}
+	return fs.ReadFile(fsys, s)
 }
 
 func ReadMap(name string) (map[string]string, error) {
@@ -79,4 +85,16 @@ func ParseLine(line string) (string, string, error) {
 	//val := line[i+1:]
 	//m[strings.TrimSpace(key)] = strings.TrimLeft(val, " ")
 	return strings.TrimSpace(line[:i]), strings.TrimLeft(line[i:], " "), nil
+}
+
+func ExpandTemplate(path string, lookup VariableLookup) (string, error) {
+	return path, nil
+}
+
+func variableLookup(name string) (string, error) {
+	switch name {
+	case ENV_TEMPLATE_VAR:
+		return GetEnv(), nil
+	}
+	return "", errors.New(fmt.Sprintf("invalid argument : template variable is invalid: %v", name))
 }

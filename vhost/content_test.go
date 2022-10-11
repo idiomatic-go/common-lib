@@ -5,7 +5,7 @@ import (
 )
 
 func ExampleAccessCredentialsSuccess() {
-	msg := CreateCredentialsMessage("event", "sender", Credentials(func() (username string, password string) { return "", "" }))
+	msg := CreateCredentialsMessage("event", "sender", Credentials(func() (username string, password string, err error) { return "", "", nil }))
 	fmt.Printf("Credentials Fn : %v\n", AccessCredentials(&msg) != nil)
 
 	//Output:
@@ -15,7 +15,7 @@ func ExampleAccessCredentialsSuccess() {
 // Need to cast as adding content via any
 func ExampleAccessCredentialsSlice() {
 	msg := CreateMessage("event", "sender", "first content")
-	AddContent(&msg, Credentials(func() (username string, password string) { return "", "" }))
+	AddContent(&msg, Credentials(func() (username string, password string, err error) { return "", "", nil }))
 	fmt.Printf("Credentials Fn : %v\n", AccessCredentials(&msg) != nil)
 
 	//Output:
