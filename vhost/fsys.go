@@ -1,10 +1,12 @@
 package vhost
 
 import (
+	"bufio"
 	"bytes"
 	"errors"
 	"fmt"
 	"github.com/idiomatic-go/common-lib/util"
+	"io"
 	"io/fs"
 	"strings"
 )
@@ -64,26 +66,25 @@ func ParseBuffer(buf []byte) (map[string]string, error) {
 	if len(buf) == 0 {
 		return m, nil
 	}
-	buffer := bytes.NewBuffer(buf)
-	var line []byte //string
+	r := bytes.NewReader(buf)
+	reader := bufio.NewReader(r)
+	var line string
 	var err error
-	var text string
-	for line, err = buffer.ReadBytes('\n'); ; {
-		l := len(line)
-		if line[l-2] == byte('\r') {
-			text = string(line[:l-2])
-		} else {
-			text = string(line[:l-1])
-		}
-		k, v, err0 := ParseLine(text)
+	for {
+		line, err = reader.ReadString('\n')
+		k, v, err0 := ParseLine(line)
 		if err0 != nil {
 			return m, err0
 		}
 		if len(k) > 0 {
 			m[k] = v
 		}
-		if err != nil && err.Error() == "EOF" {
+		if err == io.EOF {
 			break
+		} else {
+			if err != nil {
+				break
+			}
 		}
 	}
 	return m, nil
