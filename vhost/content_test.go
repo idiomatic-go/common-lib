@@ -14,7 +14,7 @@ func ExampleAccessCredentialsSuccess() {
 
 // Need to cast as adding content via any
 func ExampleAccessCredentialsSlice() {
-	msg := CreateMessage("event", "sender", "first content")
+	msg := CreateMessage("event", "sender", 0, "first content")
 	AddContent(&msg, Credentials(func() (username string, password string, err error) { return "", "", nil }))
 	fmt.Printf("Credentials Fn : %v\n", AccessCredentials(&msg) != nil)
 

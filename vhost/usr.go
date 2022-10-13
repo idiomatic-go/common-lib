@@ -30,17 +30,25 @@ func OverrideIsDevEnv(fn EnvValid) {
 }
 
 // Messaging
+var MaxStartupIterations = 4
+
 const (
 	StartupEvent  = "event:startup"
 	ShutdownEvent = "event:shutdown"
 	ACKEvent      = "event:ack"
 	ErrorEvent    = "event:error"
-	HostSender    = "vhost"
+	HostFrom      = "vhost"
+
+	StatusEmpty      = int32(0)
+	StatusInProgress = int32(1)
+	StatusSuccessful = int32(2)
+	StatusFailure    = int32(3)
 )
 
 type Message struct {
 	Event   string
-	Sender  string
+	From    string // Uri of package that is sending the message
+	Status  int32
 	Content []any
 }
 

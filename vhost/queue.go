@@ -30,11 +30,11 @@ func (q *Queue) IsErrorEvent() bool {
 	return false
 }
 
-func (q *Queue) Exists(uri string) bool {
+func (q *Queue) Exists(from string) bool {
 	q.mu.Lock()
 	defer q.mu.Unlock()
 	for _, m := range q.msgs {
-		if uri == m.Sender {
+		if from == m.From {
 			return true
 		}
 	}

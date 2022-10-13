@@ -2,7 +2,7 @@ package vhost
 
 // Credentials function methds
 func CreateCredentialsMessage(event, sender string, fn Credentials) Message {
-	return CreateMessage(event, sender, fn)
+	return CreateMessage(event, sender, 0, fn)
 }
 
 func AccessCredentials(msg *Message) Credentials {
