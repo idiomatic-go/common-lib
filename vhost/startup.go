@@ -3,9 +3,13 @@ package vhost
 import (
 	"errors"
 	"fmt"
+	"github.com/idiomatic-go/common-lib/util"
 	"log"
 	"time"
 )
+
+type currentWork func(sent util.List, toSend messageMap, current messageMap, dir *syncMap) error
+type toSend func(sent util.List, entry *entry, dir *syncMap) (bool, error)
 
 // Response methods
 var resp chan Message
@@ -26,7 +30,7 @@ func Startup(ticks int, msgs envelopeMap) bool {
 	// Create the toSend and sent maps
 	log.Printf("Startup begin with iteration seconds: %v", ticks)
 	toSend := createToSend(msgs)
-	sent := make(list)
+	sent := make(util.List)
 	var count = 1
 	item := struct{}{}
 	current := make(messageMap)
@@ -84,11 +88,11 @@ func Startup(ticks int, msgs envelopeMap) bool {
 	return true
 }
 
-func getCurrentWork(sent list, toSend messageMap, current messageMap, dir *syncMap) error {
+var getCurrentWork = func(sent util.List, toSend messageMap, current messageMap, dir *syncMap) error {
 	for k := range toSend {
 		e := dir.get(k)
 		if e == nil {
-			return errors.New(fmt.Sprintf("directory entry does not exist for package Uri: %v", k))
+			return errors.New(fmt.Sprintf("directory entry does not exist for package uri: %v", k))
 		}
 		ok, err := validToSend(sent, e, dir)
 		if err != nil {
@@ -102,7 +106,7 @@ func getCurrentWork(sent list, toSend messageMap, current messageMap, dir *syncM
 	return nil
 }
 
-func validToSend(sent list, entry *entry, dir *syncMap) (bool, error) {
+var validToSend = func(sent util.List, entry *entry, dir *syncMap) (bool, error) {
 	if entry == nil || sent == nil || dir == nil {
 		return false, errors.New("invalid argument for validToSend() : one of list, entry or directory is nil")
 	}
@@ -112,9 +116,7 @@ func validToSend(sent list, entry *entry, dir *syncMap) (bool, error) {
 	}
 	// Need to determine if all dependencies have been sent and are successful
 	for _, uri := range entry.dependents {
-		_, ok := sent[uri]
-		// Not in sent list
-		if !ok {
+		if !sent.Contains(uri) {
 			return false, nil
 		}
 		status, ok := dir.getStatus(uri)

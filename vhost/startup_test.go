@@ -1,7 +1,9 @@
 package vhost
 
 import (
+	"errors"
 	"fmt"
+	"github.com/idiomatic-go/common-lib/util"
 	"time"
 )
 
@@ -22,11 +24,11 @@ func _ExampleStatusUpdate() {
 	// Entry : &{progresql:main <nil> [uri1 uri2] 2}
 }
 
-func ExampleValidToSend() {
+func _ExampleValidToSend() {
 	//item := struct{}{}
 	depUri := "test:dependent"
 	uri := "progresql:main"
-	sent := make(list)
+	sent := make(util.List)
 	dir := createSyncMap()
 
 	// Test nil inputs
@@ -73,12 +75,55 @@ func ExampleValidToSend() {
 	fmt.Printf("Test - {All Dependents In Sent List And Startup Successful} : %v %v\n", ok, err)
 
 	//Output:
-	// ToSend : false invalid argument for validToSend() : one of list, entry or directory is nil
-	// ToSend [Empty Dependents]: true <nil>
-	// ToSend [Dependents Not In Sent List]: false <nil>
-	// ToSend [One Dependent In Sent List - Target Package Not Found]: false dependency not fufilled, package entry not found: test:dependent
-	// ToSend [One Dependent In Sent List - Target Package Not Started]: false dependency not fufilled, startup has failed for package: test:dependent
-	// ToSend [All Dependents In Sent List And Startup Successful]: true <nil>
-	// ToSend [One Dependent In Sent List]: false dependency not fufilled, startup has failed for package: test:dependent
+	// Test - {nil} : false invalid argument for validToSend() : one of list, entry or directory is nil
+	// Test - {Empty Dependents} : true <nil>
+	// Test - {Dependents Not In Sent List} : false <nil>
+	// Test - {One Dependent In Sent List - Target Package Not Found} : false dependency not fufilled, package entry not found: test:dependent
+	// Test - {One Dependent In Sent List - Target Package Not Started} : false dependency not fufilled, startup has failed for package: test:dependent
+	// Test - {All Dependents In Sent List And Startup Successful} : true <nil>
 
+}
+
+func _ExampleGetCurrentWorkError() {
+	uri := "progresql:main"
+	sent := make(util.List)
+	dir := createSyncMap()
+	toSend := messageMap{uri: {Event: "test", From: ""}}
+	current := messageMap{}
+
+	err := getCurrentWork(sent, toSend, current, dir)
+	fmt.Printf("Test - {empty directory} : %v\n", err)
+
+	e := &entry{uri: uri, c: nil, dependents: nil, startupStatus: 0}
+	dir.put(e)
+	validToSend = func(sent util.List, entry *entry, dir *syncMap) (bool, error) {
+		return false, errors.New("validToSend error ")
+	}
+
+	err = getCurrentWork(sent, toSend, current, dir)
+	fmt.Printf("Test - {validToSend error} : %v\n", err)
+
+	//Output:
+	// Test - {empty directory} : directory entry does not exist for package uri: progresql:main
+	// Test - {validToSend error} : validToSend error
+
+}
+
+func ExampleGetCurrentWork() {
+	uri := "progresql:main"
+	sent := make(util.List)
+	dir := createSyncMap()
+	toSend := messageMap{uri: {Event: StartupEvent, From: HostFrom}}
+	current := messageMap{}
+
+	e := &entry{uri: uri, c: nil, dependents: nil, startupStatus: StatusEmpty}
+	dir.put(e)
+	validToSend = func(sent util.List, entry *entry, dir *syncMap) (bool, error) {
+		return true, nil
+	}
+	err := getCurrentWork(sent, toSend, current, dir)
+	fmt.Printf("Test - {empty directory} : %v %v %v\n", err, current, toSend)
+
+	//Output:
+	// fail
 }

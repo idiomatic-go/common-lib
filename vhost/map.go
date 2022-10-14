@@ -2,12 +2,6 @@ package vhost
 
 import "sync"
 
-type list map[string]struct{}
-
-func (l list) Add(s string) {
-	l[s] = struct{}{}
-}
-
 type messageMap map[string]Message
 
 type envelopeMap map[string]Envelope
