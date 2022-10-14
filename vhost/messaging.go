@@ -16,7 +16,7 @@ func RegisterPackage(uri string, c chan Message, dependents []string) error {
 	if c == nil {
 		return fmt.Errorf("invalid argument : channel is nil")
 	}
-	directory.put(uri, &entry{uri: uri, c: c, dependents: dependents})
+	directory.put(&entry{uri: uri, c: c, dependents: dependents})
 	return nil
 }
 
@@ -28,7 +28,7 @@ func UnregisterPackage(uri string) {
 	entry := directory.get(uri)
 	if entry != nil {
 		close(entry.c)
-		directory.put(uri, nil)
+		delete(directory.m, uri)
 	}
 }
 

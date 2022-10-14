@@ -117,7 +117,11 @@ func validToSend(sent list, entry *entry, dir *syncMap) (bool, error) {
 		if !ok {
 			return false, nil
 		}
-		if !dir.isStartupSuccessful(uri) {
+		status, ok := dir.getStatus(uri)
+		if !ok {
+			return false, errors.New(fmt.Sprintf("dependency not fufilled, package entry not found: %v", uri))
+		}
+		if status != StatusSuccessful {
 			return false, errors.New(fmt.Sprintf("dependency not fufilled, startup has failed for package: %v", uri))
 		}
 	}

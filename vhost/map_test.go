@@ -10,7 +10,7 @@ func ExampleSyncMapInit() {
 	fmt.Printf("Entry : %v\n", d2)
 
 	entry := &entry{uri: uri, c: nil, dependents: []string{"uri1", "uri2"}, startupStatus: 100}
-	directory.put(uri, entry)
+	directory.put(entry)
 	fmt.Printf("Count : %v\n", directory.count())
 	d2 = directory.get(uri)
 	fmt.Printf("Entry : %v\n", d2)
@@ -29,7 +29,7 @@ func ExampleSyncMapStatus() {
 	m := &syncMap{m: make(map[string]*entry)}
 
 	entry := &entry{uri: uri}
-	m.put(uri, entry)
+	m.put(entry)
 	e2 := m.get(uri)
 	fmt.Printf("Entry : %v\n", e2)
 
@@ -75,17 +75,17 @@ func _ExampleSyncMapDirectoryStatus() {
 	m := &syncMap{m: make(map[string]*entry)}
 
 	e := &entry{uri: uri, startupStatus: StatusSuccessful}
-	m.put(uri, e)
+	m.put(e)
 	e2 := m.get(uri)
 	fmt.Printf("Entry [%v] : %v\n", uri, e2)
 
 	e = &entry{uri: "urn:test2", startupStatus: StatusFailure}
-	m.put("urn:test2", e)
+	m.put(e)
 	e2 = m.get("urn:test2")
 	fmt.Printf("Entry [%v] : %v\n", "urn:test2", e2)
 
 	e = &entry{uri: "urn:test3", startupStatus: StatusEmpty}
-	m.put("urn:test3", e)
+	m.put(e)
 	e2 = m.get("urn:test3")
 	fmt.Printf("Entry [%v] : %v\n", "urn:test3", e2)
 

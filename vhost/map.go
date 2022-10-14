@@ -4,6 +4,10 @@ import "sync"
 
 type list map[string]struct{}
 
+func (l list) Add(s string) {
+	l[s] = struct{}{}
+}
+
 type messageMap map[string]Message
 
 type envelopeMap map[string]Envelope
@@ -32,10 +36,14 @@ func (s *syncMap) data() map[string]*entry {
 	return s.m
 }
 
-func (s *syncMap) put(uri string, e *entry) {
+func (s *syncMap) put(e *entry) bool {
+	if e == nil || e.uri == "" {
+		return false
+	}
 	s.mu.Lock()
-	s.m[uri] = e
+	s.m[e.uri] = e
 	s.mu.Unlock()
+	return true
 }
 
 func (s *syncMap) get(uri string) *entry {
@@ -108,5 +116,5 @@ func createSyncMap() *syncMap {
 var directory *syncMap
 
 func init() {
-	directory = &syncMap{m: make(map[string]*entry)}
+	directory = createSyncMap()
 }
