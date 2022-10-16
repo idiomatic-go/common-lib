@@ -33,20 +33,20 @@ func ExampleSyncMapStatus() {
 	e2 := m.get(uri)
 	fmt.Printf("Entry : %v\n", e2)
 
-	status, ok := m.getStatus(uri)
-	fmt.Printf("Get Status [%v]: %v  %v\n", uri, status, ok)
+	status := m.getStatus(uri)
+	fmt.Printf("Get Status [%v]: %v\n", uri, status)
 
-	status, ok = m.getStatus("invalid")
-	fmt.Printf("Get Status [%v]: %v  %v\n", "invalid", status, ok)
+	status = m.getStatus("invalid")
+	fmt.Printf("Get Status [%v]: %v\n", "invalid", status)
 
-	ok = m.setStatus(uri, StatusFailure)
+	ok := m.setStatus(uri, StatusFailure)
 	fmt.Printf("Set Status [%v] : %v %v\n", uri, StatusFailure, ok)
 
 	ok = m.setStatus("invalid", StatusFailure)
 	fmt.Printf("Set Status [%v] : %v %v\n", "invalid", StatusFailure, ok)
 
-	status, ok = m.getStatus(uri)
-	fmt.Printf("Get Status [%v]: %v  %v\n", uri, status, ok)
+	status = m.getStatus(uri)
+	fmt.Printf("Get Status [%v]: %v\n", uri, status)
 
 	ok = m.isStartupSuccessful(uri)
 	fmt.Printf("Startup Successful [%v]: %v\n", uri, ok)

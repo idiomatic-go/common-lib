@@ -46,6 +46,7 @@ const (
 )
 
 type Message struct {
+	To      string // Uri of the destination package
 	Event   string
 	From    string // Uri of package that is sending the message
 	Status  int32
@@ -53,9 +54,3 @@ type Message struct {
 }
 
 type Credentials func() (username string, password string, err error)
-
-// Envelope - struct for startup
-type Envelope struct {
-	Uri string
-	Msg Message
-}

@@ -32,8 +32,8 @@ func UnregisterPackage(uri string) {
 	}
 }
 
-func CreateMessage(event, from string, status int, content any) Message {
-	msg := Message{Event: event, From: from, Status: int32(status), Content: nil}
+func CreateMessage(to, event, from string, status int32, content any) Message {
+	msg := Message{To: to, Event: event, From: from, Status: int32(status), Content: nil}
 	if content != nil {
 		AddContent(&msg, content)
 	}
@@ -47,21 +47,21 @@ func AddContent(msg *Message, content any) {
 	msg.Content = append(msg.Content, content)
 }
 
-func SendMessage(to string, msg Message) error {
-	e := directory.get(to)
+func SendMessage(msg Message) error {
+	e := directory.get(msg.To)
 	if e == nil {
-		return fmt.Errorf("invalid argument : to uri invalid %v", to)
+		return fmt.Errorf("invalid argument : to uri invalid %v", msg.To)
 	}
 	e.c <- msg
 	return nil
 }
 
 func SendStartupMessage(to, from string) error {
-	return SendMessage(to, Message{Event: StartupEvent, From: from})
+	return SendMessage(Message{To: to, Event: StartupEvent, From: from})
 }
 
 func SendShutdownMessage(to, from string) error {
-	return SendMessage(to, Message{Event: ShutdownEvent, From: from})
+	return SendMessage(Message{To: to, Event: ShutdownEvent, From: from})
 }
 
 // SendResponse - response processing

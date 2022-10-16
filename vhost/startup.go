@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"github.com/idiomatic-go/common-lib/util"
 	"log"
-	"time"
 )
 
+type work func(sent util.List, toSend messageMap, current messageMap, dir *syncMap) error
 type currentWork func(sent util.List, toSend messageMap, current messageMap, dir *syncMap) error
 type toSend func(sent util.List, entry *entry, dir *syncMap) (bool, error)
 
@@ -22,77 +22,64 @@ func init() {
 }
 
 // Startup - virtual host startup
-func Startup(ticks int, msgs envelopeMap) bool {
+func Startup(ticks int, override messageMap) bool {
 	packages := directory.count()
 	if packages == 0 {
 		return true
 	}
-	// Create the toSend and sent maps
-	log.Printf("Startup begin with iteration seconds: %v", ticks)
-	toSend := createToSend(msgs)
-	sent := make(util.List)
-	var count = 1
-	item := struct{}{}
-	current := make(messageMap)
-	for {
-		if count > MaxStartupIterations {
-			log.Printf("Startup failure: max iterations excedded: %v", count)
-			return false
-		}
-		log.Printf("Startup iteration: %v", count)
-		if count == 1 || len(current) == 0 {
-			err := getCurrentWork(sent, toSend, current, directory)
-			// This is either a startup message with a directory entry that does not exist, or a startup failure
-			// on a dependent package
-			if err != nil {
-				log.Printf("Startup failure: getting current work: %v", err)
-				return false
-			}
-			// Did not find any messages to send, but there are still messages waiting in the to send map
-			if len(current) == 0 && len(toSend) > 0 {
-				log.Printf("Startup failure: %v", "unable to find items to work, verify cyclic dependencies")
-				return false
-			}
-			// Process the current work map
-			for k := range current {
-				if !directory.setStatus(k, StatusInProgress) {
-					log.Printf("Startup failure: unable to set package %v startup status", k)
-					return false
-				}
-				sent[k] = item
-				SendMessage(k, toSend[k])
-			}
-		}
-		time.Sleep(time.Second * time.Duration(ticks))
-		// Check the startup status of the directory, continue if a package is still in startup
-		uri := directory.startupInProgress()
-		if uri != "" {
-			log.Printf("Startup still in progress continuing: %v", uri)
-			count++
-			continue
-		}
-		// All the current messages have been sent, so lets check for failure.
-		fail := directory.startupFailure()
-		if fail != "" {
-			log.Printf("Startup failure status on: %v", fail)
-			return false
-		}
-		// Success so empty current work map and check for completion
-		empty(current)
-		if len(toSend) == 0 {
-			log.Printf("Startup successful: %v", count)
-			return true
-		}
-		count++
+	toSend := createToSend(override, directory)
+	err := validateToSend(toSend, directory)
+	if err != nil {
+		log.Printf("%v", err)
+		return false
 	}
-	return true
+	return startupProcess(ticks, toSend)
 }
 
-var getCurrentWork = func(sent util.List, toSend messageMap, current messageMap, dir *syncMap) error {
+func createToSend(msgs messageMap, dir *syncMap) messageMap {
+	m := make(messageMap)
+	for k := range dir.data() {
+		if msgs != nil {
+			message, ok := msgs[k]
+			if ok {
+				message.Event = StartupEvent
+				message.From = HostFrom
+				message.Status = StatusEmpty
+				m[k] = message
+				continue
+			}
+		}
+		e := dir.get(k)
+		if e != nil {
+			m[k] = CreateMessage(e.uri, StartupEvent, HostFrom, StatusEmpty, nil)
+		} else {
+			m[k] = CreateMessage("invalid:uri", StartupEvent, HostFrom, StatusEmpty, nil)
+		}
+	}
+	return m
+}
+
+func validateToSend(toSend messageMap, dir *syncMap) error {
 	for k := range toSend {
 		e := dir.get(k)
 		if e == nil {
 			return errors.New(fmt.Sprintf("directory entry does not exist for package uri: %v", k))
+		}
+		for _, k2 := range e.dependents {
+			e := dir.get(k2)
+			if e == nil {
+				return errors.New(fmt.Sprintf("directory entry does not exist for dependent package uri: %v", k2))
+			}
+		}
+	}
+	return nil
+}
+
+var getCurrentWork currentWork = func(sent util.List, toSend messageMap, current messageMap, dir *syncMap) error {
+	for k := range toSend {
+		e := dir.get(k)
+		if e == nil {
+			continue
 		}
 		ok, err := validToSend(sent, e, dir)
 		if err != nil {
@@ -106,10 +93,7 @@ var getCurrentWork = func(sent util.List, toSend messageMap, current messageMap,
 	return nil
 }
 
-var validToSend = func(sent util.List, entry *entry, dir *syncMap) (bool, error) {
-	if entry == nil || sent == nil || dir == nil {
-		return false, errors.New("invalid argument for validToSend() : one of list, entry or directory is nil")
-	}
+var validToSend toSend = func(sent util.List, entry *entry, dir *syncMap) (bool, error) {
 	// No dependencies, so can be sent
 	if len(entry.dependents) == 0 {
 		return true, nil
@@ -119,32 +103,11 @@ var validToSend = func(sent util.List, entry *entry, dir *syncMap) (bool, error)
 		if !sent.Contains(uri) {
 			return false, nil
 		}
-		status, ok := dir.getStatus(uri)
-		if !ok {
-			return false, errors.New(fmt.Sprintf("dependency not fufilled, package entry not found: %v", uri))
-		}
-		if status != StatusSuccessful {
+		if !dir.isStartupSuccessful(uri) {
 			return false, errors.New(fmt.Sprintf("dependency not fufilled, startup has failed for package: %v", uri))
 		}
 	}
 	return true, nil
-}
-
-func createToSend(msgs envelopeMap) messageMap {
-	m := make(messageMap)
-	for k := range directory.data() {
-		if msgs != nil {
-			env, ok := msgs[k]
-			if ok {
-				env.Msg.Event = StartupEvent
-				env.Msg.From = HostFrom
-				m[k] = env.Msg
-				continue
-			}
-		}
-		m[k] = CreateMessage(StartupEvent, HostFrom, 0, nil)
-	}
-	return m
 }
 
 func receive(q *Queue) {

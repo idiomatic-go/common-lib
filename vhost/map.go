@@ -4,8 +4,6 @@ import "sync"
 
 type messageMap map[string]Message
 
-type envelopeMap map[string]Envelope
-
 type entry struct {
 	uri           string
 	c             chan Message
@@ -57,16 +55,16 @@ func (s *syncMap) setStatus(uri string, status int32) bool {
 	return true
 }
 
-func (s *syncMap) getStatus(uri string) (int32, bool) {
+func (s *syncMap) getStatus(uri string) int32 {
 	e := s.get(uri)
 	if e == nil {
-		return StatusEmpty, false
+		return StatusEmpty
 	}
-	return e.startupStatus, true
+	return e.startupStatus
 }
 
 func (s *syncMap) isStartupSuccessful(uri string) bool {
-	status, _ := s.getStatus(uri)
+	status := s.getStatus(uri)
 	return status == StatusSuccessful
 }
 

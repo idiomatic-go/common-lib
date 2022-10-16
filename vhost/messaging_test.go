@@ -5,7 +5,7 @@ import (
 )
 
 func ExampleCreateMessage() {
-	msg := CreateMessage("event", "sender", 0, "content")
+	msg := CreateMessage("to:uri", "event", "sender", 0, "content")
 	fmt.Printf("Content : %v", len(msg.Content))
 
 	//Output:
