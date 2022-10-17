@@ -52,6 +52,21 @@ func SendMessage(msg Message) error {
 	if e == nil {
 		return fmt.Errorf("invalid argument : to uri invalid %v", msg.To)
 	}
+	if e.c == nil {
+		return fmt.Errorf("invalid initialization : channel is nil %v", msg.To)
+	}
+	e.c <- msg
+	return nil
+}
+
+func SendMessageWithDirectory(msg Message, dir *syncMap) error {
+	e := dir.get(msg.To)
+	if e == nil {
+		return fmt.Errorf("invalid argument : to uri invalid %v", msg.To)
+	}
+	if e.c == nil {
+		return fmt.Errorf("invalid initialization : channel is nil %v", msg.To)
+	}
 	e.c <- msg
 	return nil
 }

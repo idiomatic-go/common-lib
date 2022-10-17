@@ -8,8 +8,8 @@ import (
 )
 
 type work func(sent util.List, toSend messageMap, current messageMap, dir *syncMap) error
-type currentWork func(sent util.List, toSend messageMap, current messageMap, dir *syncMap) error
-type toSend func(sent util.List, entry *entry, dir *syncMap) (bool, error)
+type currentWork func(sent util.List, toSend messageMap, current messageMap, dir *syncMap) bool
+type toSend func(sent util.List, entry *entry) bool
 
 // Response methods
 var resp chan Message
@@ -75,39 +75,35 @@ func validateToSend(toSend messageMap, dir *syncMap) error {
 	return nil
 }
 
-var getCurrentWork currentWork = func(sent util.List, toSend messageMap, current messageMap, dir *syncMap) error {
+var getCurrentWork currentWork = func(sent util.List, toSend messageMap, current messageMap, dir *syncMap) bool {
+	valid := false
 	for k := range toSend {
 		e := dir.get(k)
 		if e == nil {
 			continue
 		}
-		ok, err := validToSend(sent, e, dir)
-		if err != nil {
-			return err
-		}
+		ok := validToSend(sent, e)
 		if ok {
+			valid = true
 			current[k] = toSend[k]
 			delete(toSend, k)
 		}
 	}
-	return nil
+	return valid
 }
 
-var validToSend toSend = func(sent util.List, entry *entry, dir *syncMap) (bool, error) {
+var validToSend toSend = func(sent util.List, entry *entry) bool {
 	// No dependencies, so can be sent
 	if len(entry.dependents) == 0 {
-		return true, nil
+		return true
 	}
 	// Need to determine if all dependencies have been sent and are successful
 	for _, uri := range entry.dependents {
 		if !sent.Contains(uri) {
-			return false, nil
-		}
-		if !dir.isStartupSuccessful(uri) {
-			return false, errors.New(fmt.Sprintf("dependency not fufilled, startup has failed for package: %v", uri))
+			return false
 		}
 	}
-	return true, nil
+	return true
 }
 
 func receive(q *Queue) {

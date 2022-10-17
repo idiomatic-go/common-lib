@@ -1,7 +1,6 @@
 package vhost
 
 import (
-	"errors"
 	"fmt"
 	"github.com/idiomatic-go/common-lib/util"
 	"time"
@@ -78,19 +77,19 @@ func ExampleValidateToSend() {
 
 func ExampleValidToSend() {
 	depUri := "test:dependent"
+	testUri := "test:uri2"
 	uri := "progresql:main"
 	sent := make(util.List)
-	dir := createSyncMap()
 
 	// Test entry with no dependents, should be able to send
 	e := &entry{uri: uri, c: nil, dependents: nil, startupStatus: 0}
-	ok, err := validToSend(sent, e, dir)
-	fmt.Printf("Test - {Empty Dependents} : %v %v\n", ok, err)
+	ok := validToSend(sent, e)
+	fmt.Printf("Test - {Empty Dependents} : %v\n", ok)
 
 	// Test entry with dependents not in sent list
 	e = &entry{uri: uri, c: nil, dependents: []string{depUri, "test:uri2"}, startupStatus: 0}
-	ok, err = validToSend(sent, e, dir)
-	fmt.Printf("Test - {Dependents Not In Sent List} : %v %v\n", ok, err)
+	ok = validToSend(sent, e)
+	fmt.Printf("Test - {Dependents Not In Sent List} : %v\n", ok)
 
 	// Test entry with one dependent in sent list, target package not found
 	//e = &entry{uri: uri, c: nil, dependents: []string{depUri}, startupStatus: 0}
@@ -99,37 +98,36 @@ func ExampleValidToSend() {
 	//fmt.Printf("Test - {One Dependent In Sent List - Target Package Not Found} : %v %v\n", ok, err)
 
 	// Start the target package
-	e = &entry{uri: depUri, c: nil, dependents: nil, startupStatus: StatusEmpty}
-	dir.put(e)
+	//e = &entry{uri: depUri, c: nil, dependents: nil, startupStatus: StatusEmpty}
+	//dir.put(e)
 
 	// Test entry with one dependent in sent list, target package not started
-	e = &entry{uri: uri, c: nil, dependents: []string{depUri}, startupStatus: 0}
-	sent.Add("test:dependent")
-	ok, err = validToSend(sent, e, dir)
-	fmt.Printf("Test - {One Dependent In Sent List - Target Package Not Started} : %v %v\n", ok, err)
+	//e = &entry{uri: uri, c: nil, dependents: []string{depUri}, startupStatus: 0}
+	//sent.Add("test:dependent")
+	//ok = validToSend(sent, e, dir)
+	//fmt.Printf("Test - {One Dependent In Sent List - Target Package Not Started} : %vn", ok)
 
 	// Make all dependents valid
-	testUri := "test:uri2"
-	dir.setStatus(depUri, StatusSuccessful)
-	e = &entry{uri: testUri, c: nil, dependents: nil, startupStatus: StatusSuccessful}
-	dir.put(e)
+	//testUri := "test:uri2"
+	//dir.setStatus(depUri, StatusSuccessful)
+	//e = &entry{uri: testUri, c: nil, dependents: nil, startupStatus: StatusSuccessful}
+	//dir.put(e)
 
 	// Test entry with all dependents in sent list
 	e = &entry{uri: uri, c: nil, dependents: []string{depUri, testUri}, startupStatus: 0}
 	sent.Add(depUri)
 	sent.Add(testUri)
-	ok, err = validToSend(sent, e, dir)
-	fmt.Printf("Test - {All Dependents In Sent List And Startup Successful} : %v %v\n", ok, err)
+	ok = validToSend(sent, e)
+	fmt.Printf("Test - {All Dependents In Sent List} : %v\n", ok)
 
 	//Output:
-	// Test - {Empty Dependents} : true <nil>
-	// Test - {Dependents Not In Sent List} : false <nil>
-	// Test - {One Dependent In Sent List - Target Package Not Started} : false dependency not fufilled, startup has failed for package: test:dependent
-	// Test - {All Dependents In Sent List And Startup Successful} : true <nil>
+	// Test - {Empty Dependents} : true
+	// Test - {Dependents Not In Sent List} : false
+	// Test - {All Dependents In Sent List} : true
 
 }
 
-func ExampleGetCurrentWorkError() {
+func _ExampleGetCurrentWorkError() {
 	uri := "progresql:main"
 	sent := make(util.List)
 	dir := createSyncMap()
@@ -141,8 +139,8 @@ func ExampleGetCurrentWorkError() {
 
 	e := &entry{uri: uri, c: nil, dependents: nil, startupStatus: 0}
 	dir.put(e)
-	validToSend = func(sent util.List, entry *entry, dir *syncMap) (bool, error) {
-		return false, errors.New("validToSend error ")
+	validToSend = func(sent util.List, entry *entry) bool {
+		return false
 	}
 
 	err = getCurrentWork(sent, toSend, current, dir)
@@ -167,27 +165,27 @@ func ExampleGetCurrentWork() {
 	e = &entry{uri: uri2, c: nil, dependents: nil, startupStatus: StatusEmpty}
 	dir.put(e)
 
-	validToSend = func(sent util.List, entry *entry, dir *syncMap) (bool, error) {
-		return true, nil
+	validToSend = func(sent util.List, entry *entry) bool {
+		return true
 	}
 	fmt.Printf("Test - {valid}   : current : %v  toSend : %v\n", current, toSend)
-	err := getCurrentWork(sent, toSend, current, dir)
-	fmt.Printf("Test - {valid}   : current : %v  toSend : %v %v\n", current, toSend, err)
+	ok := getCurrentWork(sent, toSend, current, dir)
+	fmt.Printf("Test - {valid}   : current : %v  toSend : %v %v\n", current, toSend, ok)
 
 	toSend = messageMap{uri: {Event: StartupEvent, From: HostFrom}, uri2: {Event: StartupEvent, From: HostFrom, Status: StatusSuccessful}}
 	current = messageMap{}
-	validToSend = func(sent util.List, entry *entry, dir *syncMap) (bool, error) {
-		return false, nil
+	validToSend = func(sent util.List, entry *entry) bool {
+		return false
 	}
 	fmt.Printf("Test - {invalid} : current : %v  toSend : %v\n", current, toSend)
-	err = getCurrentWork(sent, toSend, current, dir)
-	fmt.Printf("Test - {invalid} : current : %v  toSend : %v %v\n", current, toSend, err)
+	ok = getCurrentWork(sent, toSend, current, dir)
+	fmt.Printf("Test - {invalid} : current : %v  toSend : %v %v\n", current, toSend, ok)
 
 	//Output:
 	// Test - {valid}   : current : map[]  toSend : map[awssql:main:{ event:startup vhost 2 []} progresql:main:{ event:startup vhost 0 []}]
-	// Test - {valid}   : current : map[awssql:main:{ event:startup vhost 2 []} progresql:main:{ event:startup vhost 0 []}]  toSend : map[] <nil>
+	// Test - {valid}   : current : map[awssql:main:{ event:startup vhost 2 []} progresql:main:{ event:startup vhost 0 []}]  toSend : map[] true
 	// Test - {invalid} : current : map[]  toSend : map[awssql:main:{ event:startup vhost 2 []} progresql:main:{ event:startup vhost 0 []}]
-	// Test - {invalid} : current : map[]  toSend : map[awssql:main:{ event:startup vhost 2 []} progresql:main:{ event:startup vhost 0 []}] <nil>
+	// Test - {invalid} : current : map[]  toSend : map[awssql:main:{ event:startup vhost 2 []} progresql:main:{ event:startup vhost 0 []}] false
 
 }
 

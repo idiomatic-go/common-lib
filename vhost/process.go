@@ -52,23 +52,18 @@ func startupProcess(ticks int, toSend messageMap) bool {
 }
 
 var processWork work = func(sent util.List, toSend messageMap, current messageMap, dir *syncMap) error {
-	err := getCurrentWork(sent, toSend, current, dir)
-	// This is either a startup message with a directory entry that does not exist, or a startup failure
-	// on a dependent package
-	if err != nil {
-		return errors.New(fmt.Sprintf("Startup failure: getting current work: %v", err))
-	}
+	getCurrentWork(sent, toSend, current, dir)
 	// Did not find any messages to send, but there are still messages waiting in the to send map
 	if len(current) == 0 && len(toSend) > 0 {
 		return errors.New(fmt.Sprintf("Startup failure: %v", "unable to find items to work, verify cyclic dependencies"))
 	}
 	// Process the current work map
 	for k := range current {
-		if !directory.setStatus(k, StatusInProgress) {
+		if !dir.setStatus(k, StatusInProgress) {
 			return errors.New(fmt.Sprintf("Startup failure: unable to set package %v startup status", k))
 		}
 		sent.Add(k)
-		SendMessage(toSend[k])
+		SendMessageWithDirectory(current[k], dir)
 	}
 	return nil
 }
