@@ -40,7 +40,7 @@ func ExampleStatusUpdate() {
 	//Output:
 	// Entry : progresql:main 0
 	// Entry : progresql:main 2
-	
+
 }
 
 func ExampleValidateToSend() {
