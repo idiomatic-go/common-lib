@@ -7,8 +7,8 @@ import (
 	"log"
 )
 
-type work func(sent util.List, toSend messageMap, current messageMap, dir *syncMap) error
-type currentWork func(sent util.List, toSend messageMap, current messageMap, dir *syncMap) bool
+type work func(sent util.List, toSend messageMap, current messageMap) error
+type currentWork func(sent util.List, toSend messageMap, current messageMap) bool
 type toSend func(sent util.List, entry *entry) bool
 
 // Response methods
@@ -27,8 +27,8 @@ func Startup(ticks int, override messageMap) bool {
 	if packages == 0 {
 		return true
 	}
-	toSend := createToSend(override, directory)
-	err := validateToSend(toSend, directory)
+	toSend := createToSend(override)
+	err := validateToSend(toSend)
 	if err != nil {
 		log.Printf("%v", err)
 		return false
@@ -36,9 +36,9 @@ func Startup(ticks int, override messageMap) bool {
 	return startupProcess(ticks, toSend)
 }
 
-func createToSend(msgs messageMap, dir *syncMap) messageMap {
+func createToSend(msgs messageMap) messageMap {
 	m := make(messageMap)
-	for k := range dir.data() {
+	for k := range directory.data() {
 		if msgs != nil {
 			message, ok := msgs[k]
 			if ok {
@@ -49,7 +49,7 @@ func createToSend(msgs messageMap, dir *syncMap) messageMap {
 				continue
 			}
 		}
-		e := dir.get(k)
+		e := directory.get(k)
 		if e != nil {
 			m[k] = CreateMessage(e.uri, StartupEvent, HostFrom, StatusEmpty, nil)
 		} else {
@@ -59,14 +59,14 @@ func createToSend(msgs messageMap, dir *syncMap) messageMap {
 	return m
 }
 
-func validateToSend(toSend messageMap, dir *syncMap) error {
+func validateToSend(toSend messageMap) error {
 	for k := range toSend {
-		e := dir.get(k)
+		e := directory.get(k)
 		if e == nil {
 			return errors.New(fmt.Sprintf("directory entry does not exist for package uri: %v", k))
 		}
 		for _, k2 := range e.dependents {
-			e := dir.get(k2)
+			e := directory.get(k2)
 			if e == nil {
 				return errors.New(fmt.Sprintf("directory entry does not exist for dependent package uri: %v", k2))
 			}
@@ -75,10 +75,10 @@ func validateToSend(toSend messageMap, dir *syncMap) error {
 	return nil
 }
 
-var getCurrentWork currentWork = func(sent util.List, toSend messageMap, current messageMap, dir *syncMap) bool {
+var getCurrentWork currentWork = func(sent util.List, toSend messageMap, current messageMap) bool {
 	valid := false
 	for k := range toSend {
-		e := dir.get(k)
+		e := directory.get(k)
 		if e == nil {
 			continue
 		}

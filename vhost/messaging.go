@@ -16,6 +16,11 @@ func RegisterPackage(uri string, c chan Message, dependents []string) error {
 	if c == nil {
 		return fmt.Errorf("invalid argument : channel is nil")
 	}
+	registerPackageUnchecked(uri, c, dependents)
+	return nil
+}
+
+func registerPackageUnchecked(uri string, c chan Message, dependents []string) error {
 	directory.put(&entry{uri: uri, c: c, dependents: dependents})
 	return nil
 }
@@ -27,7 +32,9 @@ func UnregisterPackage(uri string) {
 	}
 	entry := directory.get(uri)
 	if entry != nil {
-		close(entry.c)
+		if entry.c != nil {
+			close(entry.c)
+		}
 		delete(directory.m, uri)
 	}
 }
@@ -49,18 +56,6 @@ func AddContent(msg *Message, content any) {
 
 func SendMessage(msg Message) error {
 	e := directory.get(msg.To)
-	if e == nil {
-		return fmt.Errorf("invalid argument : to uri invalid %v", msg.To)
-	}
-	if e.c == nil {
-		return fmt.Errorf("invalid initialization : channel is nil %v", msg.To)
-	}
-	e.c <- msg
-	return nil
-}
-
-func SendMessageWithDirectory(msg Message, dir *syncMap) error {
-	e := dir.get(msg.To)
 	if e == nil {
 		return fmt.Errorf("invalid argument : to uri invalid %v", msg.To)
 	}

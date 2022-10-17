@@ -7,18 +7,17 @@ import (
 )
 
 func ExampleCreateToSend() {
-	dir := createSyncMap()
+	uriNone := "package:none"
+	uriOne := "package:one"
 
-	e := &entry{uri: "package:none", c: nil, dependents: nil, startupStatus: 0}
-	dir.put(e)
-	e = &entry{uri: "package:one", c: nil, dependents: nil, startupStatus: 0}
-	dir.put(e)
+	registerPackageUnchecked(uriNone, nil, nil)
+	registerPackageUnchecked(uriOne, nil, nil)
 
-	m := createToSend(nil, dir)
+	m := createToSend(nil)
 	fmt.Printf("Test {no override messages} : %v\n", m)
 
 	em := messageMap{"package:one": {To: "package:one", Event: StartupEvent, From: "fromUri"}}
-	m = createToSend(em, dir)
+	m = createToSend(em)
 	fmt.Printf("Test {one override messages} : %v\n", m)
 
 	//Output:
@@ -28,8 +27,8 @@ func ExampleCreateToSend() {
 
 func ExampleStatusUpdate() {
 	uri := "progresql:main"
-	entry := &entry{uri: uri, c: nil, dependents: []string{"uri1", "uri2"}, startupStatus: 0}
-	directory.put(entry)
+
+	registerPackageUnchecked(uri, nil, []string{"uri1", "uri2"})
 	e := directory.get(uri)
 	fmt.Printf("Entry : %v\n", e)
 
@@ -44,28 +43,30 @@ func ExampleStatusUpdate() {
 }
 
 func ExampleValidateToSend() {
-	dir := createSyncMap()
+	uri := "package:none"
 
-	e := &entry{uri: "package:none", c: nil, dependents: nil, startupStatus: 0}
-	dir.put(e)
+	registerPackageUnchecked(uri, nil, nil)
+
 	toSend := messageMap{"invalid": {Event: StartupEvent, From: HostFrom}}
-	err := validateToSend(toSend, dir)
+	err := validateToSend(toSend)
 	fmt.Printf("Test - {invalid package uri in message} : %v\n", err)
 
-	toSend = messageMap{"package:none": {Event: StartupEvent, From: HostFrom}}
-	err = validateToSend(toSend, dir)
+	toSend = messageMap{uri: {Event: StartupEvent, From: HostFrom}}
+	err = validateToSend(toSend)
 	fmt.Printf("Test - {valid package uri in message} : %v\n", err)
 
-	e = &entry{uri: "package:one", c: nil, dependents: []string{"package:invalid"}, startupStatus: 0}
-	dir.put(e)
-	toSend = messageMap{"package:none": {Event: StartupEvent, From: HostFrom}, "package:one": {Event: StartupEvent, From: HostFrom}}
-	err = validateToSend(toSend, dir)
+	uri2 := "package:one"
+	registerPackageUnchecked(uri2, nil, []string{"package:invalid"})
+
+	toSend = messageMap{uri: {Event: StartupEvent, From: HostFrom}, uri2: {Event: StartupEvent, From: HostFrom}}
+	err = validateToSend(toSend)
 	fmt.Printf("Test - {invalid package uri in dependent} : %v\n", err)
 
-	e = &entry{uri: "package:one", c: nil, dependents: []string{"package:none"}, startupStatus: 0}
-	dir.put(e)
+	UnregisterPackage(uri2)
+	registerPackageUnchecked(uri2, nil, []string{"package:none"})
+
 	toSend = messageMap{"package:none": {Event: StartupEvent, From: HostFrom}, "package:one": {Event: StartupEvent, From: HostFrom}}
-	err = validateToSend(toSend, dir)
+	err = validateToSend(toSend)
 	fmt.Printf("Test - {valid package uri in dependent} : %v\n", err)
 
 	//Output:
@@ -91,28 +92,6 @@ func ExampleValidToSend() {
 	ok = validToSend(sent, e)
 	fmt.Printf("Test - {Dependents Not In Sent List} : %v\n", ok)
 
-	// Test entry with one dependent in sent list, target package not found
-	//e = &entry{uri: uri, c: nil, dependents: []string{depUri}, startupStatus: 0}
-	//sent.Add(depUri)
-	//ok, err = validToSend(sent, e, dir)
-	//fmt.Printf("Test - {One Dependent In Sent List - Target Package Not Found} : %v %v\n", ok, err)
-
-	// Start the target package
-	//e = &entry{uri: depUri, c: nil, dependents: nil, startupStatus: StatusEmpty}
-	//dir.put(e)
-
-	// Test entry with one dependent in sent list, target package not started
-	//e = &entry{uri: uri, c: nil, dependents: []string{depUri}, startupStatus: 0}
-	//sent.Add("test:dependent")
-	//ok = validToSend(sent, e, dir)
-	//fmt.Printf("Test - {One Dependent In Sent List - Target Package Not Started} : %vn", ok)
-
-	// Make all dependents valid
-	//testUri := "test:uri2"
-	//dir.setStatus(depUri, StatusSuccessful)
-	//e = &entry{uri: testUri, c: nil, dependents: nil, startupStatus: StatusSuccessful}
-	//dir.put(e)
-
 	// Test entry with all dependents in sent list
 	e = &entry{uri: uri, c: nil, dependents: []string{depUri, testUri}, startupStatus: 0}
 	sent.Add(depUri)
@@ -127,28 +106,28 @@ func ExampleValidToSend() {
 
 }
 
-func _ExampleGetCurrentWorkError() {
+func ExampleGetCurrentWorkError() {
 	uri := "progresql:main"
 	sent := make(util.List)
-	dir := createSyncMap()
 	toSend := messageMap{uri: {Event: "test", From: ""}}
 	current := messageMap{}
 
-	err := getCurrentWork(sent, toSend, current, dir)
-	fmt.Printf("Test - {empty directory} : %v\n", err)
+	ok := getCurrentWork(sent, toSend, current)
+	fmt.Printf("Test - {empty directory} : %v\n", ok)
 
-	e := &entry{uri: uri, c: nil, dependents: nil, startupStatus: 0}
-	dir.put(e)
+	registerPackageUnchecked(uri, nil, nil)
+	//e := &entry{uri: uri, c: nil, dependents: nil, startupStatus: 0}
+	//dir.put(e)
 	validToSend = func(sent util.List, entry *entry) bool {
 		return false
 	}
 
-	err = getCurrentWork(sent, toSend, current, dir)
-	fmt.Printf("Test - {validToSend error} : %v\n", err)
+	ok = getCurrentWork(sent, toSend, current)
+	fmt.Printf("Test - {validToSend error} : %v\n", ok)
 
 	//Output:
-	// Test - {empty directory} : <nil>
-	// Test - {validToSend error} : validToSend error
+	// Test - {empty directory} : false
+	// Test - {validToSend error} : false
 
 }
 
@@ -156,20 +135,17 @@ func ExampleGetCurrentWork() {
 	uri := "progresql:main"
 	uri2 := "awssql:main"
 	sent := make(util.List)
-	dir := createSyncMap()
 	toSend := messageMap{uri: {Event: StartupEvent, From: HostFrom}, uri2: {Event: StartupEvent, From: HostFrom, Status: StatusSuccessful}}
 	current := messageMap{}
 
-	e := &entry{uri: uri, c: nil, dependents: nil, startupStatus: StatusEmpty}
-	dir.put(e)
-	e = &entry{uri: uri2, c: nil, dependents: nil, startupStatus: StatusEmpty}
-	dir.put(e)
+	registerPackageUnchecked(uri, nil, nil)
+	registerPackageUnchecked(uri2, nil, nil)
 
 	validToSend = func(sent util.List, entry *entry) bool {
 		return true
 	}
 	fmt.Printf("Test - {valid}   : current : %v  toSend : %v\n", current, toSend)
-	ok := getCurrentWork(sent, toSend, current, dir)
+	ok := getCurrentWork(sent, toSend, current)
 	fmt.Printf("Test - {valid}   : current : %v  toSend : %v %v\n", current, toSend, ok)
 
 	toSend = messageMap{uri: {Event: StartupEvent, From: HostFrom}, uri2: {Event: StartupEvent, From: HostFrom, Status: StatusSuccessful}}
@@ -178,7 +154,7 @@ func ExampleGetCurrentWork() {
 		return false
 	}
 	fmt.Printf("Test - {invalid} : current : %v  toSend : %v\n", current, toSend)
-	ok = getCurrentWork(sent, toSend, current, dir)
+	ok = getCurrentWork(sent, toSend, current)
 	fmt.Printf("Test - {invalid} : current : %v  toSend : %v %v\n", current, toSend, ok)
 
 	//Output:

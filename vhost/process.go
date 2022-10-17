@@ -20,7 +20,7 @@ func startupProcess(ticks int, toSend messageMap) bool {
 		}
 		log.Printf("Startup iteration: %v", count)
 		if count == 1 || len(current) == 0 {
-			err := processWork(sent, toSend, current, directory)
+			err := processWork(sent, toSend, current)
 			if err != nil {
 				log.Printf("%v", err)
 				return false
@@ -51,19 +51,19 @@ func startupProcess(ticks int, toSend messageMap) bool {
 	return true
 }
 
-var processWork work = func(sent util.List, toSend messageMap, current messageMap, dir *syncMap) error {
-	getCurrentWork(sent, toSend, current, dir)
+var processWork work = func(sent util.List, toSend messageMap, current messageMap) error {
+	getCurrentWork(sent, toSend, current)
 	// Did not find any messages to send, but there are still messages waiting in the to send map
 	if len(current) == 0 && len(toSend) > 0 {
 		return errors.New(fmt.Sprintf("Startup failure: %v", "unable to find items to work, verify cyclic dependencies"))
 	}
 	// Process the current work map
 	for k := range current {
-		if !dir.setStatus(k, StatusInProgress) {
+		if !directory.setStatus(k, StatusInProgress) {
 			return errors.New(fmt.Sprintf("Startup failure: unable to set package %v startup status", k))
 		}
 		sent.Add(k)
-		SendMessageWithDirectory(current[k], dir)
+		SendMessage(current[k])
 	}
 	return nil
 }
