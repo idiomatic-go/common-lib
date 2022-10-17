@@ -1,14 +1,18 @@
 package vhost
 
-import "sync"
+import (
+	"sync"
+	"time"
+)
 
 type messageMap map[string]Message
 
 type entry struct {
-	uri           string
-	c             chan Message
-	dependents    []string
-	startupStatus int32
+	uri            string
+	c              chan Message
+	dependents     []string
+	startupStatus  int32
+	statusChangeTS time.Time
 }
 
 type syncMap struct {
@@ -52,6 +56,7 @@ func (s *syncMap) setStatus(uri string, status int32) bool {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	e.startupStatus = status
+	e.statusChangeTS = time.Now()
 	return true
 }
 

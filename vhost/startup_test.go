@@ -30,16 +30,17 @@ func ExampleStatusUpdate() {
 
 	registerPackageUnchecked(uri, nil, []string{"uri1", "uri2"})
 	e := directory.get(uri)
-	fmt.Printf("Entry : %v\n", e)
+	fmt.Printf("Entry : %v %v\n", e.uri, e.startupStatus) //, e.statusChangeTS.Format(time.RFC3339))
 
 	SendStartupSuccessfulResponse(uri)
 	time.Sleep(time.Nanosecond * 1)
 	e = directory.get(uri)
-	fmt.Printf("Entry : %v\n", e)
+	fmt.Printf("Entry : %v %v\n", e.uri, e.startupStatus) //e.statusChangeTS.Format(time.RFC3339))
 
 	//Output:
-	// Entry : &{progresql:main <nil> [uri1 uri2] 0}
-	// Entry : &{progresql:main <nil> [uri1 uri2] 2}
+	// Entry : progresql:main 0
+	// Entry : progresql:main 2
+	
 }
 
 func ExampleValidateToSend() {
