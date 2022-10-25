@@ -1,14 +1,10 @@
 package vhost
 
 import (
-	"bufio"
-	"bytes"
 	"errors"
 	"fmt"
 	"github.com/idiomatic-go/common-lib/util"
-	"io"
 	"io/fs"
-	"strings"
 )
 
 const (
@@ -40,7 +36,7 @@ func ReadFile(path string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	buf, err1 := fs.ReadFile(fsys, root+"/"+s)
+	buf, err1 := util.FSReadFile(fsys, s)
 	// If no error or there was no template, then return
 	if err1 == nil || s == path {
 		return buf, err1
@@ -50,61 +46,11 @@ func ReadFile(path string) ([]byte, error) {
 	if err1 != nil {
 		return nil, err1
 	}
-	return fs.ReadFile(fsys, root+"/"+s)
+	return util.FSReadFile(fsys, s)
 }
 
 func ReadMap(path string) (map[string]string, error) {
-	buf, err := ReadFile(path)
-	if err != nil {
-		return nil, err
-	}
-	return ParseBuffer(buf)
-}
-
-func ParseBuffer(buf []byte) (map[string]string, error) {
-	m := make(map[string]string)
-	if len(buf) == 0 {
-		return m, nil
-	}
-	r := bytes.NewReader(buf)
-	reader := bufio.NewReader(r)
-	var line string
-	var err error
-	for {
-		line, err = reader.ReadString('\n')
-		k, v, err0 := ParseLine(line)
-		if err0 != nil {
-			return m, err0
-		}
-		if len(k) > 0 {
-			m[k] = v
-		}
-		if err == io.EOF {
-			break
-		} else {
-			if err != nil {
-				break
-			}
-		}
-	}
-	return m, nil
-}
-
-func ParseLine(line string) (string, string, error) {
-	if len(line) == 0 {
-		return "", "", nil
-	}
-	line = strings.TrimLeft(line, " ")
-	if len(line) == 0 || strings.HasPrefix(line, comment) {
-		return "", "", nil
-	}
-	i := strings.Index(line, delimiter)
-	if i == -1 {
-		return "", "", fmt.Errorf("invalid argument : line does not contain the ':' delimeter : [%v]", line)
-	}
-	key := line[:i]
-	val := line[i+1:]
-	return strings.TrimSpace(key), strings.TrimLeft(val, " "), nil
+	return util.FSReadMap(fsys, path)
 }
 
 var lookupEnv LookupVariable = func(name string) (string, error) {
