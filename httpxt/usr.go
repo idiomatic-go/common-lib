@@ -2,12 +2,10 @@ package httpxt
 
 import "net/http"
 
-// Http
-var Client *http.Client
-
+// OverrideHttpClient - change client implementation
 func OverrideHttpClient(c *http.Client) {
 	if c != nil {
-		Client = c
+		client = c
 	}
 }
 
@@ -15,13 +13,12 @@ type HttpTraceStart func(req *http.Request) HttpTraceFinish
 
 type HttpTraceFinish func(resp *http.Response, err error)
 
-var TraceStart HttpTraceStart
-
+// OverrideHttpTracing - Enable Http tracing
 func OverrideHttpTracing(fn HttpTraceStart) {
-	TraceStart = fn
+	traceStart = fn
 }
 
-// Response status
+// ResponseStatus - status from a Http exchange
 type ResponseStatus struct {
 	BodyIOErr    error
 	UnmarshalErr error

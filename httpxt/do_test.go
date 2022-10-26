@@ -2,12 +2,16 @@ package httpxt
 
 import (
 	"context"
+	"embed"
 	"fmt"
 	"io"
 	"net/http"
 	"strconv"
 	"strings"
 )
+
+//go:embed resource/*
+var content embed.FS
 
 func isInvalidArgument(err error) bool {
 	return err != nil && strings.HasPrefix(err.Error(), "invalid argument:")

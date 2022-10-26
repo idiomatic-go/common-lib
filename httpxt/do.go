@@ -6,6 +6,7 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
+	"github.com/idiomatic-go/common-lib/fse"
 	"io"
 	"io/fs"
 	"net/http"
@@ -16,6 +17,9 @@ import (
 	internal "github.com/idiomatic-go/common-lib/httpxt/internal"
 )
 
+var client *http.Client
+var traceStart HttpTraceStart
+
 func init() {
 	t, ok := http.DefaultTransport.(*http.Transport)
 	if ok {
@@ -24,9 +28,9 @@ func init() {
 		transport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 		transport.MaxIdleConns = 200
 		transport.MaxIdleConnsPerHost = 100
-		Client = &http.Client{Transport: transport, Timeout: time.Second * 5}
+		client = &http.Client{Transport: transport, Timeout: time.Second * 5}
 	} else {
-		Client = &http.Client{Transport: http.DefaultTransport, Timeout: time.Second * 5}
+		client = &http.Client{Transport: http.DefaultTransport, Timeout: time.Second * 5}
 	}
 }
 
@@ -45,17 +49,18 @@ func Do(req *http.Request) (resp *http.Response, err error) {
 		return nil, errors.New("invalid argument: Request is nil")
 	}
 	var traceFinish HttpTraceFinish
-	if TraceStart != nil {
-		traceFinish = TraceStart(req)
+	if traceStart != nil {
+		traceFinish = traceStart(req)
 	}
 	switch req.URL.Scheme {
 	case "http", "https":
-		resp, err = Client.Do(req)
-	case "file":
+		resp, err = client.Do(req)
+	case fse.Scheme:
+		fsys := fse.ContextEmbeddedFS(req.Context())
 		if fsys == nil {
-			return nil, fmt.Errorf("no file system mounted")
+			return nil, fmt.Errorf("no embedded file system in Context")
 		}
-		resp, err = createFileResponse(req)
+		resp, err = createFileResponse(fsys, fse.ContextEmbeddedContent(req.Context()), req)
 	case "echo":
 		resp, err = createEchoResponse(req)
 	default:
@@ -88,10 +93,18 @@ func isHttpResponseMessage(buf []byte) bool {
 	return false
 }
 
-func createFileResponse(req *http.Request) (*http.Response, error) {
-	path := req.URL.Path
-	path = strings.TrimPrefix(path, "/")
-	buf, err := fs.ReadFile(fsys, path)
+func createFileResponse(fsys fs.FS, name string, req *http.Request) (*http.Response, error) {
+	var buf []byte
+	var err error
+	var path string
+	if name != "" {
+		path = name
+		buf, err = fse.ReadFile(fsys, name)
+	} else {
+		path = req.URL.Path
+		path = strings.TrimPrefix(path, "/")
+		buf, err = fse.ReadFile(fsys, path)
+	}
 	if err != nil {
 		if strings.Contains(err.Error(), "file does not exist") {
 			return &http.Response{StatusCode: http.StatusNotFound}, nil

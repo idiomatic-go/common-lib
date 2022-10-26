@@ -1,4 +1,4 @@
-package httpxt
+package fse
 
 import (
 	"bufio"
@@ -12,14 +12,10 @@ import (
 )
 
 //go:embed resource/*
-var fsysContent embed.FS
-
-func init() {
-	Mount(fsysContent)
-}
+var fsys embed.FS
 
 func ExampleReader() {
-	buf, err := fsysContent.ReadFile("resource/readme.txt")
+	buf, err := ReadFile(fsys, "resource/readme.txt")
 	if err != nil {
 		fmt.Printf("failure : [%v]\n", err)
 	} else {
@@ -43,7 +39,7 @@ func ExampleDirectory() {
 	var dirs []fs.DirEntry
 	var err error
 
-	dirs, err = fsysContent.ReadDir("resource")
+	dirs, err = ReadDir(fsys, "resource")
 	if err != nil {
 		fmt.Println("failure")
 	} else {
@@ -62,7 +58,7 @@ func ExampleDirectory() {
 }
 
 func ExampleHttp504Response() {
-	buf, err := fsysContent.ReadFile("resource/http/http-504.txt")
+	buf, err := ReadFile(fsys, "resource/http/http-504.txt")
 	if err != nil {
 		fmt.Println("failure")
 	} else {
@@ -83,7 +79,7 @@ func ExampleHttp504Response() {
 }
 
 func ExampleHtmlResponse() {
-	buf, err := fsysContent.ReadFile("resource/http/html-response.html")
+	buf, err := ReadFile(fsys, "resource/http/html-response.html")
 	if err != nil {
 		fmt.Println("failure")
 	} else {
@@ -115,4 +111,41 @@ func ExampleHtmlResponse() {
 	// <h1>Hello, World!</h1>
 	// </body>
 	// </html>
+}
+
+func _ExampleReadMap() {
+	_, err0 := ReadMap(fsys, "")
+	fmt.Printf("Error : %v\n", err0)
+
+	m, err := ReadMap(fsys, "postgresql/config_dev.txt")
+	if err != nil {
+		fmt.Printf("Error : %v\n", err)
+	} else {
+		fmt.Printf("Map [config_dev.txt]: %v\n", m)
+	}
+
+	m, err = ReadMap(fsys, "postgresql/config_test.txt")
+	if err != nil {
+		fmt.Printf("Error : %v\n", err)
+	} else {
+		fmt.Printf("Map [config_test.txt]: %v\n", m)
+	}
+
+	// Should override and return config_test.txt
+	//lookupEnv = func(name string) (string, error) { return "stage", nil }
+	//m, err = ReadMap("postgresql/config_{env}.txt")
+	//if err != nil {
+	//	fmt.Printf("Error : %v\n", err)
+	//} else {
+	//	fmt.Printf("Map : %v\n", m)
+	//}
+
+	//Output:
+	// Error : invalid argument : path is empty
+	// Map [config_dev.txt]: map[env:dev
+	//  next:second value
+	//  timeout:10020]
+	// Map [config_test.txt]: map[env:test
+	//  thelast:line of the file]
+
 }
