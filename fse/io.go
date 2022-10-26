@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io/fs"
-	"strings"
 )
 
 const (
@@ -25,17 +24,11 @@ func ReadFile(fsys fs.FS, name string) ([]byte, error) {
 	return fs.ReadFile(fsys, name)
 }
 
-func ReadFileContext(ctx context.Context, path string) ([]byte, error) {
+func ReadFileContext(ctx context.Context) ([]byte, error) {
 	if ctx == nil {
 		return nil, fmt.Errorf("invalid argument : context is nil")
 	}
-	fsys := ContextEmbeddedFS(ctx)
-	name := ContextEmbeddedContent(ctx)
-	if name == "" {
-		path = strings.TrimPrefix(path, "/")
-		return ReadFile(fsys, path)
-	}
-	return ReadFile(fsys, name)
+	return ReadFile(ContextEmbeddedFS(ctx), ContextEmbeddedContent(ctx))
 }
 
 func ReadDir(fsys fs.FS, name string) ([]fs.DirEntry, error) {

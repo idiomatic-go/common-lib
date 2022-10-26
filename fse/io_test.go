@@ -149,3 +149,17 @@ func _ExampleReadMap() {
 	//  thelast:line of the file]
 
 }
+
+func ExampleReadFileContext() {
+	ctx := ContextWithEmbeddedFS(nil, fsys)
+	ctx = ContextWithEmbeddedContent(ctx, "resource/readme.txt")
+	buf, err := ReadFileContext(ctx)
+	if err != nil {
+		fmt.Printf("failure : [%v]\n", err)
+	} else {
+		fmt.Println(string(buf))
+	}
+
+	//Output:
+	// fail
+}

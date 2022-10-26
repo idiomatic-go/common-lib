@@ -14,7 +14,7 @@ import (
 	"strings"
 	"time"
 
-	internal "github.com/idiomatic-go/common-lib/httpxt/internal"
+	"github.com/idiomatic-go/common-lib/httpxt/internal"
 )
 
 var client *http.Client
