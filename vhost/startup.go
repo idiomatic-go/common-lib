@@ -3,9 +3,11 @@ package vhost
 import (
 	"errors"
 	"fmt"
+	"github.com/idiomatic-go/common-lib/logxt"
 	"github.com/idiomatic-go/common-lib/util"
-	"log"
 )
+
+var maxStartupIterations = DefaultMaxStartupIterations
 
 type work func(sent util.List, toSend messageMap, current messageMap) error
 type currentWork func(sent util.List, toSend messageMap, current messageMap) bool
@@ -30,7 +32,7 @@ func Startup(ticks int, override messageMap) bool {
 	toSend := createToSend(override)
 	err := validateToSend(toSend)
 	if err != nil {
-		log.Printf("%v", err)
+		logxt.LogPrintf("%v", err)
 		return false
 	}
 	return startupProcess(ticks, toSend)
@@ -116,7 +118,7 @@ func receive(q *Queue) {
 			}
 			if msg.Event == StartupEvent {
 				if !directory.setStatus(msg.From, msg.Status) {
-					log.Printf("failure to set startup status from package: %v", msg.From)
+					logxt.LogPrintf("failure to set startup status from package: %v", msg.From)
 				}
 			} else {
 				q.Enqueue(msg)

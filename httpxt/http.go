@@ -1,37 +1,37 @@
-package util
+package httpxt
 
 import (
 	"context"
 	"errors"
-	"github.com/idiomatic-go/common-lib/httpxt"
+	"github.com/idiomatic-go/common-lib/logxt"
 	"io"
 	"net/http"
 )
 
 // HttpDo - process a http request with error handling
-func HttpDo(ctx context.Context, method, url string, header http.Header, body io.Reader) *httpxt.ResponseStatus {
+func HttpDo(ctx context.Context, method, url string, header http.Header, body io.Reader) *ResponseStatus {
 	if ctx == nil {
 		ctx = context.Background()
 	}
 	req, err := http.NewRequestWithContext(ctx, method, url, body)
 	if err != nil {
-		LogPrintf("%v", err)
-		return &httpxt.ResponseStatus{RequestErr: err}
+		logxt.LogPrintf("%v", err)
+		return &ResponseStatus{RequestErr: err}
 	}
-	httpxt.AddHeaders(req, header)
-	status := httpxt.DoStatus(req)
+	AddHeaders(req, header)
+	status := DoStatus(req)
 	if !status.IsSuccess() && status.FirstError() != nil {
-		LogPrintf("%v", status.FirstError())
+		logxt.LogPrintf("%v", status.FirstError())
 	}
 	return status
 }
 
 // HttpDoContent - process a http request with error handling
-func HttpDoContent(ctx context.Context, method, url string, header http.Header, body io.Reader, content any) *httpxt.ResponseStatus {
+func HttpDoContent(ctx context.Context, method, url string, header http.Header, body io.Reader, content any) *ResponseStatus {
 	if content == nil {
 		err0 := errors.New("invalid argument: content interface{} is nil")
-		LogDebug("%v", err0)
-		return &httpxt.ResponseStatus{RequestErr: err0}
+		logxt.LogDebug("%v", err0)
+		return &ResponseStatus{RequestErr: err0}
 	}
 	status := HttpDo(ctx, method, url, header, body)
 	if status.IsError() || !status.IsContent() {
@@ -39,30 +39,30 @@ func HttpDoContent(ctx context.Context, method, url string, header http.Header, 
 	}
 	entity, _ := status.UnmarshalJson(content)
 	if status.FirstError() != nil {
-		LogPrintf("%v", status.FirstError())
+		logxt.LogPrintf("%v", status.FirstError())
 		if body != nil {
-			LogDebug("%v", string(entity))
+			logxt.LogDebug("%v", string(entity))
 		}
 	}
 	return status
 }
 
 // HttpGet - process a get request with error handling
-func HttpGet(ctx context.Context, url string, header http.Header) *httpxt.ResponseStatus {
+func HttpGet(ctx context.Context, url string, header http.Header) *ResponseStatus {
 	return HttpDo(ctx, "", url, header, nil)
 }
 
 // HttpGetContent - processes a get request, unmarshalling content, and handling errors
-func HttpGetContent(ctx context.Context, url string, header http.Header, content any) *httpxt.ResponseStatus {
+func HttpGetContent(ctx context.Context, url string, header http.Header, content any) *ResponseStatus {
 	return HttpDoContent(ctx, "", url, header, nil, content)
 }
 
 // HttpPost - process a post request with error handling
-func HttpPost(ctx context.Context, url string, header http.Header, body io.Reader) *httpxt.ResponseStatus {
+func HttpPost(ctx context.Context, url string, header http.Header, body io.Reader) *ResponseStatus {
 	return HttpDo(ctx, http.MethodPost, url, header, body)
 }
 
 // HttpPostContent - process a post request with error handling
-func HttpPostContent(ctx context.Context, url string, header http.Header, body io.Reader, content any) *httpxt.ResponseStatus {
+func HttpPostContent(ctx context.Context, url string, header http.Header, body io.Reader, content any) *ResponseStatus {
 	return HttpDoContent(ctx, http.MethodPost, url, header, body, content)
 }

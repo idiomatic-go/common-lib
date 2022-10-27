@@ -1,6 +1,6 @@
 package vhost
 
-// Credentials function methds
+// CreateCredentialsMessage - functions
 func CreateCredentialsMessage(to, event, sender string, fn Credentials) Message {
 	return CreateMessage(to, event, sender, 0, fn)
 }

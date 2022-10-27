@@ -2,6 +2,7 @@ package vhost
 
 import (
 	"fmt"
+	"github.com/idiomatic-go/common-lib/logxt"
 	"github.com/idiomatic-go/common-lib/util"
 	"time"
 )
@@ -141,7 +142,7 @@ func receiveTest(c chan Message) {
 			if !open {
 				return
 			}
-			util.LogDebug("%v\n", msg)
+			logxt.LogDebug("%v\n", msg)
 			SendStartupSuccessfulResponse(msg.To)
 		default:
 		}

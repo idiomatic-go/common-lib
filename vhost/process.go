@@ -3,26 +3,26 @@ package vhost
 import (
 	"errors"
 	"fmt"
+	"github.com/idiomatic-go/common-lib/logxt"
 	"github.com/idiomatic-go/common-lib/util"
-	"log"
 	"time"
 )
 
 func startupProcess(ticks int, toSend messageMap) bool {
-	log.Printf("Startup begin with iteration seconds: %v", ticks)
+	logxt.LogPrintf("Startup begin with iteration seconds: %v", ticks)
 	sent := make(util.List)
 	var count = 1
 	current := make(messageMap)
 	for {
-		if count > MaxStartupIterations {
-			log.Printf("Startup failure: max iterations excedded: %v", count)
+		if count > maxStartupIterations {
+			logxt.LogPrintf("Startup failure: max iterations excedded: %v", count)
 			return false
 		}
-		log.Printf("Startup iteration: %v", count)
+		logxt.LogPrintf("Startup iteration: %v", count)
 		if count == 1 || len(current) == 0 {
 			err := processWork(sent, toSend, current)
 			if err != nil {
-				log.Printf("%v", err)
+				logxt.LogPrintf("%v", err)
 				return false
 			}
 		}
@@ -30,20 +30,20 @@ func startupProcess(ticks int, toSend messageMap) bool {
 		// Check the startup status of the directory, continue if a package is still in startup
 		uri := directory.startupInProgress()
 		if uri != "" {
-			log.Printf("Startup still in progress continuing: %v", uri)
+			logxt.LogPrintf("Startup still in progress continuing: %v", uri)
 			count++
 			continue
 		}
 		// All the current messages have been sent, so lets check for failure.
 		fail := directory.startupFailure()
 		if fail != "" {
-			log.Printf("Startup failure status on: %v", fail)
+			logxt.LogPrintf("Startup failure status on: %v", fail)
 			return false
 		}
 		// Success so empty current work map and check for completion
 		empty(current)
 		if len(toSend) == 0 {
-			log.Printf("Startup successful: %v", count)
+			logxt.LogPrintf("Startup successful: %v", count)
 			return true
 		}
 		count++

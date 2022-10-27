@@ -1,13 +1,15 @@
-package util
+package logxt
 
 import (
-	"context"
 	"fmt"
+	//"github.com/idiomatic-go/common-lib/util"
 	"log"
 )
 
+var debug = false
+
 func init() {
-	//log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds | log.Llongfile | log.LUTC)
+	//logxt.SetFlags(logxt.Ldate | logxt.Ltime | logxt.Lmicroseconds | logxt.Llongfile | logxt.LUTC)
 	log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds | log.LUTC)
 }
 
@@ -33,11 +35,14 @@ var LogPrintf SpecifiedFmt = func(specifier string, v ...any) {
 	log.Printf(specifier, v)
 }
 
+/*
 var LogContextPrint ContextDefaultFmt = func(ctx context.Context, v ...any) {
-	u := []any{ContextRequestId(ctx)}
+	u := []any{util.ContextRequestId(ctx)}
 	log.Print(append(u, v))
 }
 
 var LogContextPrintf ContextSpecifiedFmt = func(ctx context.Context, specifier string, v ...any) {
 	log.Printf(specifier, v)
 }
+
+*/

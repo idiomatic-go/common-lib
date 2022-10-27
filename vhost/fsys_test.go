@@ -50,7 +50,7 @@ func ExampleReadFile() {
 	*/
 
 	//Output:
-	// Error : invalid argument : path is empty
+	// Error : invalid argument : file name is empty
 	// Error : open resource/bad-path/config_bad.txt: file does not exist
 	// Error : invalid argument : template variable is invalid: env
 }

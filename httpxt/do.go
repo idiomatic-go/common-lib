@@ -18,7 +18,6 @@ import (
 )
 
 var client *http.Client
-var traceStart HttpTraceStart
 
 func init() {
 	t, ok := http.DefaultTransport.(*http.Transport)

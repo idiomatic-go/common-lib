@@ -14,7 +14,7 @@ func ExampleDevEnv() {
 	fmt.Println(vhost.IsDevEnv())
 
 	// Output:
-	// false
+	// true
 	// true
 	// false
 }
@@ -33,6 +33,7 @@ func ExampleDevEnvOverride() {
 	// false
 }
 
+/*
 func ExampleProdEnv() {
 	fmt.Println(vhost.IsProdEnv())
 	os.Setenv(vhost.RuntimeEnvKey, "prod")
@@ -84,3 +85,6 @@ func ExampleTestEnv() {
 	// true
 	// false
 }
+
+
+*/

@@ -1,10 +1,10 @@
-package util
+package vhost
 
 import "context"
 
-type id struct{}
+type requestid struct{}
 
-var key id
+var key requestid
 
 // ContextWithRequestId - creates a new Context with a request id
 func ContextWithRequestId(ctx context.Context, requestId string) context.Context {
