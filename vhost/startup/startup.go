@@ -1,4 +1,4 @@
-package vhost
+package startup
 
 import (
 	"errors"
