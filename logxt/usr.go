@@ -5,9 +5,6 @@ func ToggleDebug(v bool) {
 	debug = v
 }
 
-// DebugFmt - logging function type
-type DebugFmt func(specifier string, v ...any)
-
 // DefaultFmt - logging function type
 type DefaultFmt func(v ...any)
 

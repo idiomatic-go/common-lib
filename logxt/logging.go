@@ -13,7 +13,13 @@ func init() {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds | log.LUTC)
 }
 
-var LogDebug DebugFmt = func(specifier string, v ...any) {
+var LogDebug DefaultFmt = func(v ...any) {
+	if debug {
+		fmt.Print(v)
+	}
+}
+
+var LogDebugf SpecifiedFmt = func(specifier string, v ...any) {
 	if debug {
 		fmt.Printf(specifier, v)
 	}
@@ -34,15 +40,3 @@ var LogPrint DefaultFmt = func(v ...any) {
 var LogPrintf SpecifiedFmt = func(specifier string, v ...any) {
 	log.Printf(specifier, v)
 }
-
-/*
-var LogContextPrint ContextDefaultFmt = func(ctx context.Context, v ...any) {
-	u := []any{util.ContextRequestId(ctx)}
-	log.Print(append(u, v))
-}
-
-var LogContextPrintf ContextSpecifiedFmt = func(ctx context.Context, specifier string, v ...any) {
-	log.Printf(specifier, v)
-}
-
-*/
