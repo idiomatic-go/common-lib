@@ -1,4 +1,4 @@
-package startup
+package vhost
 
 // CreateCredentialsMessage - functions
 func CreateCredentialsMessage(to, event, sender string, fn Credentials) Message {
