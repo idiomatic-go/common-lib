@@ -1,7 +1,6 @@
 package fse
 
 import (
-	"context"
 	"fmt"
 	"io/fs"
 )
@@ -24,12 +23,15 @@ func ReadFile(fsys fs.FS, name string) ([]byte, error) {
 	return fs.ReadFile(fsys, name)
 }
 
+/*
 func ReadFileContext(ctx context.Context) ([]byte, error) {
 	if ctx == nil {
 		return nil, fmt.Errorf("invalid argument : context is nil")
 	}
 	return ReadFile(ContextEmbeddedFS(ctx), ContextEmbeddedContent(ctx))
 }
+
+*/
 
 func ReadDir(fsys fs.FS, name string) ([]fs.DirEntry, error) {
 	if fsys == nil {

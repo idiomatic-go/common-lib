@@ -150,6 +150,7 @@ func _ExampleReadMap() {
 
 }
 
+/*
 func ExampleReadFileContext() {
 	ctx := ContextWithEmbeddedFS(nil, fsys)
 	ctx = ContextWithEmbeddedContent(ctx, "resource/readme.txt")
@@ -163,3 +164,5 @@ func ExampleReadFileContext() {
 	//Output:
 	// fail
 }
+
+*/

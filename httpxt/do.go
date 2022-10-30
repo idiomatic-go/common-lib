@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"github.com/idiomatic-go/common-lib/fse"
 	"io"
-	"io/fs"
 	"net/http"
 	"strconv"
 	"strings"
@@ -55,11 +54,11 @@ func Do(req *http.Request) (resp *http.Response, err error) {
 	case "http", "https":
 		resp, err = client.Do(req)
 	case fse.Scheme:
-		fsys := fse.ContextEmbeddedFS(req.Context())
-		if fsys == nil {
-			return nil, fmt.Errorf("no embedded file system in Context")
-		}
-		resp, err = createFileResponse(fsys, fse.ContextEmbeddedContent(req.Context()), req)
+		//fsys := fse.ContextEmbeddedFS(req.Context())
+		//if fsys == nil {
+		//return nil, fmt.Errorf("no embedded file system in Context")
+		//}
+		resp, err = createFileResponse(fse.ContextContent(req.Context()), req)
 	case "echo":
 		resp, err = createEchoResponse(req)
 	default:
@@ -92,28 +91,30 @@ func isHttpResponseMessage(buf []byte) bool {
 	return false
 }
 
-func createFileResponse(fsys fs.FS, name string, req *http.Request) (*http.Response, error) {
-	var buf []byte
-	var err error
-	var path string
-	if name != "" {
-		path = name
-		buf, err = fse.ReadFile(fsys, name)
-	} else {
-		path = req.URL.Path
-		path = strings.TrimPrefix(path, "/")
-		buf, err = fse.ReadFile(fsys, path)
+func createFileResponse(entry *fse.Entry, req *http.Request) (*http.Response, error) {
+	if req == nil || entry == nil {
+		return nil, errors.New("invalid argument: Request or Entry nil")
 	}
-	if err != nil {
-		if strings.Contains(err.Error(), "file does not exist") {
-			return &http.Response{StatusCode: http.StatusNotFound}, nil
-		}
-		return &http.Response{StatusCode: http.StatusInternalServerError}, nil
-	}
-	if isHttpResponseMessage(buf) {
-		return http.ReadResponse(bufio.NewReader(bytes.NewReader(buf)), req)
+	//var err error
+	var path string = entry.Name
+	//if name != "" {
+	//	path = name
+	//	buf, err = fse.ReadFile(fsys, name)
+	//} else {
+	//	path = req.URL.Path
+	//	path = strings.TrimPrefix(path, "/")
+	//	buf, err = fse.ReadFile(fsys, path)
+	//}
+	//if err != nil {
+	//	if strings.Contains(err.Error(), "file does not exist") {
+	//		return &http.Response{StatusCode: http.StatusNotFound}, nil
+	//	}
+	//	return &http.Response{StatusCode: http.StatusInternalServerError}, nil
+	//}
+	if isHttpResponseMessage(entry.Content) {
+		return http.ReadResponse(bufio.NewReader(bytes.NewReader(entry.Content)), req)
 	} else {
-		resp := &http.Response{StatusCode: http.StatusOK, Header: make(http.Header), Body: &internal.ReaderCloser{Reader: bytes.NewReader(buf), Err: nil}}
+		resp := &http.Response{StatusCode: http.StatusOK, Header: make(http.Header), Body: &internal.ReaderCloser{Reader: bytes.NewReader(entry.Content), Err: nil}}
 		if strings.HasSuffix(path, ".json") {
 			resp.Header.Add("Content-Type", "application/json")
 		} else {

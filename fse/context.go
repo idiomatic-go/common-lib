@@ -2,9 +2,11 @@ package fse
 
 import (
 	"context"
+	"github.com/idiomatic-go/common-lib/logxt"
 	"io/fs"
 )
 
+/*
 type fsid struct{}
 
 var fskey fsid
@@ -28,27 +30,37 @@ func ContextEmbeddedFS(ctx context.Context) fs.FS {
 	}
 	return nil
 }
+*/
 
-type contentid struct{}
+type entryid struct{}
 
-var contentkey contentid
+var entrykey entryid
 
-// ContextWithEmbeddedContent - creates a new Context with an embedded content
-func ContextWithEmbeddedContent(ctx context.Context, name string) context.Context {
+// ContextWithContent - creates a new Context with content
+func ContextWithContent(ctx context.Context, fs fs.FS, name string) context.Context {
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	return context.WithValue(ctx, contentkey, name)
+	if fs == nil {
+		logxt.LogDebugf("%v", "file system is nil")
+		return ctx
+	}
+	buf, err := ReadFile(fs, name)
+	if err != nil {
+		logxt.LogDebugf("file system read error : %v", err)
+		return ctx
+	}
+	return context.WithValue(ctx, entrykey, Entry{Name: name, Content: buf})
 }
 
-// ContextEmbeddedContent - return the embedded content
-func ContextEmbeddedContent(ctx context.Context) string {
+// ContextContent - return the content
+func ContextContent(ctx context.Context) *Entry {
 	if ctx == nil {
-		return ""
+		return nil
 	}
-	i := ctx.Value(contentkey)
-	if name, ok := i.(string); ok {
-		return name
+	i := ctx.Value(entrykey)
+	if buf, ok := i.(Entry); ok {
+		return &buf
 	}
-	return ""
+	return nil
 }
