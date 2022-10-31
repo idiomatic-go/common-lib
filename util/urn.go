@@ -1,11 +1,13 @@
 package util
 
-import "net/url"
+import (
+	"net/url"
+)
 
-func UrnParse(urn string) (nsid, nss string) {
+func UrnParse(urn string) (nsid string, nss string, query string) {
 	u, err := url.Parse(urn)
 	if err != nil {
-		return "", ""
+		return "", "", ""
 	}
-	return u.Scheme, u.Opaque
+	return u.Scheme, u.Opaque, u.RawQuery
 }
