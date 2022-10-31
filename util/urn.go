@@ -4,14 +4,14 @@ import (
 	"net/url"
 )
 
-func ParseUrn(urn string) (nsid string, nss string, args url.Values) {
+func ParseUrn(urn string) *UrnComponents {
 	u, err := url.Parse(urn)
 	if err != nil {
-		return "", "", nil
+		return nil
 	}
 	if u.RawQuery == "" {
-		return u.Scheme, u.Opaque, nil
+		return &UrnComponents{NSID: u.Scheme, NSS: u.Opaque}
 	}
 	val, _ := url.ParseQuery(u.RawQuery)
-	return u.Scheme, u.Opaque, val
+	return &UrnComponents{NSID: u.Scheme, NSS: u.Opaque, Values: val}
 }
