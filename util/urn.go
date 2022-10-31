@@ -4,10 +4,14 @@ import (
 	"net/url"
 )
 
-func UrnParse(urn string) (nsid string, nss string, query string) {
+func ParseUrn(urn string) (nsid string, nss string, args url.Values) {
 	u, err := url.Parse(urn)
 	if err != nil {
-		return "", "", ""
+		return "", "", nil
 	}
-	return u.Scheme, u.Opaque, u.RawQuery
+	if u.RawQuery == "" {
+		return u.Scheme, u.Opaque, nil
+	}
+	val, _ := url.ParseQuery(u.RawQuery)
+	return u.Scheme, u.Opaque, val
 }

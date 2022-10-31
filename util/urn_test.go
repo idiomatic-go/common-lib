@@ -34,15 +34,28 @@ func _ExampleNetUrlParse() {
 
 func ExampleUrnParse() {
 	urn := "pgxsql:sloentry"
-	nsid, nss, query := UrnParse(urn)
+
+	nsid, nss, query := ParseUrn(urn)
+	fmt.Printf("Urn   : %v\n", urn)
+	fmt.Printf("NSID  : %v\n", nsid)
+	fmt.Printf("NSS   : %v\n", nss)
+	fmt.Printf("Query : %v\n", query)
+
+	urn = "pgxsql:sloentry?id=1001&name=test_slo"
+	nsid, nss, query = ParseUrn(urn)
 	fmt.Printf("Urn   : %v\n", urn)
 	fmt.Printf("NSID  : %v\n", nsid)
 	fmt.Printf("NSS   : %v\n", nss)
 	fmt.Printf("Query : %v\n", query)
 
 	//Output:
-	// Urn   : pgxsql:nss.101
-	// NSID  : pgxsql
-	// NSS   : nss.101
+	//Urn   : pgxsql:sloentry
+	//NSID  : pgxsql
+	//NSS   : sloentry
+	//Query : map[]
+	//Urn   : pgxsql:sloentry?id=1001&name=test_slo
+	//NSID  : pgxsql
+	//NSS   : sloentry
+	//Query : map[id:[1001] name:[test_slo]]
 
 }
