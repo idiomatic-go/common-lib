@@ -6,6 +6,7 @@ const (
 	ContentLocation = "content-location"
 	Embedded        = "embedded"
 	EmbeddedContent = "content-location=embedded"
+	EchoScheme      = "echo"
 )
 
 // OverrideHttpClient - change client implementation

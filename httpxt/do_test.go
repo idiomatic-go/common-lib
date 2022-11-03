@@ -3,6 +3,7 @@ package httpxt
 import (
 	"embed"
 	"fmt"
+	"github.com/idiomatic-go/common-lib/fse"
 	"io"
 	"net/http"
 	"strings"
@@ -90,6 +91,35 @@ func ExampleDoSuccess() {
 	// Body : true
 	// IOError : <nil>
 	// Body : <html><body><h1>Hello, World</h1></body></html>
+
+}
+
+func ExampleDoEmbeddedContent() {
+	var uri = "fse://google.com?search=query by example" //&content-location=embedded"
+	req, err0 := http.NewRequestWithContext(fse.ContextWithContent(nil, content, "resource/http/http-503.txt"), http.MethodGet, uri, nil)
+	if err0 != nil {
+		fmt.Println("failure")
+	}
+	resp, err := Do(req)
+	fmt.Printf("Error : %v\n", err)
+	fmt.Printf("Response : %v\n", resp != nil)
+	fmt.Printf("Status Code : %v\n", resp.StatusCode)
+	fmt.Printf("Content-Type : %v\n", resp.Header.Get("content-type"))
+	//fmt.Printf("Content-Length : %v\n", resp.Header.Get("content-length"))
+	fmt.Printf("Body : %v\n", resp.Body != nil)
+
+	defer resp.Body.Close()
+	_, ioerr := io.ReadAll(resp.Body)
+	fmt.Printf("IOError : %v\n", ioerr)
+	//fmt.Printf("Body : %v\n", string(buf))
+
+	//Output:
+	// Error : <nil>
+	// Response : true
+	// Status Code : 503
+	// Content-Type : text/html
+	// Body : true
+	// IOError : <nil>
 
 }
 

@@ -49,15 +49,16 @@ func Do(req *http.Request) (resp *http.Response, err error) {
 	if traceStart != nil {
 		traceFinish = traceStart(req)
 	}
-	if isEmbeddedContent(req) {
+	//if isEmbeddedContent(req) {
+	//resp, err = createEmbeddedResponse(fse.ContextContent(req.Context()), req)
+	//} else {}
+	switch req.URL.Scheme {
+	case EchoScheme:
+		resp, err = createEchoResponse(req)
+	case fse.Scheme:
 		resp, err = createEmbeddedResponse(fse.ContextContent(req.Context()), req)
-	} else {
-		switch req.URL.Scheme {
-		case "echo":
-			resp, err = createEchoResponse(req)
-		default:
-			resp, err = client.Do(req)
-		}
+	default:
+		resp, err = client.Do(req)
 	}
 	if traceFinish != nil {
 		traceFinish(resp, err)
@@ -80,35 +81,36 @@ func isHttpResponseMessage(buf []byte) bool {
 	if buf == nil {
 		return false
 	}
-	l := len(buf)
+	l := len(http11Bytes)
 	if bytes.Equal(buf[0:l], http11Bytes) {
 		return true
 	}
+	l = len(http12Bytes)
 	if bytes.Equal(buf[0:l], http12Bytes) {
 		return true
 	}
+	l = len(http20Bytes)
 	if bytes.Equal(buf[0:l], http20Bytes) {
 		return true
 	}
 	return false
 }
 
-func createEmbeddedResponse(entry *fse.Entry, req *http.Request) (*http.Response, error) {
+func createEmbeddedResponse(entry *fse.Entry, req *http.Request) (resp *http.Response, err error) {
 	if req == nil || entry == nil {
 		return nil, errors.New("invalid argument: Request or Entry nil")
 	}
-	var path = entry.Name
 	if isHttpResponseMessage(entry.Content) {
-		return http.ReadResponse(bufio.NewReader(bytes.NewReader(entry.Content)), req)
+		resp, err = http.ReadResponse(bufio.NewReader(bytes.NewReader(entry.Content)), req)
 	} else {
 		resp := &http.Response{StatusCode: http.StatusOK, Header: make(http.Header), Body: &internal.ReaderCloser{Reader: bytes.NewReader(entry.Content), Err: nil}}
-		if strings.HasSuffix(path, ".json") {
+		if strings.HasSuffix(entry.Name, ".json") {
 			resp.Header.Add("Content-Type", "application/json")
 		} else {
 			resp.Header.Add("Content-Type", "text/plain")
 		}
-		return resp, nil
 	}
+	return resp, err
 }
 
 func createEchoResponse(req *http.Request) (*http.Response, error) {
