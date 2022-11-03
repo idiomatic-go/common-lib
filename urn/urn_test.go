@@ -41,10 +41,10 @@ func _ExampleNetUrlParse() {
 	// Nss   : Nss.101
 
 }
-func ExampleParseQbeInvalid() {
+func _ExampleParseQbeInvalid() {
 	urn := "urn:jksk-invalid:id=test_slo"
 
-	u := ParseQbe(urn)
+	u := Parse(urn)
 	fmt.Printf("Urn   : %v\n", urn)
 	fmt.Printf("Error : %v\n", u.Err)
 
@@ -56,22 +56,20 @@ func ExampleParseQbeInvalid() {
 
 func ExampleParseQbe() {
 	urn := "urn:qbe:id=test_slo"
-	u := ParseQbe(urn)
+	u := Parse(urn)
 	fmt.Printf("Urn    : %v\n", urn)
 	fmt.Printf("Nid    : %v\n", u.Nid)
 	fmt.Printf("Nss    : %v\n", u.Nss)
-	fmt.Printf("QBE    : %v\n", u.Grid)
+	fmt.Printf("QBE    : %v\n", u.QbeGrid)
 	fmt.Printf("Query  : %v\n", u.RawQuery)
-	fmt.Printf("Embedded: %v\n", u.IsEmbeddedContent())
 
 	urn = "qbe:id=1001,name=test_slo?content-location=embedded"
-	u = ParseQbe(urn)
+	u = Parse(urn)
 	fmt.Printf("Urn    : %v\n", urn)
 	fmt.Printf("Nid    : %v\n", u.Nid)
 	fmt.Printf("Nss    : %v\n", u.Nss)
-	fmt.Printf("QBE    : %v\n", u.Grid)
+	fmt.Printf("QBE    : %v\n", u.QbeGrid)
 	fmt.Printf("Query  : %v\n", u.RawQuery)
-	fmt.Printf("Embedded: %v\n", u.IsEmbeddedContent())
 
 	//Output:
 	// Urn    : urn:qbe:id=test_slo
@@ -88,59 +86,43 @@ func ExampleParseQbe() {
 }
 
 func ExampleBuildQbe() {
-	u := BuildQbe(true, "id", 1001)
+	u := Build("fse", "id", 1001)
 
 	fmt.Printf("Urn    : %v\n", u)
 	fmt.Printf("Error  : %v\n", u.Err)
-	fmt.Printf("Query  : %v\n", u.RawQuery)
 
-	u = BuildQbe(false, "id", 1001)
+	u = Build("", "id", 1001)
 	fmt.Printf("Urn    : %v\n", u)
 	fmt.Printf("Error  : %v\n", u.Err)
-	fmt.Printf("Query  : %v\n", u.RawQuery)
 
-	u = BuildQbe(true, "id", nil)
+	u = Build("fse", "id", nil)
 	fmt.Printf("Urn    : %v\n", u)
 	fmt.Printf("Error  : %v\n", u.Err)
-	fmt.Printf("Query  : %v\n", u.RawQuery)
 
 	//Output:
-	// Urn    : qbe:id=1001?content-location=embedded
+	// Urn    : fse:id=1001
 	// Error  : <nil>
-	// Query  : content-location=embedded
 	// Urn    : qbe:id=1001
 	// Error  : <nil>
-	// Query  :
-	// Urn    : qbe:id=<nil>?content-location=embedded
+	// Urn    : fse:id=<nil>
 	// Error  : <nil>
-	// Query  : content-location=embedded
+
 }
 
 func ExampleBuildQbeMulti() {
-	u := BuildQbeMulti(true, Cell{Field: "id", Criteria: 1001})
+	u := BuildMulti("fse", Cell{Field: "id", Criteria: 1001})
 
 	fmt.Printf("Urn    : %v\n", u)
 	fmt.Printf("Error  : %v\n", u.Err)
-	fmt.Printf("Query  : %v\n", u.RawQuery)
 
-	u = BuildQbeMulti(true, Cell{Field: "", Criteria: 1001})
+	u = BuildMulti("", Cell{Field: "", Criteria: 1001})
 	fmt.Printf("Urn    : %v\n", u)
 	fmt.Printf("Error  : %v\n", u.Err)
-	fmt.Printf("Query  : %v\n", u.RawQuery)
-
-	/*
-		u = BuildQbe("pgxsql", "id", nil)
-		fmt.Printf("Urn    : %v\n", u)
-		fmt.Printf("Error  : %v\n", u.Err)
-		fmt.Printf("Scheme : %v\n", u.Scheme())
-	*/
 
 	//Output:
-	// Urn    : qbe:id=1001?content-location=embedded
+	// Urn    : fse:id=1001
 	// Error  : <nil>
-	// Query  : content-location=embedded
 	// Urn    : qbe:
-	// Error  : invalid QbeURN, cell field is empty
-	// Query  :
+	// Error  : invalid URN, cell field is empty
 
 }

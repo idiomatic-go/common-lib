@@ -7,10 +7,10 @@ import (
 )
 
 const (
-	QbeNid          = "qbe"
-	ContentLocation = "content-location"
-	Embedded        = "embedded"
-	EmbeddedContent = ContentLocation + "=" + Embedded
+	QbeNid = "qbe"
+	//ContentLocation = "content-location"
+	//Embedded        = "embedded"
+	//EmbeddedContent = ContentLocation + "=" + Embedded
 )
 
 type Cell struct {
@@ -32,16 +32,15 @@ func (c *Cell) String() string {
 	return fmt.Sprintf("%v=%v", c.Field, c.Criteria)
 }
 
-type QbeURN struct {
+type URN struct {
 	Nid      string
 	Nss      string
 	RawQuery string
-	Grid     []Cell
-	//Values url.Values
-	Err error
+	QbeGrid  []Cell
+	Err      error
 }
 
-func (u *QbeURN) String() string {
+func (u *URN) String() string {
 	var sb strings.Builder
 	sb.WriteString(u.Nid)
 	sb.WriteString(":")
@@ -49,19 +48,22 @@ func (u *QbeURN) String() string {
 	return sb.String()
 }
 
-func (u *QbeURN) Cell(field string) Cell {
-	for i, cell := range u.Grid {
+func (u *URN) Cell(field string) Cell {
+	for i, cell := range u.QbeGrid {
 		if cell.Field == field {
-			return u.Grid[i]
+			return u.QbeGrid[i]
 		}
 	}
 	return Cell{}
 }
 
-func (u *QbeURN) IsEmbeddedContent() bool {
+/*
+func (u *URN) IsEmbeddedContent() bool {
 	if u.RawQuery == "" {
 		return false
 	}
 	//if list, ok := u.Values[ContentLocation]; ok {
 	return strings.Index(u.RawQuery, EmbeddedContent) != -1
 }
+
+*/
