@@ -8,18 +8,24 @@ import (
 )
 
 func ParseQbe(urn string) *QbeURN {
+	if urn == "" {
+		return &QbeURN{Nid: "", Nss: "", Grid: nil, Values: nil, Err: errors.New("invalid QbeURN, urn is empty")}
+	}
 	url, err := url.Parse(strings.TrimPrefix(urn, "urn:"))
 	if err != nil {
-		return &QbeURN{Nid: "", Nss: "", Grid: nil, Err: err}
+		return &QbeURN{Nid: "", Nss: "", Grid: nil, Values: nil, Err: err}
 	}
 	if url.Scheme != QbeNid {
-		return &QbeURN{Nid: "", Nss: "", Grid: nil, Err: errors.New(fmt.Sprintf("invalid QbeURN Nid : %v", url.Scheme))}
+		return &QbeURN{Nid: "", Nss: "", Grid: nil, Values: nil, Err: errors.New(fmt.Sprintf("invalid QbeURN Nid : %v", url.Scheme))}
 	}
 	u := QbeURN{Nid: url.Scheme, Nss: url.Opaque}
 	if u.Nid == "" || u.Nss == "" {
 		u.Err = errors.New(fmt.Sprintf("invalid QbeURNn, Nid or Nss is empty : %v", u))
 	} else {
 		parseQbeGrid(&u)
+	}
+	if url.RawQuery != "" {
+		u.Values = url.Query()
 	}
 	return &u
 }
@@ -36,15 +42,11 @@ func parseQbeGrid(urn *QbeURN) {
 	}
 }
 
-func BuildQbe(scheme string, field string, criteria any) *QbeURN {
-	if scheme != "" {
-		c := Cell{Field: SchemeName, Criteria: scheme}
-		return BuildQbeMulti(c, Cell{Field: field, Criteria: criteria})
-	}
-	return BuildQbeMulti(Cell{Field: field, Criteria: criteria})
+func BuildQbe(embeddedContent bool, field string, criteria any) *QbeURN {
+	return BuildQbeMulti(embeddedContent, Cell{Field: field, Criteria: criteria})
 }
 
-func BuildQbeMulti(cells ...Cell) *QbeURN {
+func BuildQbeMulti(embeddedContent bool, cells ...Cell) *QbeURN {
 	u := QbeURN{Nid: QbeNid}
 	if u.Nid == "" {
 		u.Err = errors.New("invalid QbeURN, Nid is empty")
@@ -53,6 +55,10 @@ func BuildQbeMulti(cells ...Cell) *QbeURN {
 	if len(cells) == 0 {
 		u.Err = errors.New("invalid QbeURN, cells are empty")
 		return &u
+	}
+	if embeddedContent {
+		u.Values = make(url.Values)
+		u.Values[ContentLocation] = []string{Embedded}
 	}
 	for i, cell := range cells {
 		if cell.Field == "" {
@@ -64,6 +70,9 @@ func BuildQbeMulti(cells ...Cell) *QbeURN {
 		}
 		u.Nss += cell.String()
 		u.Grid = append(u.Grid, cell)
+	}
+	if embeddedContent {
+		u.Nss += fmt.Sprintf("?%v=%v", ContentLocation, Embedded)
 	}
 	return &u
 }

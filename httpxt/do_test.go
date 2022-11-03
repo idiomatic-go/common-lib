@@ -25,17 +25,6 @@ func ExampleDoNilRequest() {
 	// invalid argument: Request is nil
 }
 
-func ExampleDoInvalidScheme() {
-	req, _ := http.NewRequest(http.MethodGet, "ftp:test", nil)
-	_, err := Do(req)
-	fmt.Println(isInvalidArgument(err))
-	fmt.Println(err)
-
-	//Output:
-	// true
-	// invalid argument: URL scheme is not supported [ftp]
-}
-
 func ExampleDoHttpError() {
 	req, _ := http.NewRequest(http.MethodGet, "echo://www.somestupidname.com?httpError=true", nil)
 	resp, err := Do(req)

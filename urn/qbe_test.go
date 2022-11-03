@@ -46,9 +46,6 @@ func ExampleParseQbeInvalid() {
 
 	u := ParseQbe(urn)
 	fmt.Printf("Urn   : %v\n", urn)
-	//fmt.Printf("Nid   : %v\n", u.Nid)
-	//fmt.Printf("Nss   : %v\n", u.Nss)
-	//fmt.Printf("QBE   : %v\n", u.Grid)
 	fmt.Printf("Error : %v\n", u.Err)
 
 	//Output:
@@ -60,75 +57,74 @@ func ExampleParseQbeInvalid() {
 func ExampleParseQbe() {
 	urn := "urn:qbe:id=test_slo"
 	u := ParseQbe(urn)
-	fmt.Printf("Urn   : %v\n", urn)
-	fmt.Printf("Nid   : %v\n", u.Nid)
-	fmt.Printf("Nss   : %v\n", u.Nss)
-	fmt.Printf("QBE   : %v\n", u.Grid)
+	fmt.Printf("Urn    : %v\n", urn)
+	fmt.Printf("Nid    : %v\n", u.Nid)
+	fmt.Printf("Nss    : %v\n", u.Nss)
+	fmt.Printf("QBE    : %v\n", u.Grid)
+	fmt.Printf("Values : %v\n", u.Values)
 
-	urn = "qbe:id=1001,name=test_slo,scheme=pgxsql"
+	urn = "qbe:id=1001,name=test_slo?content-location=embedded"
 	u = ParseQbe(urn)
-	fmt.Printf("Urn   : %v\n", urn)
-	fmt.Printf("Nid   : %v\n", u.Nid)
-	fmt.Printf("Nss   : %v\n", u.Nss)
-	fmt.Printf("QBE   : %v\n", u.Grid)
+	fmt.Printf("Urn    : %v\n", urn)
+	fmt.Printf("Nid    : %v\n", u.Nid)
+	fmt.Printf("Nss    : %v\n", u.Nss)
+	fmt.Printf("QBE    : %v\n", u.Grid)
+	fmt.Printf("Values : %v\n", u.Values)
 
 	//Output:
-	// Urn   : urn:qbe:id=test_slo
-	// Nid   : qbe
-	// Nss   : id=test_slo
-	// QBE   : [{id test_slo}]
-	// Urn   : qbe:id=1001,name=test_slo,scheme=pgxsql
-	// Nid   : qbe
-	// Nss   : id=1001,name=test_slo,scheme=pgxsql
-	// QBE   : [{id 1001} {name test_slo} {scheme pgxsql}]
+	// Urn    : urn:qbe:id=test_slo
+	// Nid    : qbe
+	// Nss    : id=test_slo
+	// QBE    : [{id test_slo}]
+	// Values : map[]
+	// Urn    : qbe:id=1001,name=test_slo?content-location=embedded
+	// Nid    : qbe
+	// Nss    : id=1001,name=test_slo
+	// QBE    : [{id 1001} {name test_slo}]
+	// Values : map[content-location:[embedded]]
 
 }
 
 func ExampleBuildQbe() {
-	u := BuildQbe("pgxsql", "id", 1001)
+	u := BuildQbe(true, "id", 1001)
 
 	fmt.Printf("Urn    : %v\n", u)
 	fmt.Printf("Error  : %v\n", u.Err)
-	fmt.Printf("Scheme : %v\n", u.Scheme())
+	fmt.Printf("Values : %v\n", u.Values)
 
-	u = BuildQbe("", "id", 1001)
+	u = BuildQbe(false, "id", 1001)
 	fmt.Printf("Urn    : %v\n", u)
 	fmt.Printf("Error  : %v\n", u.Err)
-	fmt.Printf("Scheme : %v\n", u.Scheme())
+	fmt.Printf("Values : %v\n", u.Values)
 
-	u = BuildQbe("pgxsql", "id", nil)
+	u = BuildQbe(true, "id", nil)
 	fmt.Printf("Urn    : %v\n", u)
 	fmt.Printf("Error  : %v\n", u.Err)
-	fmt.Printf("Scheme : %v\n", u.Scheme())
+	fmt.Printf("Values : %v\n", u.Values)
 
 	//Output:
-	// Urn    : qbe:scheme=pgxsql,id=1001
+	// Urn    : qbe:id=1001?content-location=embedded
 	// Error  : <nil>
-	// Scheme : pgxsql
+	// Values : map[content-location:[embedded]]
 	// Urn    : qbe:id=1001
 	// Error  : <nil>
-	// Scheme :
-	// Urn    : qbe:scheme=pgxsql,id=<nil>
+	// Values : map[]
+	// Urn    : qbe:id=<nil>?content-location=embedded
 	// Error  : <nil>
-	// Scheme : pgxsql
+	// Values : map[content-location:[embedded]]
 }
 
 func ExampleBuildQbeMulti() {
-	u := BuildQbeMulti(Cell{Field: SchemeName, Criteria: "pgxsql"}, Cell{Field: "id", Criteria: 1001})
+	u := BuildQbeMulti(true, Cell{Field: "id", Criteria: 1001})
 
 	fmt.Printf("Urn    : %v\n", u)
 	fmt.Printf("Error  : %v\n", u.Err)
-	fmt.Printf("Scheme : %v\n", u.Scheme())
+	fmt.Printf("Values : %v\n", u.Values)
 
-	u = BuildQbeMulti(Cell{Field: SchemeName, Criteria: nil}, Cell{Field: "id", Criteria: 1001})
+	u = BuildQbeMulti(true, Cell{Field: "", Criteria: 1001})
 	fmt.Printf("Urn    : %v\n", u)
 	fmt.Printf("Error  : %v\n", u.Err)
-	fmt.Printf("Scheme : %v\n", u.Scheme())
-
-	u = BuildQbeMulti(Cell{Field: SchemeName, Criteria: nil}, Cell{Field: "", Criteria: 1001})
-	fmt.Printf("Urn    : %v\n", u)
-	fmt.Printf("Error  : %v\n", u.Err)
-	fmt.Printf("Scheme : %v\n", u.Scheme())
+	fmt.Printf("Values : %v\n", u.Values)
 
 	/*
 		u = BuildQbe("pgxsql", "id", nil)
@@ -138,14 +134,11 @@ func ExampleBuildQbeMulti() {
 	*/
 
 	//Output:
-	// Urn    : qbe:scheme=pgxsql,id=1001
+	// Urn    : qbe:id=1001?content-location=embedded
 	// Error  : <nil>
-	// Scheme : pgxsql
-	// Urn    : qbe:scheme=<nil>,id=1001
-	// Error  : <nil>
-	// Scheme :
-	// Urn    : qbe:scheme=<nil>
+	// Values : map[content-location:[embedded]]
+	// Urn    : qbe:
 	// Error  : invalid QbeURN, cell field is empty
-	// Scheme :
+	// Values : map[content-location:[embedded]]
 
 }

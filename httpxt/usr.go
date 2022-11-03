@@ -2,6 +2,12 @@ package httpxt
 
 import "net/http"
 
+const (
+	ContentLocation = "content-location"
+	Embedded        = "embedded"
+	EmbeddedContent = "content-location=embedded"
+)
+
 // OverrideHttpClient - change client implementation
 func OverrideHttpClient(c *http.Client) {
 	if c != nil {

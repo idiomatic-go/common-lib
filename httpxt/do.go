@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"crypto/tls"
 	"errors"
-	"fmt"
 	"github.com/idiomatic-go/common-lib/fse"
 	"io"
 	"net/http"
@@ -50,24 +49,27 @@ func Do(req *http.Request) (resp *http.Response, err error) {
 	if traceStart != nil {
 		traceFinish = traceStart(req)
 	}
-	switch req.URL.Scheme {
-	case "http", "https":
-		resp, err = client.Do(req)
-	case fse.Scheme:
-		//fsys := fse.ContextEmbeddedFS(req.Context())
-		//if fsys == nil {
-		//return nil, fmt.Errorf("no embedded file system in Context")
-		//}
-		resp, err = createFileResponse(fse.ContextContent(req.Context()), req)
-	case "echo":
-		resp, err = createEchoResponse(req)
-	default:
-		resp, err = nil, fmt.Errorf("invalid argument: URL scheme is not supported [%v]", req.URL.Scheme)
+	if isEmbeddedContent(req) {
+		resp, err = createEmbeddedResponse(fse.ContextContent(req.Context()), req)
+	} else {
+		switch req.URL.Scheme {
+		case "echo":
+			resp, err = createEchoResponse(req)
+		default:
+			resp, err = client.Do(req)
+		}
 	}
 	if traceFinish != nil {
 		traceFinish(resp, err)
 	}
 	return resp, err
+}
+
+func isEmbeddedContent(req *http.Request) bool {
+	if req == nil || req.URL.RawQuery == "" {
+		return false
+	}
+	return strings.Index(req.URL.RawQuery, EmbeddedContent) != -1
 }
 
 var http11Bytes = []byte("HTTP/1.1")
@@ -91,26 +93,11 @@ func isHttpResponseMessage(buf []byte) bool {
 	return false
 }
 
-func createFileResponse(entry *fse.Entry, req *http.Request) (*http.Response, error) {
+func createEmbeddedResponse(entry *fse.Entry, req *http.Request) (*http.Response, error) {
 	if req == nil || entry == nil {
 		return nil, errors.New("invalid argument: Request or Entry nil")
 	}
-	//var err error
-	var path string = entry.Name
-	//if name != "" {
-	//	path = name
-	//	buf, err = fse.ReadFile(fsys, name)
-	//} else {
-	//	path = req.URL.Path
-	//	path = strings.TrimPrefix(path, "/")
-	//	buf, err = fse.ReadFile(fsys, path)
-	//}
-	//if err != nil {
-	//	if strings.Contains(err.Error(), "file does not exist") {
-	//		return &http.Response{StatusCode: http.StatusNotFound}, nil
-	//	}
-	//	return &http.Response{StatusCode: http.StatusInternalServerError}, nil
-	//}
+	var path = entry.Name
 	if isHttpResponseMessage(entry.Content) {
 		return http.ReadResponse(bufio.NewReader(bytes.NewReader(entry.Content)), req)
 	} else {
