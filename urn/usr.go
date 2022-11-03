@@ -3,7 +3,6 @@ package urn
 import (
 	"errors"
 	"fmt"
-	"net/url"
 	"strings"
 )
 
@@ -11,6 +10,7 @@ const (
 	QbeNid          = "qbe"
 	ContentLocation = "content-location"
 	Embedded        = "embedded"
+	EmbeddedContent = ContentLocation + "=" + Embedded
 )
 
 type Cell struct {
@@ -33,11 +33,12 @@ func (c *Cell) String() string {
 }
 
 type QbeURN struct {
-	Nid    string
-	Nss    string
-	Grid   []Cell
-	Values url.Values
-	Err    error
+	Nid      string
+	Nss      string
+	RawQuery string
+	Grid     []Cell
+	//Values url.Values
+	Err error
 }
 
 func (u *QbeURN) String() string {
@@ -58,11 +59,9 @@ func (u *QbeURN) Cell(field string) Cell {
 }
 
 func (u *QbeURN) IsEmbeddedContent() bool {
-	if u.Values == nil {
+	if u.RawQuery == "" {
 		return false
 	}
-	if list, ok := u.Values[ContentLocation]; ok {
-		return list[0] == Embedded
-	}
-	return false
+	//if list, ok := u.Values[ContentLocation]; ok {
+	return strings.Index(u.RawQuery, EmbeddedContent) != -1
 }

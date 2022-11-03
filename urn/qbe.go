@@ -9,14 +9,14 @@ import (
 
 func ParseQbe(urn string) *QbeURN {
 	if urn == "" {
-		return &QbeURN{Nid: "", Nss: "", Grid: nil, Values: nil, Err: errors.New("invalid QbeURN, urn is empty")}
+		return &QbeURN{Nid: "", Nss: "", Grid: nil, Err: errors.New("invalid QbeURN, urn is empty")}
 	}
 	url, err := url.Parse(strings.TrimPrefix(urn, "urn:"))
 	if err != nil {
-		return &QbeURN{Nid: "", Nss: "", Grid: nil, Values: nil, Err: err}
+		return &QbeURN{Nid: "", Nss: "", Grid: nil, Err: err}
 	}
 	if url.Scheme != QbeNid {
-		return &QbeURN{Nid: "", Nss: "", Grid: nil, Values: nil, Err: errors.New(fmt.Sprintf("invalid QbeURN Nid : %v", url.Scheme))}
+		return &QbeURN{Nid: "", Nss: "", Grid: nil, Err: errors.New(fmt.Sprintf("invalid QbeURN Nid : %v", url.Scheme))}
 	}
 	u := QbeURN{Nid: url.Scheme, Nss: url.Opaque}
 	if u.Nid == "" || u.Nss == "" {
@@ -25,7 +25,7 @@ func ParseQbe(urn string) *QbeURN {
 		parseQbeGrid(&u)
 	}
 	if url.RawQuery != "" {
-		u.Values = url.Query()
+		u.RawQuery = url.RawQuery
 	}
 	return &u
 }
@@ -57,8 +57,7 @@ func BuildQbeMulti(embeddedContent bool, cells ...Cell) *QbeURN {
 		return &u
 	}
 	if embeddedContent {
-		u.Values = make(url.Values)
-		u.Values[ContentLocation] = []string{Embedded}
+		u.RawQuery = EmbeddedContent
 	}
 	for i, cell := range cells {
 		if cell.Field == "" {
@@ -72,7 +71,7 @@ func BuildQbeMulti(embeddedContent bool, cells ...Cell) *QbeURN {
 		u.Grid = append(u.Grid, cell)
 	}
 	if embeddedContent {
-		u.Nss += fmt.Sprintf("?%v=%v", ContentLocation, Embedded)
+		u.Nss += fmt.Sprintf("?%v", EmbeddedContent)
 	}
 	return &u
 }
