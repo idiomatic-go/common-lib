@@ -17,7 +17,7 @@ type Event struct {
 	LogEventId  string
 }
 
-func _ExampleEntryErrorFile() {
+func ExampleEntryErrorFile() {
 	ctx := ContextWithContent(nil, fsys, "resource/error/invalid-error-content.txt")
 	entry := ContextContent(ctx)
 
@@ -53,59 +53,52 @@ func _ExampleEntryErrorFile() {
 }
 
 func ExampleProcessContentError() {
-	cust := CustomerHistory{}
-	err := ProcessContent(nil, nil)
+	//cust := CustomerHistory{}
+	_, err := ProcessContent[CustomerHistory](nil)
 	fmt.Printf("Nil Context : %v\n", err)
 
-	err = ProcessContent(context.Background(), nil)
+	_, err = ProcessContent[CustomerHistory](context.Background())
 	fmt.Printf("Nil Entry   : %v\n", err)
 
 	ctx := ContextWithContent(nil, fsys, "resource/json/event-empty.json")
-	err = ProcessContent(ctx, nil)
+	_, err = ProcessContent[CustomerHistory](ctx)
 	fmt.Printf("Nil Content : %v\n", err)
 
-	ctx = ContextWithContent(nil, fsys, "resource/json/event.json")
-	err = ProcessContent(ctx, nil)
-	fmt.Printf("Nil Any     : %v\n", err)
+	//ctx = ContextWithContent(nil, fsys, "resource/json/event.json")
+	//_, err = ProcessContent[CustomerHistory](ctx)
+	//fmt.Printf("Nil Any     : %v\n", err)
 
 	ctx = ContextWithContent(nil, fsys, "resource/json/event-not-json.txt")
-	err = ProcessContent(ctx, &cust)
+	_, err = ProcessContent[CustomerHistory](ctx)
 	fmt.Printf("Non Json    : %v\n", err)
 
 	//Output:
 	//Nil Context : invalid argument : context is nil
 	//Nil Entry   : no file system entry available
 	//Nil Content : no content available for entry name : resource/json/event-empty.json
-	//Nil Any     : invalid argument : any parameter is nil
 	//Non Json    : invalid content for json.Unmarshal() : resource/json/event-not-json.txt
 }
 
 func ExampleProcessContent() {
-	cust := CustomerHistory{}
-
-	err := ProcessContent(nil, nil)
-	fmt.Printf("Nil Context : %v\n", err)
-
-	err = ProcessContent(context.Background(), nil)
-	fmt.Printf("Nil Entry   : %v\n", err)
-
-	ctx := ContextWithContent(nil, fsys, "resource/json/event-empty.json")
-	err = ProcessContent(ctx, nil)
-	fmt.Printf("Nil Content : %v\n", err)
+	ctx := ContextWithContent(nil, fsys, "resource/error/test-name-eRr.txt")
+	_, err := ProcessContent[CustomerHistory](ctx)
+	fmt.Printf("Error : %v\n", err)
 
 	ctx = ContextWithContent(nil, fsys, "resource/json/event.json")
-	err = ProcessContent(ctx, nil)
-	fmt.Printf("Nil Any     : %v\n", err)
+	cust, err0 := ProcessContent[CustomerHistory](ctx)
+	fmt.Printf("Error : %v\n", err0)
+	fmt.Printf("Cust  : %v\n", cust)
 
-	ctx = ContextWithContent(nil, fsys, "resource/json/event-not-json.txt")
-	err = ProcessContent(ctx, &cust)
-	fmt.Printf("Non Json    : %v\n", err)
+	ctx = ContextWithContent(nil, fsys, "resource/json/event-list.json")
+	list, err1 := ProcessContent[[]CustomerHistory](ctx)
+	fmt.Printf("Error : %v\n", err1)
+	fmt.Printf("List  : %v\n", list)
 
 	//Output:
-	//Nil Context : invalid argument : context is nil
-	//Nil Entry   : no file system entry available
-	//Nil Content : no content available for entry name : resource/json/event-empty.json
-	//Nil Any     : invalid argument : any parameter is nil
-	//Non Json    : invalid content for json.Unmarshal() : resource/json/event-not-json.txt
-}
+	//Error : This is example 1 of an error from test-name-eRr.txt
+	//Error : <nil>
+	//Cust  : {C1 [{ invoice created 2022-08-25 0001} { payment created 2022-08-26 0002}]}
+	//Error : <nil>
+	//List  : [{C1 [{ invoice created 2022-08-25 0001} { payment created 2022-08-26 0002}]} {C0002 [{ return created 2022-10-25 99990001} { credit created 2022-11-01 0002333}]}]
 
+}

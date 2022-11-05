@@ -15,26 +15,25 @@ func (e *Entry) Error() error {
 	return nil
 }
 
-func ProcessContent(ctx context.Context, t any) error {
+func ProcessContent[T any](ctx context.Context) (T, error) {
+	var t T
 	if ctx == nil {
-		return errors.New(fmt.Sprintf("invalid argument : context is nil"))
+		return t, errors.New(fmt.Sprintf("invalid argument : context is nil"))
 	}
 	fs := ContextContent(ctx)
 	if fs == nil {
-		return errors.New(fmt.Sprintf("no file system entry available"))
+		return t, errors.New(fmt.Sprintf("no file system entry available"))
 	}
 	if fs.Content == nil || len(fs.Content) == 0 {
-		return errors.New(fmt.Sprintf("no content available for entry name : %v", fs.Name))
+		return t, errors.New(fmt.Sprintf("no content available for entry name : %v", fs.Name))
 	}
 	err := fs.Error()
 	if err != nil {
-		return err
-	}
-	if t == nil {
-		return errors.New("invalid argument : any parameter is nil")
+		return t, err
 	}
 	if strings.Index(fs.Name, ".json") == -1 {
-		return errors.New(fmt.Sprintf("invalid content for json.Unmarshal() : %v", fs.Name))
+		return t, errors.New(fmt.Sprintf("invalid content for json.Unmarshal() : %v", fs.Name))
 	}
-	return json.Unmarshal(fs.Content, t)
+	err = json.Unmarshal(fs.Content, &t)
+	return t, err
 }
