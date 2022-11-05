@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/idiomatic-go/common-lib/logxt"
 	"io/fs"
+	"strings"
 )
 
 /*
@@ -50,7 +51,7 @@ func ContextWithContent(ctx context.Context, fs fs.FS, name string) context.Cont
 		logxt.LogDebugf("file system read error : %v", err)
 		return ctx
 	}
-	return context.WithValue(ctx, entrykey, Entry{Name: name, Content: buf})
+	return context.WithValue(ctx, entrykey, Entry{Name: strings.ToLower(name), Content: buf})
 }
 
 // ContextContent - return the content

@@ -2,7 +2,9 @@ package fse
 
 const (
 	// Scheme - file system entry
-	Scheme = "fse"
+	Scheme    = "fse"
+	ErrorText = "error.txt"
+	ErrText   = "err.txt"
 )
 
 type Entry struct {
