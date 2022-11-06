@@ -7,6 +7,14 @@ import (
 	"strings"
 )
 
+func (u URN) String() string {
+	var sb strings.Builder
+	sb.WriteString(u.Nid)
+	sb.WriteString(":")
+	sb.WriteString(u.Nss)
+	return sb.String()
+}
+
 func (c *QbeCell) Parse(exp string) error {
 	tokens := strings.Split(exp, "=")
 	if len(tokens) < 2 {
