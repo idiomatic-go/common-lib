@@ -50,27 +50,27 @@ func parseQbeGrid(urn *URN) {
 	}
 }
 
-func Build(nid string, field string, criteria any) *URN {
+func Build(nid string, field string, criteria any) URN {
 	return BuildMulti(nid, QbeCell{Field: field, Criteria: criteria})
 }
 
-func BuildMulti(nid string, cells ...QbeCell) *URN {
+func BuildMulti(nid string, cells ...QbeCell) URN {
 	u := URN{Nid: QbeNid}
 	if nid != "" {
 		u.Nid = nid
 	}
 	if u.Nid == "" {
 		u.Err = errors.New("invalid URN, Nid is empty")
-		return &u
+		return u
 	}
 	if len(cells) == 0 {
 		u.Err = errors.New("invalid URN, cells are empty")
-		return &u
+		return u
 	}
 	for i, cell := range cells {
 		if cell.Field == "" {
 			u.Err = errors.New("invalid URN, cell field is empty")
-			return &u
+			return u
 		}
 		if i > 0 {
 			u.Nss += ","
@@ -78,5 +78,5 @@ func BuildMulti(nid string, cells ...QbeCell) *URN {
 		u.Nss += cell.String()
 		u.QbeGrid = append(u.QbeGrid, cell)
 	}
-	return &u
+	return u
 }
