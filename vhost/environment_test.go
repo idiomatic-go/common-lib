@@ -3,14 +3,13 @@ package vhost_test
 import (
 	"fmt"
 	"github.com/idiomatic-go/common-lib/vhost"
-	"os"
 )
 
 func ExampleDevEnv() {
 	fmt.Println(vhost.IsDevEnv())
-	os.Setenv(vhost.RuntimeEnvKey, "dev")
+	vhost.SetEnv("dev")
 	fmt.Println(vhost.IsDevEnv())
-	os.Setenv(vhost.RuntimeEnvKey, "devrrr")
+	vhost.SetEnv("devrrr")
 	fmt.Println(vhost.IsDevEnv())
 
 	// Output:
@@ -22,9 +21,9 @@ func ExampleDevEnv() {
 func ExampleDevEnvOverride() {
 	vhost.IsDevEnv = func() bool { return false }
 	fmt.Println(vhost.IsDevEnv())
-	os.Setenv(vhost.RuntimeEnvKey, "dev")
+	vhost.SetEnv("dev")
 	fmt.Println(vhost.IsDevEnv())
-	os.Setenv(vhost.RuntimeEnvKey, "devrrr")
+	vhost.SetEnv("devrrr")
 	fmt.Println(vhost.IsDevEnv())
 
 	// Output:

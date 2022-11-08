@@ -62,7 +62,7 @@ func ExampleValidateToSend() {
 	err = validateToSend(toSend)
 	fmt.Printf("Test - {invalid package uri in dependent} : %v\n", err)
 
-	UnregisterPackage(uri2)
+	unregisterPackage(uri2)
 	registerPackageUnchecked(uri2, nil, []string{"package:none"})
 
 	toSend = messageMap{"package:none": {Event: StartupEvent, From: HostFrom}, "package:one": {Event: StartupEvent, From: HostFrom}}
@@ -70,7 +70,7 @@ func ExampleValidateToSend() {
 	fmt.Printf("Test - {valid package uri in dependent} : %v\n", err)
 
 	//Output:
-	// Test - {invalid package uri in message} : Startup failure: directory entry does not exist for package uri: invalid
+	// Test - {invalid package uri in message} : startup failure: directory entry does not exist for package uri: invalid
 	// Test - {valid package uri in message} : <nil>
 	// Test - {invalid package uri in dependent} : <nil>
 	// Test - {valid package uri in dependent} : <nil>

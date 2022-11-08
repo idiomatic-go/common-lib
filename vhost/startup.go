@@ -42,10 +42,10 @@ func IsPackageStartupSuccessful(uri string) bool {
 // RegisterPackage - function to register a package uri
 func RegisterPackage(uri string, c chan Message, dependents []string) error {
 	if uri == "" {
-		return errors.New("Startup RegisterPackage() error : uri is empty")
+		return errors.New("startup RegisterPackage() error : uri is empty")
 	}
 	if c == nil {
-		return errors.New("Startup RegisterPackage() error : channel is nil")
+		return errors.New("startup RegisterPackage() error : channel is nil")
 	}
 	registerPackageUnchecked(uri, c, dependents)
 	return nil
@@ -57,7 +57,7 @@ func registerPackageUnchecked(uri string, c chan Message, dependents []string) e
 }
 
 // UnregisterPackage - function to unregister a package
-func UnregisterPackage(uri string) {
+func unregisterPackage(uri string) {
 	if uri == "" {
 		return
 	}
@@ -69,8 +69,13 @@ func UnregisterPackage(uri string) {
 		delete(directory.m, uri)
 	}
 }
-func unregisterPackages() {
 
+// Shutdown - virtual host shutdown
+func Shutdown() {
+	for k := range directory.data() {
+		SendShutdownMessage(k, HostFrom)
+		unregisterPackage(k)
+	}
 }
 
 // Startup - virtual host startup
@@ -88,32 +93,32 @@ func Startup(ticks int, override messageMap) bool {
 	err = sendMessages(toSend)
 	if err != nil {
 		logxt.LogPrintf("%v", err)
-		unregisterPackages()
+		Shutdown()
 		return false
 	}
 	var count = 1
 	for {
 		if count > maxStartupIterations {
-			logxt.LogPrintf("Startup failure %v, max iterations exceeded: %v", directory.notSuccessfulStatus(), count)
-			unregisterPackages()
+			logxt.LogPrintf("startup failure %v, max iterations exceeded: %v", directory.notSuccessfulStatus(), count)
+			Shutdown()
 			return false
 		}
 		time.Sleep(time.Second * time.Duration(ticks))
 		// Check the startup status of the directory, continue if a package is still in startup
 		uri := directory.inProgress()
 		if uri != "" {
-			logxt.LogPrintf("Startup in progress: continuing: %v", uri)
+			logxt.LogPrintf("startup in progress: continuing: %v", uri)
 			count++
 			continue
 		}
 		// All the current messages have been sent, so lets check for failure.
 		fail := directory.failure()
 		if fail != "" {
-			logxt.LogPrintf("Startup failure: status on: %v", fail)
-			unregisterPackages()
+			logxt.LogPrintf("startup failure: status on: %v", fail)
+			Shutdown()
 			return false
 		}
-		logxt.LogPrintf("Startup successful: %v", count)
+		logxt.LogPrintf("startup successful: %v", count)
 		break
 	}
 	return true
@@ -146,7 +151,7 @@ func validateToSend(toSend messageMap) error {
 	for k := range toSend {
 		e := directory.get(k)
 		if e == nil {
-			return errors.New(fmt.Sprintf("Startup failure: directory entry does not exist for package uri: %v", k))
+			return errors.New(fmt.Sprintf("startup failure: directory entry does not exist for package uri: %v", k))
 		}
 	}
 	return nil

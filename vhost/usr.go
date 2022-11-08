@@ -6,7 +6,7 @@ import (
 
 // Environment
 const (
-	DevEnv         = "DEV"
+	DevEnv         = "dev"
 	EnvTemplateVar = "{env}"
 	RuntimeEnvKey  = "RUNTIME_ENV"
 )
@@ -18,9 +18,18 @@ func OverrideRuntimeEnvKey(k string) {
 	}
 }
 
-// GetEnv - function to get the runtime environment
+// GetEnv - function to get the vhost runtime environment
 func GetEnv() string {
-	return os.Getenv(runtimeKey)
+	s := os.Getenv(runtimeKey)
+	if s == "" {
+		return DevEnv
+	}
+	return s
+}
+
+// SetEnv - function to set the vhost runtime environment
+func SetEnv(s string) {
+	os.Setenv(runtimeKey, s)
 }
 
 // EnvValid - type to allow override of dev environment determination
@@ -63,3 +72,5 @@ type Message struct {
 }
 
 type Credentials func() (username string, password string, err error)
+
+type MessageHandler func(msg Message)
