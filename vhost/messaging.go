@@ -4,41 +4,6 @@ import (
 	"fmt"
 )
 
-func IsStartupSuccessful(uri string) bool {
-	return directory.isStartupSuccessful(uri)
-}
-
-// RegisterPackage - public method to register
-func RegisterPackage(uri string, c chan Message, dependents []string) error {
-	if uri == "" {
-		return fmt.Errorf("invalid argument : uri is empty")
-	}
-	if c == nil {
-		return fmt.Errorf("invalid argument : channel is nil")
-	}
-	registerPackageUnchecked(uri, c, dependents)
-	return nil
-}
-
-func registerPackageUnchecked(uri string, c chan Message, dependents []string) error {
-	directory.put(&entry{uri: uri, c: c, dependents: dependents})
-	return nil
-}
-
-// UnregisterPackage - public method to unregister a package
-func UnregisterPackage(uri string) {
-	if uri == "" {
-		return
-	}
-	entry := directory.get(uri)
-	if entry != nil {
-		if entry.c != nil {
-			close(entry.c)
-		}
-		delete(directory.m, uri)
-	}
-}
-
 func CreateMessage(to, event, from string, status int32, content any) Message {
 	msg := Message{To: to, Event: event, From: from, Status: int32(status), Content: nil}
 	if content != nil {

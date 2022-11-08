@@ -51,7 +51,7 @@ func ReadMap(path string) (map[string]string, error) {
 	return fse.ReadMap(fsys, path)
 }
 
-var lookupEnv LookupVariable = func(name string) (string, error) {
+var lookupEnv = func(name string) (string, error) {
 	switch name {
 	case EnvTemplateVar:
 		return GetEnv(), nil

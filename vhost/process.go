@@ -8,6 +8,10 @@ import (
 	"time"
 )
 
+type work func(sent util.List, toSend messageMap, current messageMap) error
+type currentWork func(sent util.List, toSend messageMap, current messageMap) bool
+type toSend func(sent util.List, entry *entry) bool
+
 func startupProcess(ticks int, toSend messageMap) bool {
 	logxt.LogPrintf("Startup begin with iteration seconds: %v", ticks)
 	sent := make(util.List)
@@ -15,7 +19,7 @@ func startupProcess(ticks int, toSend messageMap) bool {
 	current := make(messageMap)
 	for {
 		if count > maxStartupIterations {
-			logxt.LogPrintf("Startup failure: max iterations excedded: %v", count)
+			logxt.LogPrintf("Startup failure: max iterations exceeded: %v", count)
 			return false
 		}
 		logxt.LogPrintf("Startup iteration: %v", count)
@@ -28,14 +32,14 @@ func startupProcess(ticks int, toSend messageMap) bool {
 		}
 		time.Sleep(time.Second * time.Duration(ticks))
 		// Check the startup status of the directory, continue if a package is still in startup
-		uri := directory.startupInProgress()
+		uri := directory.inProgress()
 		if uri != "" {
 			logxt.LogPrintf("Startup still in progress continuing: %v", uri)
 			count++
 			continue
 		}
 		// All the current messages have been sent, so lets check for failure.
-		fail := directory.startupFailure()
+		fail := directory.failure()
 		if fail != "" {
 			logxt.LogPrintf("Startup failure status on: %v", fail)
 			return false
@@ -66,4 +70,35 @@ var processWork work = func(sent util.List, toSend messageMap, current messageMa
 		SendMessage(current[k])
 	}
 	return nil
+}
+
+var getCurrentWork currentWork = func(sent util.List, toSend messageMap, current messageMap) bool {
+	valid := false
+	for k := range toSend {
+		e := directory.get(k)
+		if e == nil {
+			continue
+		}
+		ok := validToSend(sent, e)
+		if ok {
+			valid = true
+			current[k] = toSend[k]
+			delete(toSend, k)
+		}
+	}
+	return valid
+}
+
+var validToSend toSend = func(sent util.List, entry *entry) bool {
+	// No dependencies, so can be sent
+	if len(entry.dependents) == 0 {
+		return true
+	}
+	// Need to determine if all dependencies have been sent and are successful
+	for _, uri := range entry.dependents {
+		if !sent.Contains(uri) {
+			return false
+		}
+	}
+	return true
 }

@@ -1,6 +1,7 @@
 package vhost
 
 import (
+	"fmt"
 	"sync"
 	"time"
 )
@@ -8,16 +9,23 @@ import (
 type messageMap map[string]Message
 
 type entry struct {
-	uri            string
-	c              chan Message
-	dependents     []string
-	startupStatus  int32
-	statusChangeTS time.Time
+	uri                string
+	c                  chan Message
+	dependents         []string
+	startupStatus      int32
+	statusChangeTS     time.Time
+	statusInProgressTS time.Time
 }
 
 type syncMap struct {
 	m  map[string]*entry
 	mu sync.RWMutex
+}
+
+var directory *syncMap
+
+func init() {
+	directory = createSyncMap()
 }
 
 func (s *syncMap) count() int {
@@ -56,7 +64,11 @@ func (s *syncMap) setStatus(uri string, status int32) bool {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	e.startupStatus = status
-	e.statusChangeTS = time.Now()
+	if status == StatusInProgress {
+		e.statusInProgressTS = time.Now()
+	} else {
+		e.statusChangeTS = time.Now()
+	}
 	return true
 }
 
@@ -68,12 +80,24 @@ func (s *syncMap) getStatus(uri string) int32 {
 	return e.startupStatus
 }
 
-func (s *syncMap) isStartupSuccessful(uri string) bool {
+func (s *syncMap) isSuccessful(uri string) bool {
 	status := s.getStatus(uri)
 	return status == StatusSuccessful
 }
 
-func (s *syncMap) startupInProgress() string {
+func (s *syncMap) notSuccessfulStatus() (status []string) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	for k := range s.m {
+		e := s.m[k]
+		if e != nil && (e.startupStatus == StatusInProgress || e.startupStatus == StatusFailure) {
+			status = append(status, fmt.Sprintf("{uri: %v, status: %v, inProgressTS: %v statusChangeTS: %v}", k, e.startupStatus, e.statusInProgressTS, e.statusChangeTS))
+		}
+	}
+	return status
+}
+
+func (s *syncMap) inProgress() string {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	for k := range s.m {
@@ -85,7 +109,7 @@ func (s *syncMap) startupInProgress() string {
 	return ""
 }
 
-func (s *syncMap) startupFailure() string {
+func (s *syncMap) failure() string {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	for k := range s.m {
@@ -108,10 +132,4 @@ func empty(m messageMap) {
 
 func createSyncMap() *syncMap {
 	return &syncMap{m: make(map[string]*entry)}
-}
-
-var directory *syncMap
-
-func init() {
-	directory = createSyncMap()
 }

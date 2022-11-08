@@ -16,10 +16,10 @@ func ExampleSyncMapInit() {
 	fmt.Printf("Entry : %v\n", d2)
 
 	//Output:
-	// Count : 0
-	// Entry : <nil>
-	// Count : 1
-	// Entry : &{urn:test <nil> [uri1 uri2] 100}
+	//Count : 0
+	//Entry : <nil>
+	//Count : 1
+	//Entry : &{urn:test <nil> [uri1 uri2] 100 {0 0 <nil>} {0 0 <nil>}}
 
 }
 
@@ -48,28 +48,28 @@ func ExampleSyncMapStatus() {
 	status = m.getStatus(uri)
 	fmt.Printf("Get Status [%v]: %v\n", uri, status)
 
-	ok = m.isStartupSuccessful(uri)
+	ok = m.isSuccessful(uri)
 	fmt.Printf("Startup Successful [%v]: %v\n", uri, ok)
 
 	ok = m.setStatus(uri, StatusSuccessful)
 	fmt.Printf("Set Status [%v] : %v %v\n", uri, StatusSuccessful, ok)
 
-	ok = m.isStartupSuccessful(uri)
+	ok = m.isSuccessful(uri)
 	fmt.Printf("Startup Successful [%v]: %v\n", uri, ok)
 
 	//Output:
-	// Entry : &{urn:test <nil> [] 0}
-	// Get Status [urn:test]: 0  true
-	// Get Status [invalid]: 0  false
-	// Set Status [urn:test] : 3 true
-	// Set Status [invalid] : 3 false
-	// Get Status [urn:test]: 3  true
-	// Startup Successful [urn:test]: false
-	// Set Status [urn:test] : 2 true
-	// Startup Successful [urn:test]: true
+	//Entry : &{urn:test <nil> [] 0 {0 0 <nil>} {0 0 <nil>}}
+	//Get Status [urn:test]: 0
+	//Get Status [invalid]: 0
+	//Set Status [urn:test] : 3 true
+	//Set Status [invalid] : 3 false
+	//Get Status [urn:test]: 3
+	//Startup Successful [urn:test]: false
+	//Set Status [urn:test] : 2 true
+	//Startup Successful [urn:test]: true
 }
 
-func _ExampleSyncMapDirectoryStatus() {
+func ExampleSyncMapDirectoryStatus() {
 	uri := "urn:test"
 
 	m := &syncMap{m: make(map[string]*entry)}
@@ -89,22 +89,25 @@ func _ExampleSyncMapDirectoryStatus() {
 	e2 = m.get("urn:test3")
 	fmt.Printf("Entry [%v] : %v\n", "urn:test3", e2)
 
-	s := m.startupFailure()
+	s := m.failure()
 	fmt.Printf("Startup Failure : %v\n", s)
 
-	s = m.startupInProgress()
+	s = m.inProgress()
 	fmt.Printf("Startup In Progress : %v\n", s)
 
 	m.setStatus("urn:test2", StatusInProgress)
-	s = m.startupInProgress()
-	fmt.Printf("Startup In Progress : %v\n", s)
+	fmt.Printf("Startup In Progress : %v\n", m.notSuccessfulStatus())
+
+	m.setStatus("urn:test2", StatusFailure)
+	//s = m.inProgress()
+	fmt.Printf("Startup Successful : %v\n", m.notSuccessfulStatus())
 
 	//Output:
-	// Entry [urn:test] : &{urn:test <nil> [] 2}
-	// Entry [urn:test2] : &{urn:test <nil> [] 3}
-	// Entry [urn:test3] : &{urn:test <nil> [] 0}
+	// Entry [urn:test] : &{urn:test <nil> [] 2 {0 0 <nil>} {0 0 <nil>}}
+	// Entry [urn:test2] : &{urn:test <nil> [] 3 {0 0 <nil>} {0 0 <nil>}}
+	// Entry [urn:test3] : &{urn:test <nil> [] 0 {0 0 <nil>} {0 0 <nil>}}
 	// Startup Failure : urn:test2
 	// Startup In Progress :
-	// Startup In Progress : urn:test2
-
+	// Startup In Progress : [{uri: urn:test2, status: 1, inProgressTS: 2022-11-08 04:12:18.583213 -0600 CST m=+0.005116901, statusChangeTS: 0001-01-01 00:00:00 +0000 UTC}]
+	// Startup Successful : [{uri: urn:test2, status: 3, inProgressTS: 2022-11-08 04:48:46.2468702 -0600 CST m=+0.004997001 statusChangeTS: 2022-11-08 04:48:46.2482719 -0600 CST m=+0.006398701}]
 }

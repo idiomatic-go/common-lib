@@ -29,3 +29,6 @@ type URN struct {
 	QbeGrid  []QbeCell
 	Err      error
 }
+
+// VariableLookup - type used in template.go
+type VariableLookup = func(name string) (value string, err error)

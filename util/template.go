@@ -7,11 +7,9 @@ import (
 )
 
 const (
-	TEMPLATE_BEGIN_DELIMITER = "{"
-	TEMPLATE_END_DELIMITER   = "}"
+	TemplateBeginDelimiter = "{"
+	TemplateEndDelimiter   = "}"
 )
-
-type VariableLookup = func(name string) (value string, err error)
 
 func ExpandTemplate(t string, lookup VariableLookup) (string, error) {
 	if t == "" {
@@ -21,12 +19,12 @@ func ExpandTemplate(t string, lookup VariableLookup) (string, error) {
 		return t, errors.New("invalid argument : VariableLookup() is nil")
 	}
 	var buf strings.Builder
-	tokens := strings.Split(t, TEMPLATE_BEGIN_DELIMITER)
+	tokens := strings.Split(t, TemplateBeginDelimiter)
 	if len(tokens) == 1 {
 		return t, nil
 	}
 	for _, s := range tokens {
-		sub := strings.Split(s, TEMPLATE_END_DELIMITER)
+		sub := strings.Split(s, TemplateEndDelimiter)
 		if len(sub) > 2 {
 			return "", errors.New(fmt.Sprintf("invalid argument : token has multiple end delimiters: %v", s))
 		}

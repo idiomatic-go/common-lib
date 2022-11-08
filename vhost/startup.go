@@ -4,14 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"github.com/idiomatic-go/common-lib/logxt"
-	"github.com/idiomatic-go/common-lib/util"
+	"time"
 )
 
 var maxStartupIterations = DefaultMaxStartupIterations
-
-type work func(sent util.List, toSend messageMap, current messageMap) error
-type currentWork func(sent util.List, toSend messageMap, current messageMap) bool
-type toSend func(sent util.List, entry *entry) bool
 
 // Response methods
 var resp chan Message
@@ -21,6 +17,60 @@ func init() {
 	resp = make(chan Message, 100)
 	q = CreateQueue()
 	go receive(q)
+}
+
+// IsPackageStartupSuccessful - determine if a package was successfully started
+func IsPackageStartupSuccessful(uri string) bool {
+	count := 1
+	for {
+		if count > 3 {
+			return false
+		}
+		count++
+		status := directory.getStatus(uri)
+		switch status {
+		case StatusSuccessful:
+			return true
+		case StatusFailure:
+			return false
+		default:
+			time.Sleep(time.Second * time.Duration(1))
+		}
+	}
+}
+
+// RegisterPackage - function to register a package uri
+func RegisterPackage(uri string, c chan Message, dependents []string) error {
+	if uri == "" {
+		return errors.New("Startup RegisterPackage() error : uri is empty")
+	}
+	if c == nil {
+		return errors.New("Startup RegisterPackage() error : channel is nil")
+	}
+	registerPackageUnchecked(uri, c, dependents)
+	return nil
+}
+
+func registerPackageUnchecked(uri string, c chan Message, dependents []string) error {
+	directory.put(&entry{uri: uri, c: c, dependents: dependents})
+	return nil
+}
+
+// UnregisterPackage - function to unregister a package
+func UnregisterPackage(uri string) {
+	if uri == "" {
+		return
+	}
+	entry := directory.get(uri)
+	if entry != nil {
+		if entry.c != nil {
+			close(entry.c)
+		}
+		delete(directory.m, uri)
+	}
+}
+func unregisterPackages() {
+
 }
 
 // Startup - virtual host startup
@@ -35,7 +85,38 @@ func Startup(ticks int, override messageMap) bool {
 		logxt.LogPrintf("%v", err)
 		return false
 	}
-	return startupProcess(ticks, toSend)
+	err = sendMessages(toSend)
+	if err != nil {
+		logxt.LogPrintf("%v", err)
+		unregisterPackages()
+		return false
+	}
+	var count = 1
+	for {
+		if count > maxStartupIterations {
+			logxt.LogPrintf("Startup failure %v, max iterations exceeded: %v", directory.notSuccessfulStatus(), count)
+			unregisterPackages()
+			return false
+		}
+		time.Sleep(time.Second * time.Duration(ticks))
+		// Check the startup status of the directory, continue if a package is still in startup
+		uri := directory.inProgress()
+		if uri != "" {
+			logxt.LogPrintf("Startup in progress: continuing: %v", uri)
+			count++
+			continue
+		}
+		// All the current messages have been sent, so lets check for failure.
+		fail := directory.failure()
+		if fail != "" {
+			logxt.LogPrintf("Startup failure: status on: %v", fail)
+			unregisterPackages()
+			return false
+		}
+		logxt.LogPrintf("Startup successful: %v", count)
+		break
+	}
+	return true
 }
 
 func createToSend(msgs messageMap) messageMap {
@@ -65,47 +146,20 @@ func validateToSend(toSend messageMap) error {
 	for k := range toSend {
 		e := directory.get(k)
 		if e == nil {
-			return errors.New(fmt.Sprintf("directory entry does not exist for package uri: %v", k))
-		}
-		for _, k2 := range e.dependents {
-			e := directory.get(k2)
-			if e == nil {
-				return errors.New(fmt.Sprintf("directory entry does not exist for dependent package uri: %v", k2))
-			}
+			return errors.New(fmt.Sprintf("Startup failure: directory entry does not exist for package uri: %v", k))
 		}
 	}
 	return nil
 }
 
-var getCurrentWork currentWork = func(sent util.List, toSend messageMap, current messageMap) bool {
-	valid := false
-	for k := range toSend {
-		e := directory.get(k)
-		if e == nil {
-			continue
+func sendMessages(msgs messageMap) error {
+	for k := range msgs {
+		if !directory.setStatus(k, StatusInProgress) {
+			return errors.New(fmt.Sprintf("Startup failure: unable to set package %v startup status", k))
 		}
-		ok := validToSend(sent, e)
-		if ok {
-			valid = true
-			current[k] = toSend[k]
-			delete(toSend, k)
-		}
+		SendMessage(msgs[k])
 	}
-	return valid
-}
-
-var validToSend toSend = func(sent util.List, entry *entry) bool {
-	// No dependencies, so can be sent
-	if len(entry.dependents) == 0 {
-		return true
-	}
-	// Need to determine if all dependencies have been sent and are successful
-	for _, uri := range entry.dependents {
-		if !sent.Contains(uri) {
-			return false
-		}
-	}
-	return true
+	return nil
 }
 
 func receive(q *Queue) {
@@ -118,10 +172,12 @@ func receive(q *Queue) {
 			}
 			if msg.Event == StartupEvent {
 				if !directory.setStatus(msg.From, msg.Status) {
-					logxt.LogPrintf("failure to set startup status from package: %v", msg.From)
+					logxt.LogPrintf("Startup failure: unable to set startup status from package: %v", msg.From)
 				}
 			} else {
-				q.Enqueue(msg)
+				//q.Enqueue(msg)
+				// All messages that are received must have valid processing, otherwise log an error
+				logxt.LogPrintf("vhost message received error : unable to process message, no mapping for event : %v", msg)
 			}
 		}
 	}
