@@ -20,6 +20,32 @@ func ExampleStatusOk() {
 	//StatusCode.Message() :
 }
 
+func ExampleStatusOptional() {
+	sc := NewStatusOptional(false, "not found string")
+
+	fmt.Printf("StatusCode.Ok() : %v\n", sc.Ok())
+	fmt.Printf("StatusCode.NotFound() : %v\n", sc.NotFound())
+	fmt.Printf("StatusCode.IsError() : %v\n", sc.IsError())
+	fmt.Printf("StatusCode.Message() : %v\n", sc.Message())
+
+	sc = NewStatusOptional(true, "not found string")
+
+	fmt.Printf("StatusCode.Ok() : %v\n", sc.Ok())
+	fmt.Printf("StatusCode.NotFound() : %v\n", sc.NotFound())
+	fmt.Printf("StatusCode.IsError() : %v\n", sc.IsError())
+	fmt.Printf("StatusCode.Message() : %v\n", sc.Message())
+
+	//Output:
+	//StatusCode.Ok() : true
+	//StatusCode.NotFound() : false
+	//StatusCode.IsError() : false
+	//StatusCode.Message() :
+	//StatusCode.Ok() : false
+	//StatusCode.NotFound() : true
+	//StatusCode.IsError() : false
+	//StatusCode.Message() : not found string
+}
+
 func ExampleStatusNotFound() {
 	sc := NewStatusNotFound("database row was not found")
 

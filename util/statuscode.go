@@ -6,7 +6,7 @@ const (
 	StatusCancelled        = int32(1)  // The operation was cancelled, typically by the caller.
 	StatusUnknown          = int32(2)  // Unknown error. For example, this error may be returned when a Status value received from another address space belongs to an error space that is not known in this address space. Also errors raised by APIs that do not return enough error information may be converted to this error.
 	StatusInvalidArgument  = int32(3)  // The client specified an invalid argument. Note that this differs from FAILED_PRECONDITION. INVALID_ARGUMENT indicates arguments that are problematic regardless of the state of the system (e.g., a malformed file name).
-	StatusDeadlineExceeded = int32(4)  //	The deadline expired before the operation could complete. For operations that change the state of the system, this error may be returned even if the operation has completed successfully. For example, a successful response from a server could have been delayed long
+	StatusDeadlineExceeded = int32(4)  // The deadline expired before the operation could complete. For operations that change the state of the system, this error may be returned even if the operation has completed successfully. For example, a successful response from a server could have been delayed long
 	StatusNotFound         = int32(5)  // Some requested entity (e.g., file or directory) was not found. Note to server developers: if a request is denied for an entire class of users, such as gradual feature rollout or undocumented allowlist, NOT_FOUND may be used. If a request is denied for some users within a class of users, such as user-based access control, PERMISSION_DENIED must be used.
 	StatusAlreadyExists    = int32(6)  // The entity that a client attempted to create (e.g., file or directory) already exists.
 )
@@ -87,6 +87,13 @@ func NewStatusCode(code int32, err error) StatusCode {
 */
 
 func NewStatusOk() StatusCode {
+	return &statusCode{code: StatusOk}
+}
+
+func NewStatusOptional(isNull bool, msg string) StatusCode {
+	if isNull {
+		return NewStatusNotFound(msg)
+	}
 	return &statusCode{code: StatusOk}
 }
 
