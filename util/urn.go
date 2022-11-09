@@ -3,7 +3,6 @@ package util
 import (
 	"errors"
 	"fmt"
-	"net/url"
 	"strings"
 )
 
@@ -11,11 +10,23 @@ func (u URN) String() string {
 	var sb strings.Builder
 	sb.WriteString(u.Nid)
 	sb.WriteString(":")
+	for i, cell := range u.Grid {
+		if i > 0 {
+			u.Nss += ","
+		}
+		u.Nss += cell.String()
+	}
 	sb.WriteString(u.Nss)
 	return sb.String()
 }
 
-func (c *QbeCell) Parse(exp string) error {
+func (c Cell) String() string {
+	return fmt.Sprintf("%v=%v", c.Field, c.Criteria)
+}
+
+/*
+
+func (c *Cell) Parse(exp string) error {
 	tokens := strings.Split(exp, "=")
 	if len(tokens) < 2 {
 		return errors.New(fmt.Sprintf("invalid QBE expression, missing token : %v", exp))
@@ -25,17 +36,15 @@ func (c *QbeCell) Parse(exp string) error {
 	return nil
 }
 
-func (c *QbeCell) String() string {
-	return fmt.Sprintf("%v=%v", c.Field, c.Criteria)
-}
+
 
 func Parse(urn string) *URN {
 	if urn == "" {
-		return &URN{Nid: "", Nss: "", QbeGrid: nil, Err: errors.New("invalid URN, urn is empty")}
+		return &URN{Nid: "", Nss: "", Grid: nil, Err: errors.New("invalid URN, urn is empty")}
 	}
 	url0, err := url.Parse(strings.TrimPrefix(urn, "urn:"))
 	if err != nil {
-		return &URN{Nid: "", Nss: "", QbeGrid: nil, Err: err}
+		return &URN{Nid: "", Nss: "", Grid: nil, Err: err}
 	}
 	u := URN{Nid: url0.Scheme, Nss: url0.Opaque, RawQuery: url0.RawQuery}
 	if u.Nid == "" || u.Nss == "" {
@@ -49,42 +58,59 @@ func Parse(urn string) *URN {
 func parseQbeGrid(urn *URN) {
 	cells := strings.Split(urn.Nss, ",")
 	for _, exp := range cells {
-		cell := &QbeCell{}
+		cell := &Cell{}
 		urn.Err = cell.Parse(exp)
 		if urn.Err != nil {
 			return
 		}
-		urn.QbeGrid = append(urn.QbeGrid, *cell)
+		urn.Grid = append(urn.Grid, *cell)
 	}
 }
 
-func Build(nid string, field string, criteria any) URN {
-	return BuildMulti(nid, QbeCell{Field: field, Criteria: criteria})
-}
 
-func BuildMulti(nid string, cells ...QbeCell) URN {
+*/
+
+func NewURN(nid string, cells ...Cell) URN {
 	u := URN{Nid: QbeNid}
 	if nid != "" {
 		u.Nid = nid
 	}
-	if u.Nid == "" {
-		u.Err = errors.New("invalid URN, Nid is empty")
-		return u
-	}
-	if len(cells) == 0 {
-		u.Err = errors.New("invalid URN, cells are empty")
-		return u
-	}
-	for i, cell := range cells {
-		if cell.Field == "" {
-			u.Err = errors.New("invalid URN, cell field is empty")
+	/*
+		if u.Nid == "" {
+			u.Err = errors.New("invalid URN, Nid is empty")
 			return u
 		}
-		if i > 0 {
-			u.Nss += ","
+		if len(cells) == 0 {
+			u.Err = errors.New("invalid URN, cells are empty")
+			return u
 		}
-		u.Nss += cell.String()
-		u.QbeGrid = append(u.QbeGrid, cell)
+
+	*/
+	for _, cell := range cells {
+		//if cell.Field == "" {
+		//	u.Err = errors.New("invalid URN, cell field is empty")
+		//	return u
+		//}
+		//if i > 0 {
+		//	u.Nss += ","
+		//	}
+		//	u.Nss += cell.String()
+		u.Grid = append(u.Grid, cell)
 	}
 	return u
+}
+
+func ValidateURN(urn URN) error {
+	if urn.Nid == "" {
+		return errors.New("invalid URN, Nid is empty")
+	}
+	if len(urn.Grid) == 0 {
+		return errors.New("invalid URN, Cells are empty")
+	}
+	for _, c := range urn.Grid {
+		if c.Field == "" {
+			return errors.New("invalid URN, cell field is empty")
+		}
+	}
+	return nil
 }

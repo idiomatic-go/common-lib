@@ -62,6 +62,9 @@ func (s *statusCode) IsError() bool {
 }
 
 func (s *statusCode) Message() string {
+	if s.IsError() {
+		return s.Error()
+	}
 	return s.msg
 }
 
@@ -76,22 +79,29 @@ func (s *statusCode) Error() string {
 	return ""
 }
 
-func NewStatusError(err error) StatusCode {
-	return &statusCode{code: StatusNotProvided, err: err, msg: "status code not provided for errors"}
+/*
+func NewStatusCode(code int32, err error) StatusCode {
+	return &statusCode{code: code, err: err}
 }
+
+*/
 
 func NewStatusOk() StatusCode {
 	return &statusCode{code: StatusOk}
-}
-
-func NewStatusInvalidArgument(msg string) StatusCode {
-	return &statusCode{code: StatusInvalidArgument, msg: msg}
 }
 
 func NewStatusNotFound(msg string) StatusCode {
 	return &statusCode{code: StatusNotFound, msg: msg}
 }
 
-func NewStatusDeadlineExceeded(msg string) StatusCode {
-	return &statusCode{code: StatusDeadlineExceeded}
+func NewStatusError(err error) StatusCode {
+	return &statusCode{code: StatusNotProvided, err: err}
+}
+
+func NewStatusInvalidArgument(err error) StatusCode {
+	return &statusCode{code: StatusInvalidArgument, err: err}
+}
+
+func NewStatusDeadlineExceeded(err error) StatusCode {
+	return &statusCode{code: StatusDeadlineExceeded, err: err}
 }

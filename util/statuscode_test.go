@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-func ExampleStatusCodeOk() {
+func ExampleStatusOk() {
 	sc := NewStatusOk()
 
 	fmt.Printf("StatusCode.Ok() : %v\n", sc.Ok())
@@ -20,22 +20,78 @@ func ExampleStatusCodeOk() {
 	//StatusCode.Message() :
 }
 
-func ExampleStatusCodeInvalidArgument() {
-	sc := NewStatusInvalidArgument("this is an invalid argument message")
+func ExampleStatusNotFound() {
+	sc := NewStatusNotFound("database row was not found")
+
 	fmt.Printf("StatusCode.Ok() : %v\n", sc.Ok())
-	fmt.Printf("StatusCode.InvalidArgument() : %v\n", sc.InvalidArgument())
+	fmt.Printf("StatusCode.NotFound() : %v\n", sc.NotFound())
 	fmt.Printf("StatusCode.IsError() : %v\n", sc.IsError())
 	fmt.Printf("StatusCode.Message() : %v\n", sc.Message())
 
 	//Output:
 	//StatusCode.Ok() : false
-	//StatusCode.InvalidArgument() : true
+	//StatusCode.NotFound() : true
 	//StatusCode.IsError() : false
-	//StatusCode.Message() : this is an invalid argument message
+	//StatusCode.Message() : database row was not found
 }
 
-func ExampleStatusCodeError() {
+func ExampleStatusError() {
 	sc := NewStatusError(errors.New("this is an error message"))
+	fmt.Printf("StatusCode.Ok() : %v\n", sc.Ok())
+	fmt.Printf("StatusCode.IsError() : %v\n", sc.IsError())
+	fmt.Printf("StatusCode.Message() : %v\n", sc.Message())
+
+	err, ok := sc.(error)
+	fmt.Printf("StatusCode(.error) : [%v] [%v]\n", err, ok)
+
+	//Output:
+	//StatusCode.Ok() : false
+	//StatusCode.IsError() : true
+	//StatusCode.Message() : this is an error message
+	//StatusCode(.error) : [this is an error message] [true]
+}
+
+func ExampleStatusInvalidArgument() {
+	sc := NewStatusInvalidArgument(errors.New("this is an invalid argument error"))
+	fmt.Printf("StatusCode.Ok() : %v\n", sc.Ok())
+	fmt.Printf("StatusCode.InvalidArgument() : %v\n", sc.InvalidArgument())
+	fmt.Printf("StatusCode.IsError() : %v\n", sc.IsError())
+	fmt.Printf("StatusCode.Message() : %v\n", sc.Message())
+
+	err, ok := sc.(error)
+	fmt.Printf("StatusCode(.error) : [%v] [%v]\n", err, ok)
+
+	//Output:
+	//StatusCode.Ok() : false
+	//StatusCode.InvalidArgument() : true
+	//StatusCode.IsError() : true
+	//StatusCode.Message() : this is an invalid argument error
+	//StatusCode(.error) : [this is an invalid argument error] [true]
+
+}
+
+func ExampleStatusDeadlineExceeded() {
+	sc := NewStatusDeadlineExceeded(errors.New("this is a deadline exceeded ERROR"))
+	fmt.Printf("StatusCode.Ok() : %v\n", sc.Ok())
+	fmt.Printf("StatusCode.DeadlineExceeded() : %v\n", sc.DeadlineExceeded())
+	fmt.Printf("StatusCode.IsError() : %v\n", sc.IsError())
+	fmt.Printf("StatusCode.Message() : %v\n", sc.Message())
+
+	err, ok := sc.(error)
+	fmt.Printf("StatusCode(.error) : [%v] [%v]\n", err, ok)
+
+	//Output:
+	//StatusCode.Ok() : false
+	//StatusCode.DeadlineExceeded() : true
+	//StatusCode.IsError() : true
+	//StatusCode.Message() : this is a deadline exceeded ERROR
+	//StatusCode(.error) : [this is a deadline exceeded ERROR] [true]
+
+}
+
+/*
+func ExampleStatusCode() {
+	sc := NewStatusCoder(errors.New("this is an error message"))
 	fmt.Printf("StatusCode.Ok() : %v\n", sc.Ok())
 	fmt.Printf("StatusCode.IsError() : %v\n", sc.IsError())
 	fmt.Printf("StatusCode.Message() : %v\n", sc.Message())
@@ -49,3 +105,6 @@ func ExampleStatusCodeError() {
 	//StatusCode.Message() : status code not provided for errors
 	//StatusCode(.error) : [this is an error message] [true]
 }
+
+
+*/

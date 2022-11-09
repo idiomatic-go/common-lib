@@ -17,7 +17,7 @@ type FuncResponse func() any
 
 type FuncValues func() ([]any, error)
 
-type QbeCell struct {
+type Cell struct {
 	Field    string
 	Criteria any
 }
@@ -26,8 +26,7 @@ type URN struct {
 	Nid      string
 	Nss      string
 	RawQuery string
-	QbeGrid  []QbeCell
-	Err      error
+	Grid     []Cell
 }
 
 // VariableLookup - type used in template.go

@@ -41,6 +41,8 @@ func _ExampleNetUrlParse() {
 	// Nss   : Nss.101
 
 }
+
+/*
 func _ExampleParseQbeInvalid() {
 	urn := "urn:jksk-invalid:id=test_slo"
 
@@ -125,4 +127,24 @@ func ExampleBuildQbeMulti() {
 	// Urn    : qbe:
 	// Error  : invalid URN, cell field is empty
 
+}
+
+*/
+
+func ExampleNewURN() {
+	u := NewURN(QbeNid, Cell{Field: "id", Criteria: 1001}, Cell{Field: "name", Criteria: "test name"}, Cell{Field: "Date", Criteria: nil})
+
+	fmt.Printf("Urn       : %v\n", u)
+	fmt.Printf("Validate  : %v\n", ValidateURN(u))
+
+	u = NewURN(QbeNid, Cell{Field: "id", Criteria: 1001}, Cell{Field: "", Criteria: "test name"}, Cell{Field: "Date", Criteria: nil})
+
+	fmt.Printf("Urn       : %v\n", u)
+	fmt.Printf("Validate  : %v\n", ValidateURN(u))
+
+	//Output:
+	//Urn       : qbe:id=1001,name=test name,Date=<nil>
+	//Validate  : <nil>
+	//Urn       : qbe:id=1001,=test name,Date=<nil>
+	//Validate  : invalid URN, cell field is empty
 }
