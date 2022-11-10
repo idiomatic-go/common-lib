@@ -39,6 +39,7 @@ type StatusCode interface {
 	DeadlineExceeded() bool
 	IsError() bool
 	Errors() []error
+	Error() string
 	Code() int32
 	Message() string
 }
