@@ -1,7 +1,9 @@
 package util
 
 const (
-	StatusInvalidContent = int32(-2) // Content is not available or is of the wrong type, usually found through unmarshalling
+	// gRPC status codes
+	// https://grpc.github.io/grpc/core/md_doc_statuscodes.html
+	StatusInvalidContent = int32(-2) // Content is not available or is of the wrong type, usually found via unmarshalling
 	StatusNotProvided    = int32(-1) // No status available, usually on error.
 
 	StatusOk               = int32(0) // Not an error; returned on success.
@@ -50,6 +52,10 @@ func (sc *statusCode) DeadlineExceeded() bool {
 	return sc.code == StatusDeadlineExceeded
 }
 
+func (sc *statusCode) AlreadyExists() bool {
+	return sc.code == StatusAlreadyExists
+}
+
 func (sc *statusCode) IsError() bool {
 	return sc.errs != nil
 }
@@ -74,6 +80,13 @@ func (sc *statusCode) Error() string {
 		return sc.errs[0].Error()
 	}
 	return ""
+}
+
+func (sc *statusCode) String() string {
+	if sc.IsError() {
+		return sc.Error()
+	}
+	return sc.Message()
 }
 
 func NewStatusOk() StatusCode {
@@ -119,4 +132,11 @@ func NewStatusDeadlineExceeded(err error) StatusCode {
 		return &statusCode{code: StatusDeadlineExceeded, errs: nil}
 	}
 	return &statusCode{code: StatusDeadlineExceeded, errs: []error{err}}
+}
+
+func NewStatusAlreadyExists(err error) StatusCode {
+	if err == nil {
+		return &statusCode{code: StatusAlreadyExists, errs: nil}
+	}
+	return &statusCode{code: StatusAlreadyExists, errs: []error{err}}
 }

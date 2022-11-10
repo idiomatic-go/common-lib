@@ -1,5 +1,7 @@
 package util
 
+import "fmt"
+
 const (
 	QbeNid = "qbe"
 )
@@ -33,13 +35,20 @@ type URN struct {
 type VariableLookup = func(name string) (value string, err error)
 
 type StatusCode interface {
+	error
+	fmt.Stringer
 	Ok() bool
 	InvalidArgument() bool
 	NotFound() bool
 	DeadlineExceeded() bool
+	AlreadyExists() bool
 	IsError() bool
 	Errors() []error
-	Error() string
 	Code() int32
 	Message() string
+}
+
+type Response struct {
+	Status  StatusCode
+	Content any
 }
