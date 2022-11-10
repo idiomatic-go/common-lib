@@ -87,6 +87,25 @@ func ExampleStatusError() {
 	//StatusCode.IsError() : false
 	//StatusCode.Message() : <nil>
 	//StatusCode(.error)   : [] [true]
+
+}
+func ExampleStatusErrors() {
+	sc := NewStatusError(errors.New("this is the FIRST error message"), errors.New("this is the SECOND error message"))
+	fmt.Printf("StatusCode.Ok()      : %v\n", sc.Ok())
+	fmt.Printf("StatusCode.IsError() : %v\n", sc.IsError())
+	fmt.Printf("StatusCode.Message() : %v\n", NilEmpty(sc.Message()))
+	fmt.Printf("StatusCode.Errors()  : %v\n", sc.Errors())
+
+	err, ok := sc.(error)
+	fmt.Printf("StatusCode(.error)   : [%v] [%v]\n", err, ok)
+
+	//Output:
+	//StatusCode.Ok()      : false
+	//StatusCode.IsError() : true
+	//StatusCode.Message() : this is the FIRST error message
+	//StatusCode.Errors()  : [this is the FIRST error message this is the SECOND error message]
+	//StatusCode(.error)   : [this is the FIRST error message] [true]
+
 }
 
 func ExampleStatusInvalidArgument() {

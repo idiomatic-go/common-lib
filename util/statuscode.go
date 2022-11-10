@@ -1,14 +1,17 @@
 package util
 
 const (
-	StatusNotProvided      = int32(-1) // Not an error; returned on success.
-	StatusOk               = int32(0)  // Not an error; returned on success.
-	StatusCancelled        = int32(1)  // The operation was cancelled, typically by the caller.
-	StatusUnknown          = int32(2)  // Unknown error. For example, this error may be returned when a Status value received from another address space belongs to an error space that is not known in this address space. Also errors raised by APIs that do not return enough error information may be converted to this error.
-	StatusInvalidArgument  = int32(3)  // The client specified an invalid argument. Note that this differs from FAILED_PRECONDITION. INVALID_ARGUMENT indicates arguments that are problematic regardless of the state of the system (e.g., a malformed file name).
-	StatusDeadlineExceeded = int32(4)  // The deadline expired before the operation could complete. For operations that change the state of the system, this error may be returned even if the operation has completed successfully. For example, a successful response from a server could have been delayed long
-	StatusNotFound         = int32(5)  // Some requested entity (e.g., file or directory) was not found. Note to server developers: if a request is denied for an entire class of users, such as gradual feature rollout or undocumented allowlist, NOT_FOUND may be used. If a request is denied for some users within a class of users, such as user-based access control, PERMISSION_DENIED must be used.
-	StatusAlreadyExists    = int32(6)  // The entity that a client attempted to create (e.g., file or directory) already exists.
+	StatusInvalidContent = int32(-2) // Content is not available or is of the wrong type, usually found through unmarshalling
+	StatusNotProvided    = int32(-1) // No status available, usually on error.
+
+	StatusOk               = int32(0) // Not an error; returned on success.
+	StatusCancelled        = int32(1) // The operation was cancelled, typically by the caller.
+	StatusUnknown          = int32(2) // Unknown error. For example, this error may be returned when a Status value received from another address space belongs to an error space that is not known in this address space. Also errors raised by APIs that do not return enough error information may be converted to this error.
+	StatusInvalidArgument  = int32(3) // The client specified an invalid argument. Note that this differs from FAILED_PRECONDITION. INVALID_ARGUMENT indicates arguments that are problematic regardless of the state of the system (e.g., a malformed file name).
+	StatusDeadlineExceeded = int32(4) // The deadline expired before the operation could complete. For operations that change the state of the system, this error may be returned even if the operation has completed successfully. For example, a successful response from a server could have been delayed long
+	StatusNotFound         = int32(5) // Some requested entity (e.g., file or directory) was not found. Note to server developers: if a request is denied for an entire class of users, such as gradual feature rollout or undocumented allowlist, NOT_FOUND may be used. If a request is denied for some users within a class of users, such as user-based access control, PERMISSION_DENIED must be used.
+	StatusAlreadyExists    = int32(6) // The entity that a client attempted to create (e.g., file or directory) already exists.
+
 )
 
 /*
@@ -25,19 +28,9 @@ UNAUTHENTICATED	16	The request does not have valid authentication credentials fo
 
 */
 
-type StatusCode interface {
-	Ok() bool
-	InvalidArgument() bool
-	NotFound() bool
-	DeadlineExceeded() bool
-	IsError() bool
-	Code() int32
-	Message() string
-}
-
 type statusCode struct {
 	code int32
-	err  error
+	errs []error
 	msg  string
 }
 
@@ -58,12 +51,16 @@ func (s *statusCode) DeadlineExceeded() bool {
 }
 
 func (s *statusCode) IsError() bool {
-	return s.err != nil
+	return s.errs != nil
+}
+
+func (s *statusCode) Errors() []error {
+	return s.errs
 }
 
 func (s *statusCode) Message() string {
 	if s.IsError() {
-		return s.Error()
+		return s.errs[0].Error()
 	}
 	return s.msg
 }
@@ -74,17 +71,10 @@ func (s *statusCode) Code() int32 {
 
 func (s *statusCode) Error() string {
 	if s.IsError() {
-		return s.err.Error()
+		return s.errs[0].Error()
 	}
 	return ""
 }
-
-/*
-func NewStatusCode(code int32, err error) StatusCode {
-	return &statusCode{code: code, err: err}
-}
-
-*/
 
 func NewStatusOk() StatusCode {
 	return &statusCode{code: StatusOk}
@@ -101,17 +91,32 @@ func NewStatusNotFound(msg string) StatusCode {
 	return &statusCode{code: StatusNotFound, msg: msg}
 }
 
-func NewStatusError(err error) StatusCode {
-	if err == nil {
+func NewStatusError(err ...error) StatusCode {
+	if err == nil || (len(err) == 1 && err[0] == nil) {
 		return NewStatusOk()
 	}
-	return &statusCode{code: StatusNotProvided, err: err}
+	var sc = statusCode{code: StatusNotProvided}
+	for _, e := range err {
+		if e != nil {
+			sc.errs = append(sc.errs, e)
+		}
+	}
+	if len(sc.errs) == 0 {
+		sc.code = StatusOk
+	}
+	return &sc
 }
 
 func NewStatusInvalidArgument(err error) StatusCode {
-	return &statusCode{code: StatusInvalidArgument, err: err}
+	if err == nil {
+		return &statusCode{code: StatusInvalidArgument, errs: nil}
+	}
+	return &statusCode{code: StatusInvalidArgument, errs: []error{err}}
 }
 
 func NewStatusDeadlineExceeded(err error) StatusCode {
-	return &statusCode{code: StatusDeadlineExceeded, err: err}
+	if err == nil {
+		return &statusCode{code: StatusDeadlineExceeded, errs: nil}
+	}
+	return &statusCode{code: StatusDeadlineExceeded, errs: []error{err}}
 }

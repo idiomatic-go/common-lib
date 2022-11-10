@@ -31,3 +31,14 @@ type URN struct {
 
 // VariableLookup - type used in template.go
 type VariableLookup = func(name string) (value string, err error)
+
+type StatusCode interface {
+	Ok() bool
+	InvalidArgument() bool
+	NotFound() bool
+	DeadlineExceeded() bool
+	IsError() bool
+	Errors() []error
+	Code() int32
+	Message() string
+}
