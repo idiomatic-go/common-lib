@@ -20,61 +20,73 @@ func ExampleStatusOk() {
 	//StatusCode.Message() :
 }
 
-func ExampleStatusOptional() {
-	sc := NewStatusOptional(false, "not found string")
+func ExampleStatusOptionalNotFound() {
+	sc := NewStatusOptionalNotFound(false, "not found string")
 
-	fmt.Printf("StatusCode.Ok() : %v\n", sc.Ok())
+	fmt.Printf("StatusCode.Ok()       : %v\n", sc.Ok())
 	fmt.Printf("StatusCode.NotFound() : %v\n", sc.NotFound())
-	fmt.Printf("StatusCode.IsError() : %v\n", sc.IsError())
-	fmt.Printf("StatusCode.Message() : %v\n", sc.Message())
+	fmt.Printf("StatusCode.IsError()  : %v\n", sc.IsError())
+	fmt.Printf("StatusCode.Message()  : %v\n", NilEmpty(sc.Message()))
 
-	sc = NewStatusOptional(true, "not found string")
+	sc = NewStatusOptionalNotFound(true, "not found string")
 
-	fmt.Printf("StatusCode.Ok() : %v\n", sc.Ok())
+	fmt.Printf("StatusCode.Ok()       : %v\n", sc.Ok())
 	fmt.Printf("StatusCode.NotFound() : %v\n", sc.NotFound())
-	fmt.Printf("StatusCode.IsError() : %v\n", sc.IsError())
-	fmt.Printf("StatusCode.Message() : %v\n", sc.Message())
+	fmt.Printf("StatusCode.IsError()  : %v\n", sc.IsError())
+	fmt.Printf("StatusCode.Message()  : %v\n", NilEmpty(sc.Message()))
 
 	//Output:
-	//StatusCode.Ok() : true
+	//StatusCode.Ok()       : true
 	//StatusCode.NotFound() : false
-	//StatusCode.IsError() : false
-	//StatusCode.Message() :
-	//StatusCode.Ok() : false
+	//StatusCode.IsError()  : false
+	//StatusCode.Message()  : <nil>
+	//StatusCode.Ok()       : false
 	//StatusCode.NotFound() : true
-	//StatusCode.IsError() : false
-	//StatusCode.Message() : not found string
+	//StatusCode.IsError()  : false
+	//StatusCode.Message()  : not found string
 }
 
 func ExampleStatusNotFound() {
 	sc := NewStatusNotFound("database row was not found")
 
-	fmt.Printf("StatusCode.Ok() : %v\n", sc.Ok())
+	fmt.Printf("StatusCode.Ok()       : %v\n", sc.Ok())
 	fmt.Printf("StatusCode.NotFound() : %v\n", sc.NotFound())
-	fmt.Printf("StatusCode.IsError() : %v\n", sc.IsError())
-	fmt.Printf("StatusCode.Message() : %v\n", sc.Message())
+	fmt.Printf("StatusCode.IsError()  : %v\n", sc.IsError())
+	fmt.Printf("StatusCode.Message()  : %v\n", sc.Message())
 
 	//Output:
-	//StatusCode.Ok() : false
+	//StatusCode.Ok()       : false
 	//StatusCode.NotFound() : true
-	//StatusCode.IsError() : false
-	//StatusCode.Message() : database row was not found
+	//StatusCode.IsError()  : false
+	//StatusCode.Message()  : database row was not found
 }
 
 func ExampleStatusError() {
 	sc := NewStatusError(errors.New("this is an error message"))
-	fmt.Printf("StatusCode.Ok() : %v\n", sc.Ok())
+	fmt.Printf("StatusCode.Ok()      : %v\n", sc.Ok())
 	fmt.Printf("StatusCode.IsError() : %v\n", sc.IsError())
-	fmt.Printf("StatusCode.Message() : %v\n", sc.Message())
+	fmt.Printf("StatusCode.Message() : %v\n", NilEmpty(sc.Message()))
 
 	err, ok := sc.(error)
-	fmt.Printf("StatusCode(.error) : [%v] [%v]\n", err, ok)
+	fmt.Printf("StatusCode(.error)   : [%v] [%v]\n", err, ok)
+
+	sc = NewStatusError(nil)
+	fmt.Printf("StatusCode.Ok()      : %v\n", sc.Ok())
+	fmt.Printf("StatusCode.IsError() : %v\n", sc.IsError())
+	fmt.Printf("StatusCode.Message() : %v\n", NilEmpty(sc.Message()))
+
+	err, ok = sc.(error)
+	fmt.Printf("StatusCode(.error)   : [%v] [%v]\n", err, ok)
 
 	//Output:
-	//StatusCode.Ok() : false
+	//StatusCode.Ok()      : false
 	//StatusCode.IsError() : true
 	//StatusCode.Message() : this is an error message
-	//StatusCode(.error) : [this is an error message] [true]
+	//StatusCode(.error)   : [this is an error message] [true]
+	//StatusCode.Ok()      : true
+	//StatusCode.IsError() : false
+	//StatusCode.Message() : <nil>
+	//StatusCode(.error)   : [] [true]
 }
 
 func ExampleStatusInvalidArgument() {

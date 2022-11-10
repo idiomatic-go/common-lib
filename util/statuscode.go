@@ -90,7 +90,7 @@ func NewStatusOk() StatusCode {
 	return &statusCode{code: StatusOk}
 }
 
-func NewStatusOptional(isNull bool, msg string) StatusCode {
+func NewStatusOptionalNotFound(isNull bool, msg string) StatusCode {
 	if isNull {
 		return NewStatusNotFound(msg)
 	}
@@ -102,6 +102,9 @@ func NewStatusNotFound(msg string) StatusCode {
 }
 
 func NewStatusError(err error) StatusCode {
+	if err == nil {
+		return NewStatusOk()
+	}
 	return &statusCode{code: StatusNotProvided, err: err}
 }
 
