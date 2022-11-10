@@ -75,9 +75,9 @@ func NewStatusNotFound(msg string) StatusCode {
 }
 
 func NewStatusError(err ...error) StatusCode {
-	if err == nil || (len(err) == 1 && err[0] == nil) {
-		return NewStatusOk()
-	}
+	//if err == nil || (len(err) == 1 && err[0] == nil) {
+	//	return NewStatusOk()
+	//}
 	var sc = statusCode{code: StatusNotProvided}
 	for _, e := range err {
 		if e != nil {

@@ -135,16 +135,20 @@ func ExampleNewURN() {
 	u := NewURN(QbeNid, Cell{Field: "id", Criteria: 1001}, Cell{Field: "name", Criteria: "test name"}, Cell{Field: "Date", Criteria: nil})
 
 	fmt.Printf("Urn       : %v\n", u)
-	fmt.Printf("Validate  : %v\n", ValidateURN(u))
+	fmt.Printf("Empty     : %v\n", u.IsGridEmpty())
+	fmt.Printf("Cell [id] : %v\n", u.Cell("id"))
 
 	u = NewURN(QbeNid, Cell{Field: "id", Criteria: 1001}, Cell{Field: "", Criteria: "test name"}, Cell{Field: "Date", Criteria: nil})
 
 	fmt.Printf("Urn       : %v\n", u)
-	fmt.Printf("Validate  : %v\n", ValidateURN(u))
+	fmt.Printf("Empty     : %v\n", u.IsGridEmpty())
+	fmt.Printf("Cell [id2]: %v\n", u.Cell("id2"))
 
 	//Output:
 	//Urn       : qbe:id=1001,name=test name,Date=<nil>
-	//Validate  : <nil>
+	//Empty     : false
+	//Cell [id] : id=1001
 	//Urn       : qbe:id=1001,=test name,Date=<nil>
-	//Validate  : invalid URN, cell field is empty
+	//Empty     : false
+	//Cell [id2]: <nil>
 }

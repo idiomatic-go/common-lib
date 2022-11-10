@@ -1,10 +1,42 @@
 package util
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 )
+
+/*
+func (u URN) Validate() error {
+	if u.Nid == "" {
+		return errors.New("invalid URN, Nid is empty")
+	}
+	if len(u.Grid) == 0 {
+		return errors.New("invalid URN, Cells are empty")
+	}
+	for _, c := range u.Grid {
+		if c.Field == "" {
+			return errors.New("invalid URN, cell field is empty")
+		}
+	}
+	return nil
+}
+*/
+
+func (u URN) IsGridEmpty() bool {
+	return len(u.Grid) == 0
+}
+
+func (u URN) Cell(field string) *Cell {
+	if u.IsGridEmpty() {
+		return nil
+	}
+	for _, c := range u.Grid {
+		if c.Field == field {
+			return &c
+		}
+	}
+	return nil
+}
 
 func (u URN) String() string {
 	var sb strings.Builder
@@ -98,19 +130,4 @@ func NewURN(nid string, cells ...Cell) URN {
 		u.Grid = append(u.Grid, cell)
 	}
 	return u
-}
-
-func ValidateURN(urn URN) error {
-	if urn.Nid == "" {
-		return errors.New("invalid URN, Nid is empty")
-	}
-	if len(urn.Grid) == 0 {
-		return errors.New("invalid URN, Cells are empty")
-	}
-	for _, c := range urn.Grid {
-		if c.Field == "" {
-			return errors.New("invalid URN, cell field is empty")
-		}
-	}
-	return nil
 }
