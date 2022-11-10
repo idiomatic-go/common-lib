@@ -45,3 +45,9 @@ func NewResponse[T any](status StatusCode, content T) *Response {
 	}
 	return &Response{Status: sc, Content: content}
 }
+
+func NewResponseHeaders[T any](status StatusCode, content T, headers any) *Response {
+	resp := NewResponse(status, content)
+	resp.Headers = headers
+	return resp
+}

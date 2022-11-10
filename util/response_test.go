@@ -20,9 +20,9 @@ func ExampleNewResponse() {
 	//Output:
 	//Nil         : true
 	//Serialized  : false
-	//Response    : &{ <nil>}
+	//Response    : &{ <nil> <nil>}
 	//Nil         : false
 	//Serialized  : true
-	//Response    : &{ [115 116 114 105 110 103 32 99 111 110 116 101 110 116]}
+	//Response    : &{ [115 116 114 105 110 103 32 99 111 110 116 101 110 116] <nil>}
 	//Bytes       : true string content
 }
