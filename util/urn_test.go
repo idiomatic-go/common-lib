@@ -88,7 +88,7 @@ func ExampleParseQbe() {
 }
 
 func ExampleBuildQbe() {
-	u := Build("fse", "id", 1001)
+	u := Build("qbe", "id", 1001)
 
 	fmt.Printf("Urn    : %v\n", u)
 	fmt.Printf("Error  : %v\n", u.Err)
@@ -97,22 +97,22 @@ func ExampleBuildQbe() {
 	fmt.Printf("Urn    : %v\n", u)
 	fmt.Printf("Error  : %v\n", u.Err)
 
-	u = Build("fse", "id", nil)
+	u = Build("qbe", "id", nil)
 	fmt.Printf("Urn    : %v\n", u)
 	fmt.Printf("Error  : %v\n", u.Err)
 
 	//Output:
-	// Urn    : fse:id=1001
+	// Urn    : qbe:id=1001
 	// Error  : <nil>
 	// Urn    : qbe:id=1001
 	// Error  : <nil>
-	// Urn    : fse:id=<nil>
+	// Urn    : qbe:id=<nil>
 	// Error  : <nil>
 
 }
 
 func ExampleBuildQbeMulti() {
-	u := BuildMulti("fse", QbeCell{Field: "id", Criteria: 1001})
+	u := BuildMulti("qbe", QbeCell{Field: "id", Criteria: 1001})
 
 	fmt.Printf("Urn    : %v\n", u)
 	fmt.Printf("Error  : %v\n", u.Err)
@@ -122,7 +122,7 @@ func ExampleBuildQbeMulti() {
 	fmt.Printf("Error  : %v\n", u.Err)
 
 	//Output:
-	// Urn    : fse:id=1001
+	// Urn    : qbe:id=1001
 	// Error  : <nil>
 	// Urn    : qbe:
 	// Error  : invalid URN, cell field is empty
