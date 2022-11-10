@@ -34,44 +34,44 @@ type statusCode struct {
 	msg  string
 }
 
-func (s *statusCode) Ok() bool {
-	return s.code == StatusOk
+func (sc *statusCode) Ok() bool {
+	return sc.code == StatusOk
 }
 
-func (s *statusCode) InvalidArgument() bool {
-	return s.code == StatusInvalidArgument
+func (sc *statusCode) InvalidArgument() bool {
+	return sc.code == StatusInvalidArgument
 }
 
-func (s *statusCode) NotFound() bool {
-	return s.code == StatusNotFound
+func (sc *statusCode) NotFound() bool {
+	return sc.code == StatusNotFound
 }
 
-func (s *statusCode) DeadlineExceeded() bool {
-	return s.code == StatusDeadlineExceeded
+func (sc *statusCode) DeadlineExceeded() bool {
+	return sc.code == StatusDeadlineExceeded
 }
 
-func (s *statusCode) IsError() bool {
-	return s.errs != nil
+func (sc *statusCode) IsError() bool {
+	return sc.errs != nil
 }
 
-func (s *statusCode) Errors() []error {
-	return s.errs
+func (sc *statusCode) Errors() []error {
+	return sc.errs
 }
 
-func (s *statusCode) Message() string {
-	if s.IsError() {
-		return s.errs[0].Error()
+func (sc *statusCode) Message() string {
+	if sc.IsError() {
+		return sc.errs[0].Error()
 	}
-	return s.msg
+	return sc.msg
 }
 
-func (s *statusCode) Code() int32 {
-	return s.code
+func (sc *statusCode) Code() int32 {
+	return sc.code
 }
 
-func (s *statusCode) Error() string {
-	if s.IsError() {
-		return s.errs[0].Error()
+func (sc *statusCode) Error() string {
+	if sc.IsError() {
+		return sc.errs[0].Error()
 	}
 	return ""
 }
