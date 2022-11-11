@@ -77,3 +77,8 @@ type Response struct {
 	Content any
 	Headers any
 }
+
+type Attr struct {
+	Ref string
+	Val any
+}
