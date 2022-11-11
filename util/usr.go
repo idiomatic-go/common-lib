@@ -69,6 +69,7 @@ type StatusCode interface {
 	IsError() bool
 	Errors() map[string]error
 	AddError(name string, err error)
+	CatErrors() string
 	Code() int32
 	Message() string
 }

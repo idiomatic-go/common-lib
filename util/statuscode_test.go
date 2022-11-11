@@ -95,6 +95,9 @@ func ExampleStatusErrors() {
 	fmt.Printf("StatusCode.IsError() : %v\n", sc.IsError())
 	fmt.Printf("StatusCode.Message() : %v\n", NilEmpty(sc.Message()))
 	fmt.Printf("StatusCode.Errors()  : %v\n", sc.Errors())
+	fmt.Printf("StatusCode.Cat()     : %v\n", sc.CatErrors())
+	//fmt.Printf("StatusCode.Cat()     : %v\n", sc.CatErrors(" "))
+	//fmt.Printf("StatusCode.Cat()     : %v\n", sc.CatErrors("|"))
 
 	err, ok := sc.(error)
 	fmt.Printf("StatusCode(.error)   : [%v] [%v]\n", err, ok)
@@ -104,6 +107,7 @@ func ExampleStatusErrors() {
 	//StatusCode.IsError() : true
 	//StatusCode.Message() : this is the FIRST error message
 	//StatusCode.Errors()  : map[0:this is the FIRST error message 1:this is the SECOND error message]
+	//StatusCode.Cat()     : 0:this is the FIRST error message 1:this is the SECOND error message
 	//StatusCode(.error)   : [this is the FIRST error message] [true]
 
 }

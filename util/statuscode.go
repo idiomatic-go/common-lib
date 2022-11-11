@@ -1,8 +1,14 @@
 package util
 
 import (
+	"fmt"
 	"github.com/idiomatic-go/common-lib/logxt"
 	"strconv"
+	"strings"
+)
+
+const (
+	catFmt = "%v%v:%v"
 )
 
 type statusCode struct {
@@ -78,6 +84,23 @@ func (sc *statusCode) Message() string {
 
 func (sc *statusCode) Code() int32 {
 	return sc.code
+}
+
+func (sc *statusCode) CatErrors() string {
+	if !sc.IsError() {
+		return ""
+	}
+	sep := " "
+	var sb strings.Builder
+	sb.WriteString(fmt.Sprintf("%v:%v", sc.first, sc.errs[sc.first].Error()))
+	for k, err := range sc.errs {
+		if k == sc.first {
+			continue
+		}
+		sb.WriteString(fmt.Sprintf(catFmt, sep, k, err.Error()))
+	}
+
+	return sb.String()
 }
 
 func (sc *statusCode) Error() string {
