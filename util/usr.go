@@ -67,7 +67,8 @@ type StatusCode interface {
 	DeadlineExceeded() bool
 	AlreadyExists() bool
 	IsError() bool
-	Errors() []error
+	Errors() map[string]error
+	AddError(name string, err error)
 	Code() int32
 	Message() string
 }
@@ -79,6 +80,6 @@ type Response struct {
 }
 
 type Attr struct {
-	Ref string
-	Val any
+	Name string
+	Val  any
 }

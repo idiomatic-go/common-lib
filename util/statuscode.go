@@ -1,9 +1,44 @@
 package util
 
+import (
+	"github.com/idiomatic-go/common-lib/logxt"
+	"strconv"
+)
+
 type statusCode struct {
-	code int32
-	errs []error
-	msg  string
+	code  int32
+	errs  map[string]error
+	msg   string
+	index int
+	first string
+}
+
+func createStatusCode(code int32) *statusCode {
+	return &statusCode{code: code, errs: make(map[string]error, 1)}
+}
+
+func createStatusCodeError(code int32, name string, err error) *statusCode {
+	sc := createStatusCode(code)
+	addError(sc, name, err)
+	return sc
+}
+
+func addError(sc *statusCode, name string, err error) {
+	if sc == nil || err == nil {
+		return
+	}
+	if name == "" {
+		name = strconv.Itoa(sc.index)
+		sc.index++
+	}
+	if sc.first == "" {
+		sc.first = name
+	}
+	sc.errs[name] = err
+}
+
+func (sc *statusCode) AddError(name string, err error) {
+	addError(sc, name, err)
 }
 
 func (sc *statusCode) Ok() bool {
@@ -27,16 +62,16 @@ func (sc *statusCode) AlreadyExists() bool {
 }
 
 func (sc *statusCode) IsError() bool {
-	return sc.errs != nil
+	return len(sc.errs) > 0
 }
 
-func (sc *statusCode) Errors() []error {
+func (sc *statusCode) Errors() map[string]error {
 	return sc.errs
 }
 
 func (sc *statusCode) Message() string {
 	if sc.IsError() {
-		return sc.errs[0].Error()
+		return sc.Error()
 	}
 	return sc.msg
 }
@@ -47,7 +82,7 @@ func (sc *statusCode) Code() int32 {
 
 func (sc *statusCode) Error() string {
 	if sc.IsError() {
-		return sc.errs[0].Error()
+		return sc.errs[sc.first].Error()
 	}
 	return ""
 }
@@ -60,53 +95,62 @@ func (sc *statusCode) String() string {
 }
 
 func NewStatusOk() StatusCode {
-	return &statusCode{code: StatusOk}
+	return createStatusCode(StatusOk)
 }
 
 func NewStatusOptionalNotFound(isNull bool, msg string) StatusCode {
 	if isNull {
 		return NewStatusNotFound(msg)
 	}
-	return &statusCode{code: StatusOk}
+	return NewStatusOk()
 }
 
 func NewStatusNotFound(msg string) StatusCode {
-	return &statusCode{code: StatusNotFound, msg: msg}
+	sc := createStatusCode(StatusNotFound)
+	sc.msg = msg
+	return sc
 }
 
-func NewStatusError(err ...error) StatusCode {
-	//if err == nil || (len(err) == 1 && err[0] == nil) {
-	//	return NewStatusOk()
-	//}
-	var sc = statusCode{code: StatusNotProvided}
-	for _, e := range err {
-		if e != nil {
-			sc.errs = append(sc.errs, e)
+func NewStatusError(errs ...error) StatusCode {
+	var sc = createStatusCode(StatusNotProvided)
+	for _, e := range errs {
+		if e == nil {
+			continue
 		}
+		addError(sc, "", e)
 	}
 	if len(sc.errs) == 0 {
 		sc.code = StatusOk
 	}
-	return &sc
+	return sc
+}
+
+func NewStatusErrorAttrs(errs ...Attr) StatusCode {
+	var sc = createStatusCode(StatusNotProvided)
+	for _, attr := range errs {
+		if attr.Val == nil {
+			continue
+		}
+		if err, ok := attr.Val.(error); ok {
+			addError(sc, attr.Name, err)
+		} else {
+			logxt.LogDebug("invalid attribute Val %v", attr.Val)
+		}
+	}
+	if !sc.IsError() {
+		sc.code = StatusOk
+	}
+	return sc
 }
 
 func NewStatusInvalidArgument(err error) StatusCode {
-	if err == nil {
-		return &statusCode{code: StatusInvalidArgument, errs: nil}
-	}
-	return &statusCode{code: StatusInvalidArgument, errs: []error{err}}
+	return createStatusCodeError(StatusInvalidArgument, "", err)
 }
 
 func NewStatusDeadlineExceeded(err error) StatusCode {
-	if err == nil {
-		return &statusCode{code: StatusDeadlineExceeded, errs: nil}
-	}
-	return &statusCode{code: StatusDeadlineExceeded, errs: []error{err}}
+	return createStatusCodeError(StatusDeadlineExceeded, "", err)
 }
 
 func NewStatusAlreadyExists(err error) StatusCode {
-	if err == nil {
-		return &statusCode{code: StatusAlreadyExists, errs: nil}
-	}
-	return &statusCode{code: StatusAlreadyExists, errs: []error{err}}
+	return createStatusCodeError(StatusAlreadyExists, "", err)
 }

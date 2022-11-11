@@ -103,9 +103,36 @@ func ExampleStatusErrors() {
 	//StatusCode.Ok()      : false
 	//StatusCode.IsError() : true
 	//StatusCode.Message() : this is the FIRST error message
-	//StatusCode.Errors()  : [this is the FIRST error message this is the SECOND error message]
+	//StatusCode.Errors()  : map[0:this is the FIRST error message 1:this is the SECOND error message]
 	//StatusCode(.error)   : [this is the FIRST error message] [true]
 
+}
+
+func ExampleStatusErrorsAttrs() {
+	sc := NewStatusErrorAttrs(Attr{"first", errors.New("this is the FIRST error message")}, Attr{"second", errors.New("this is the SECOND error message")})
+	fmt.Printf("StatusCode.Ok()      : %v\n", sc.Ok())
+	fmt.Printf("StatusCode.IsError() : %v\n", sc.IsError())
+	fmt.Printf("StatusCode.Error()   : %v\n", NilEmpty(sc.Error()))
+	fmt.Printf("StatusCode.Errors()  : %v\n", sc.Errors())
+
+	//err, ok := sc.(error)
+	//fmt.Printf("StatusCode(.error)   : [%v] [%v]\n", err, ok)
+	sc.AddError("", errors.New("this is the THIRD error message"))
+	sc.AddError("fourth", errors.New("this is the FOURTH error message"))
+
+	fmt.Printf("StatusCode.Error()   : %v\n", NilEmpty(sc.Error()))
+	fmt.Printf("StatusCode.Errors()  : %v\n", sc.Errors())
+
+	fmt.Printf("StatusCode.GetError(): %v\n", sc.Errors()["second"])
+
+	//Output:
+	//StatusCode.Ok()      : false
+	//StatusCode.IsError() : true
+	//StatusCode.Error()   : this is the FIRST error message
+	//StatusCode.Errors()  : map[first:this is the FIRST error message second:this is the SECOND error message]
+	//StatusCode.Error()   : this is the FIRST error message
+	//StatusCode.Errors()  : map[0:this is the THIRD error message first:this is the FIRST error message fourth:this is the FOURTH error message second:this is the SECOND error message]
+	//StatusCode.GetError(): this is the SECOND error message
 }
 
 func ExampleStatusInvalidArgument() {
