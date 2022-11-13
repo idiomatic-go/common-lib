@@ -68,6 +68,12 @@ type gRPCStatus interface {
 	Message() string
 }
 
+type Errors interface {
+	error
+	Errors() []error
+	Add(err error)
+}
+
 type StatusCode interface {
 	error
 	fmt.Stringer
