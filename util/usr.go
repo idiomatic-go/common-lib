@@ -58,20 +58,24 @@ type URN struct {
 // VariableLookup - type used in template.go
 type VariableLookup = func(name string) (value string, err error)
 
-type StatusCode interface {
-	error
-	fmt.Stringer
+type gRPCStatus interface {
 	Ok() bool
 	InvalidArgument() bool
 	NotFound() bool
 	DeadlineExceeded() bool
 	AlreadyExists() bool
+	Code() int32
+	Message() string
+}
+
+type StatusCode interface {
+	error
+	fmt.Stringer
+	gRPCStatus
 	IsError() bool
 	Errors() map[string]error
 	AddError(name string, err error)
 	CatErrors() string
-	Code() int32
-	Message() string
 }
 
 type Response struct {
