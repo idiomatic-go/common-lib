@@ -1,6 +1,13 @@
 package util
 
-import "time"
+import (
+	"strings"
+	"time"
+)
+
+func TrimDoubleSpace(s string) string {
+	return strings.Join(strings.Fields(s), " ")
+}
 
 func FmtTimestamp(t time.Time) string {
 	buf := []byte{}
