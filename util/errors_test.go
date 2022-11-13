@@ -12,6 +12,7 @@ func ExampleNewErrors() {
 	fmt.Printf("Errors : %v\n", errs.Errors())
 	errs.Add(errors.New("third error"))
 	fmt.Printf("Errors : %v\n", errs.Errors())
+	fmt.Printf("Cat    : %v\n", errs.Cat())
 
 	//Output:
 	//fail

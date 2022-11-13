@@ -72,6 +72,13 @@ type Errors interface {
 	error
 	Errors() []error
 	Add(err error)
+	Cat() string
+}
+
+type Status interface {
+	fmt.Stringer
+	gRPCStatus
+	Errors
 }
 
 type StatusCode interface {

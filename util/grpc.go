@@ -40,3 +40,7 @@ func (s *grpcStatus) Code() int32 {
 func NewgRPCStatus(code int32, msg string) gRPCStatus {
 	return creategRPCStatus(code, msg)
 }
+
+func newgRPCStatus() gRPCStatus {
+	return creategRPCStatus(0, "")
+}
