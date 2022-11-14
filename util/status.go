@@ -42,9 +42,9 @@ func (s *status) Handled() Status {
 	return &status{errs: newErrors(), grpc: s.grpc}
 }
 
-func (s *status) HandledNewCode(code int32) Status {
+func (s *status) HandledNewCode(code int32, msg string) Status {
 	s.errs2 = s.errs
-	return &status{errs: newErrors(), grpc: NewStatusCode(code, nil)}
+	return &status{errs: newErrors(), grpc: NewStatusCode(code, msg)}
 }
 
 // HttpStatus - convert gRPC -> Http
