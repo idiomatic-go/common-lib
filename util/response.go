@@ -26,7 +26,15 @@ func (r *Response) ContentBytes() (buf []byte, ok bool) {
 	return nil, false
 }
 
-func NewResponse[T any](status Status, content T) *Response {
+func NewResponse(status Status) *Response {
+	sc := status
+	if status == nil {
+		sc = NewStatusOk()
+	}
+	return &Response{Status: sc, Content: nil}
+}
+
+func NewResponseContent[T any](status Status, content T) *Response {
 	sc := status
 	if status == nil {
 		sc = NewStatusOk()
@@ -46,8 +54,8 @@ func NewResponse[T any](status Status, content T) *Response {
 	return &Response{Status: sc, Content: content}
 }
 
-func NewResponseHeaders[T any](status Status, content T, headers any) *Response {
-	resp := NewResponse(status, content)
+func NewResponseHeaders[T any](status Status, headers any) *Response {
+	resp := NewResponse(status)
 	resp.Headers = headers
 	return resp
 }

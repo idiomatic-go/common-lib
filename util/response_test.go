@@ -4,13 +4,13 @@ import "fmt"
 
 func ExampleNewResponse() {
 	var sc Status
-	resp := NewResponse(nil, sc)
+	resp := NewResponseContent(nil, sc)
 
 	fmt.Printf("Nil         : %v\n", resp.IsContentNil())
 	fmt.Printf("Serialized  : %v\n", resp.IsContentSerialized())
 	fmt.Printf("Response    : %v\n", resp)
 
-	resp = NewResponse(nil, "string content")
+	resp = NewResponseContent(nil, "string content")
 	fmt.Printf("Nil         : %v\n", resp.IsContentNil())
 	fmt.Printf("Serialized  : %v\n", resp.IsContentSerialized())
 	fmt.Printf("Response    : %v\n", resp)

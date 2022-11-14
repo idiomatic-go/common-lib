@@ -89,7 +89,7 @@ type Status interface {
 	Errors
 	HttpStatus() int
 	Handled() Status
-	HandledNewCode(code int32, mst string) Status
+	HandledNewCode(code int32, msg string) Status
 }
 
 type Response struct {
