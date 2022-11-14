@@ -89,6 +89,7 @@ type Status interface {
 	Errors
 	HttpStatus() int
 	Handled() Status
+	HandledNewCode(code int32) Status
 }
 
 type StatusCode interface {
