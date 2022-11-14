@@ -85,6 +85,7 @@ type Status interface {
 	fmt.Stringer
 	gRPCStatus
 	Errors
+	HttpStatus() int
 }
 
 type StatusCode interface {

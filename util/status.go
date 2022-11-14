@@ -35,6 +35,41 @@ func (s *status) Add(err error)   { s.errs.Add(err) }
 func (s *status) Cat() string     { return s.errs.Cat() }
 func (s *status) Handled()        { s.errs.Handled() }
 
+// HttpStatus - convert gRPC -> Http
+func (s *status) HttpStatus() int {
+	code := 0
+	switch s.grpc.Code() {
+	case StatusOk:
+		code = 200
+	case StatusInvalidArgument:
+		code = 400
+	case StatusUnauthenticated:
+		code = 401
+	case StatusPermissionDenied:
+		code = 403
+	case StatusNotFound:
+		code = 404
+	case StatusInternal:
+		code = 500
+	case StatusUnavailable:
+		code = 502
+	case StatusDeadlineExceeded:
+		code = 504
+	case StatusInvalidContent,
+		StatusNotProvided,
+		StatusCancelled,
+		StatusUnknown,
+		StatusAlreadyExists,
+		StatusResourceExhausted,
+		StatusFailedPrecondition,
+		StatusAborted,
+		StatusOutOfRange,
+		StatusUnimplemented,
+		StatusDataLoss:
+	}
+	return code
+}
+
 func NewStatusOk() Status {
 	s := status{errs: newErrors(), grpc: NewgRPCStatus(StatusOk, "")}
 	return &s
