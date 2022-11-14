@@ -56,7 +56,7 @@ func NewStatusAlreadyExists(a any) Status {
 	return NewStatusCode(StatusAlreadyExists, a)
 }
 
-func NewStatusErrors(err ...error) Status {
+func NewStatusError(err ...error) Status {
 	s := status{errs: NewErrorsList(err), grpc: NewgRPCStatus(StatusNotProvided, "")}
 	return &s
 }

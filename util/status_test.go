@@ -50,8 +50,8 @@ func ExampleStatusCode() {
 	//Status.Error()   : request timed out
 }
 
-func ExampleStatusErrors() {
-	sc := NewStatusErrors(errors.New("this is the FIRST error message"), errors.New("this is the SECOND error message"))
+func ExampleStatusError() {
+	sc := NewStatusError(errors.New("this is the FIRST error message"), errors.New("this is the SECOND error message"))
 	fmt.Printf("Status.Ok()      : %v\n", sc.Ok())
 	fmt.Printf("Status.IsError() : %v\n", sc.IsError())
 	fmt.Printf("Status.Message() : %v\n", NilEmpty(sc.Message()))
