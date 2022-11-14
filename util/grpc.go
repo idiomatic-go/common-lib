@@ -29,6 +29,14 @@ func (s *grpcStatus) NotFound() bool {
 	return s.code == StatusNotFound
 }
 
+func (s *grpcStatus) Internal() bool {
+	return s.code == StatusInternal
+}
+
+func (s *grpcStatus) Unavailable() bool {
+	return s.code == StatusInternal
+}
+
 func (s *grpcStatus) DeadlineExceeded() bool {
 	return s.code == StatusDeadlineExceeded
 }
@@ -39,10 +47,6 @@ func (s *grpcStatus) AlreadyExists() bool {
 
 func (s *grpcStatus) Cancelled() bool {
 	return s.code == StatusCancelled
-}
-
-func (s *grpcStatus) Internal() bool {
-	return s.code == StatusInternal
 }
 
 func (s *grpcStatus) Message() string {

@@ -20,12 +20,14 @@ func (s *status) InvalidArgument() bool  { return s.grpc.InvalidArgument() }
 func (s *status) Unauthenticated() bool  { return s.grpc.Unauthenticated() }
 func (s *status) PermissionDenied() bool { return s.grpc.PermissionDenied() }
 func (s *status) NotFound() bool         { return s.grpc.NotFound() }
+func (s *status) Internal() bool         { return s.grpc.Internal() }
+func (s *status) Unavailable() bool      { return s.grpc.Unavailable() }
 func (s *status) DeadlineExceeded() bool { return s.grpc.DeadlineExceeded() }
 func (s *status) AlreadyExists() bool    { return s.grpc.AlreadyExists() }
 func (s *status) Cancelled() bool        { return s.grpc.Cancelled() }
-func (s *status) Internal() bool         { return s.grpc.Internal() }
-func (s *status) Code() int32            { return s.grpc.Code() }
-func (s *status) Message() string        { return s.grpc.Message() }
+
+func (s *status) Code() int32     { return s.grpc.Code() }
+func (s *status) Message() string { return s.grpc.Message() }
 
 // Error - Errors interface implementation
 func (s *status) Error() string   { return s.errs.Error() }
@@ -41,6 +43,7 @@ func (s *status) HttpStatus() int {
 	switch s.grpc.Code() {
 	case StatusOk:
 		code = 200
+
 	case StatusInvalidArgument:
 		code = 400
 	case StatusUnauthenticated:
@@ -49,10 +52,11 @@ func (s *status) HttpStatus() int {
 		code = 403
 	case StatusNotFound:
 		code = 404
+
 	case StatusInternal:
 		code = 500
 	case StatusUnavailable:
-		code = 502
+		code = 503
 	case StatusDeadlineExceeded:
 		code = 504
 	case StatusInvalidContent,
@@ -94,6 +98,14 @@ func NewStatusPermissionDenied(a any) Status {
 
 func NewStatusNotFound(a any) Status {
 	return NewStatusCode(StatusNotFound, a)
+}
+
+func NewStatusInternal(a any) Status {
+	return NewStatusCode(StatusInternal, a)
+}
+
+func NewStatusUnavailable(a any) Status {
+	return NewStatusCode(StatusUnavailable, a)
 }
 
 func NewStatusDeadlineExceeded(a any) Status {
