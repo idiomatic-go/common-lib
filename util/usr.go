@@ -92,16 +92,6 @@ type Status interface {
 	HandledNewCode(code int32, mst string) Status
 }
 
-type StatusCode interface {
-	error
-	fmt.Stringer
-	//gRPCStatus
-	IsError() bool
-	Errors() map[string]error
-	AddError(name string, err error)
-	CatErrors() string
-}
-
 type Response struct {
 	Status  Status
 	Content any
