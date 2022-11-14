@@ -29,6 +29,10 @@ func (s *grpcStatus) AlreadyExists() bool {
 	return s.code == StatusAlreadyExists
 }
 
+func (s *grpcStatus) Internal() bool {
+	return s.code == StatusInternal
+}
+
 func (s *grpcStatus) Message() string {
 	return s.msg
 }

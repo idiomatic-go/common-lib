@@ -82,3 +82,29 @@ func ExampleStatusError() {
 	//Status.Cat()     : <nil>
 
 }
+
+func ExampleStatusErrorHandled() {
+	sc := NewStatusError(errors.New("this is the FIRST error message"), errors.New("this is the SECOND error message"))
+
+	fmt.Printf("Status.Ok()       : %v\n", sc.Ok())
+	fmt.Printf("Status.Internal() : %v\n", sc.Internal())
+	fmt.Printf("Status.IsError()  : %v\n", sc.IsError())
+	fmt.Printf("Status.Errors()   : %v\n", sc.Errors())
+
+	sc.Handled()
+	fmt.Printf("Status.Ok()       : %v\n", sc.Ok())
+	fmt.Printf("Status.Internal() : %v\n", sc.Internal())
+	fmt.Printf("Status.IsError()  : %v\n", sc.IsError())
+	fmt.Printf("Status.Errors()   : %v\n", sc.Errors())
+
+	//Output:
+	//Status.Ok()       : false
+	//Status.Internal() : true
+	//Status.IsError()  : true
+	//Status.Errors()   : [this is the FIRST error message this is the SECOND error message]
+	//Status.Ok()       : false
+	//Status.Internal() : true
+	//Status.IsError()  : false
+	//Status.Errors()   : []
+
+}

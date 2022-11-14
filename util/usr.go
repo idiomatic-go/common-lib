@@ -64,6 +64,7 @@ type gRPCStatus interface {
 	NotFound() bool
 	DeadlineExceeded() bool
 	AlreadyExists() bool
+	Internal() bool
 	Code() int32
 	Message() string
 }
@@ -74,6 +75,7 @@ type Errors interface {
 	Errors() []error
 	Add(err error)
 	Cat() string
+	Handled()
 }
 
 type Status interface {
@@ -85,7 +87,7 @@ type Status interface {
 type StatusCode interface {
 	error
 	fmt.Stringer
-	gRPCStatus
+	//gRPCStatus
 	IsError() bool
 	Errors() map[string]error
 	AddError(name string, err error)

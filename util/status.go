@@ -20,6 +20,7 @@ func (s *status) InvalidArgument() bool  { return s.grpc.InvalidArgument() }
 func (s *status) NotFound() bool         { return s.grpc.NotFound() }
 func (s *status) DeadlineExceeded() bool { return s.grpc.DeadlineExceeded() }
 func (s *status) AlreadyExists() bool    { return s.grpc.AlreadyExists() }
+func (s *status) Internal() bool         { return s.grpc.Internal() }
 func (s *status) Code() int32            { return s.grpc.Code() }
 func (s *status) Message() string        { return s.grpc.Message() }
 
@@ -29,6 +30,7 @@ func (s *status) IsError() bool   { return s.errs.IsError() }
 func (s *status) Errors() []error { return s.errs.Errors() }
 func (s *status) Add(err error)   { s.errs.Add(err) }
 func (s *status) Cat() string     { return s.errs.Cat() }
+func (s *status) Handled()        { s.errs.Handled() }
 
 func NewStatusOk() Status {
 	s := status{errs: newErrors(), grpc: NewgRPCStatus(StatusOk, "")}
@@ -59,7 +61,7 @@ func NewStatusAlreadyExists(a any) Status {
 func NewStatusError(err ...error) Status {
 	s := status{errs: NewErrorsList(err), grpc: nil}
 	if len(s.errs.Errors()) > 0 {
-		s.grpc = NewgRPCStatus(StatusNotProvided, "")
+		s.grpc = NewgRPCStatus(StatusInternal, "")
 	} else {
 		s.grpc = NewgRPCStatus(StatusOk, "")
 	}

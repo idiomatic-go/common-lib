@@ -1,9 +1,6 @@
 package util
 
-import (
-	"errors"
-	"fmt"
-)
+/*
 
 func ExampleStatusCodeOk() {
 	sc := NewStatusCodeOk()
@@ -176,6 +173,8 @@ func ExampleStatusDeadlineExceeded() {
 	//StatusCode(.error) : [this is a deadline exceeded ERROR] [true]
 
 }
+
+*/
 
 /*
 func ExampleStatusCode() {
