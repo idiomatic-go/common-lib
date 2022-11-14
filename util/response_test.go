@@ -3,7 +3,7 @@ package util
 import "fmt"
 
 func ExampleNewResponse() {
-	var sc StatusCode
+	var sc Status
 	resp := NewResponse(nil, sc)
 
 	fmt.Printf("Nil         : %v\n", resp.IsContentNil())

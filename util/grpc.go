@@ -37,8 +37,14 @@ func (s *grpcStatus) Code() int32 {
 	return s.code
 }
 
-func NewgRPCStatus(code int32, msg string) gRPCStatus {
-	return creategRPCStatus(code, msg)
+func NewgRPCStatus(code int32, msg any) gRPCStatus {
+	if IsNil(msg) {
+		return creategRPCStatus(code, "")
+	}
+	if msg, ok := msg.(string); ok {
+		return creategRPCStatus(code, msg)
+	}
+	return creategRPCStatus(code, "")
 }
 
 func newgRPCStatus() gRPCStatus {

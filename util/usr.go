@@ -70,6 +70,7 @@ type gRPCStatus interface {
 
 type Errors interface {
 	error
+	IsError() bool
 	Errors() []error
 	Add(err error)
 	Cat() string
@@ -92,7 +93,7 @@ type StatusCode interface {
 }
 
 type Response struct {
-	Status  StatusCode
+	Status  Status
 	Content any
 	Headers any
 }

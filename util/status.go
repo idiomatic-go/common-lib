@@ -9,7 +9,7 @@ type status struct {
 func (s *status) String() string {
 	str := s.Message()
 	if str == "" {
-		str = "" //s.Error()
+		str = s.Error()
 	}
 	return str
 }
@@ -25,36 +25,38 @@ func (s *status) Message() string        { return s.grpc.Message() }
 
 // Error - Errors interface implementation
 func (s *status) Error() string   { return s.errs.Error() }
+func (s *status) IsError() bool   { return s.errs.IsError() }
 func (s *status) Errors() []error { return s.errs.Errors() }
 func (s *status) Add(err error)   { s.errs.Add(err) }
 func (s *status) Cat() string     { return s.errs.Cat() }
 
-func NewStatusOk_GRPC() Status {
+func NewStatusOk() Status {
 	s := status{errs: newErrors(), grpc: NewgRPCStatus(StatusOk, "")}
 	return &s
 }
 
-func NewStatusInvalidArgument_GRPC(msg string) Status {
-	s := status{errs: newErrors(), grpc: NewgRPCStatus(StatusInvalidArgument, msg)}
+func NewStatusCode(code int32, a any) Status {
+	s := status{errs: NewErrorsAny(a), grpc: NewgRPCStatus(code, a)}
 	return &s
 }
 
-func NewStatusNotFound_GRPC(msg string) Status {
-	s := status{errs: newErrors(), grpc: NewgRPCStatus(StatusNotFound, msg)}
-	return &s
+func NewStatusInvalidArgument(a any) Status {
+	return NewStatusCode(StatusInvalidArgument, a)
 }
 
-func NewStatusDeadlineExceeded_GRPC(msg string) Status {
-	s := status{errs: newErrors(), grpc: NewgRPCStatus(StatusDeadlineExceeded, msg)}
-	return &s
+func NewStatusNotFound(a any) Status {
+	return NewStatusCode(StatusNotFound, a)
 }
 
-func NewStatusAlreadyExists_GRPC(msg string) Status {
-	s := status{errs: newErrors(), grpc: NewgRPCStatus(StatusAlreadyExists, msg)}
-	return &s
+func NewStatusDeadlineExceeded(a any) Status {
+	return NewStatusCode(StatusDeadlineExceeded, a)
+}
+
+func NewStatusAlreadyExists(a any) Status {
+	return NewStatusCode(StatusAlreadyExists, a)
 }
 
 func NewStatusErrors(err ...error) Status {
-	s := status{errs: newErrors(), grpc: newgRPCStatus()}
+	s := status{errs: NewErrorsList(err), grpc: NewgRPCStatus(StatusNotProvided, "")}
 	return &s
 }

@@ -8,15 +8,17 @@ type errorList struct {
 	errs []error
 }
 
-func (e *errorList) Errors() []error {
-	return e.errs
-}
-
 func (e *errorList) Error() string {
-	if len(e.errs) == 0 {
+	if !e.IsError() {
 		return ""
 	}
 	return e.errs[0].Error()
+}
+
+func (e *errorList) IsError() bool { return len(e.errs) != 0 }
+
+func (e *errorList) Errors() []error {
+	return e.errs
 }
 
 func (e *errorList) Add(err error) {
@@ -48,6 +50,25 @@ func NewErrors(errs ...error) Errors {
 			continue
 		}
 		s.errs = append(s.errs, e)
+	}
+	return &s
+}
+
+func NewErrorsList(errs []error) Errors {
+	s := errorList{}
+	if errs != nil {
+		s.errs = append(s.errs, errs...)
+	}
+	return &s
+}
+
+func NewErrorsAny(a any) Errors {
+	s := errorList{}
+	if IsNil(a) {
+		return &s
+	}
+	if err, ok := a.(error); ok {
+		s.errs = append(s.errs, err)
 	}
 	return &s
 }

@@ -5,8 +5,8 @@ import (
 	"fmt"
 )
 
-func ExampleStatusOk() {
-	sc := NewStatusOk()
+func ExampleStatusCodeOk() {
+	sc := NewStatusCodeOk()
 
 	fmt.Printf("StatusCode.Ok() : %v\n", sc.Ok())
 	fmt.Printf("StatusCode.InvalidArgument() : %v\n", sc.InvalidArgument())
@@ -20,15 +20,15 @@ func ExampleStatusOk() {
 	//StatusCode.Message() :
 }
 
-func ExampleStatusOptionalNotFound() {
-	sc := NewStatusOptionalNotFound(false, "not found string")
+func ExampleStatusCodeOptionalNotFound() {
+	sc := NewStatusCodeOptionalNotFound(false, "not found string")
 
 	fmt.Printf("StatusCode.Ok()       : %v\n", sc.Ok())
 	fmt.Printf("StatusCode.NotFound() : %v\n", sc.NotFound())
 	fmt.Printf("StatusCode.IsError()  : %v\n", sc.IsError())
 	fmt.Printf("StatusCode.Message()  : %v\n", NilEmpty(sc.Message()))
 
-	sc = NewStatusOptionalNotFound(true, "not found string")
+	sc = NewStatusCodeOptionalNotFound(true, "not found string")
 
 	fmt.Printf("StatusCode.Ok()       : %v\n", sc.Ok())
 	fmt.Printf("StatusCode.NotFound() : %v\n", sc.NotFound())
@@ -46,8 +46,8 @@ func ExampleStatusOptionalNotFound() {
 	//StatusCode.Message()  : not found string
 }
 
-func ExampleStatusNotFound() {
-	sc := NewStatusNotFound("database row was not found")
+func ExampleStatusCodeNotFound() {
+	sc := NewStatusCodeNotFound("database row was not found")
 
 	fmt.Printf("StatusCode.Ok()       : %v\n", sc.Ok())
 	fmt.Printf("StatusCode.NotFound() : %v\n", sc.NotFound())
@@ -61,8 +61,8 @@ func ExampleStatusNotFound() {
 	//StatusCode.Message()  : database row was not found
 }
 
-func ExampleStatusError() {
-	sc := NewStatusError(errors.New("this is an error message"))
+func ExampleStatusCodeError() {
+	sc := NewStatusCodeError(errors.New("this is an error message"))
 	fmt.Printf("StatusCode.Ok()      : %v\n", sc.Ok())
 	fmt.Printf("StatusCode.IsError() : %v\n", sc.IsError())
 	fmt.Printf("StatusCode.Message() : %v\n", NilEmpty(sc.Message()))
@@ -70,7 +70,7 @@ func ExampleStatusError() {
 	err, ok := sc.(error)
 	fmt.Printf("StatusCode(.error)   : [%v] [%v]\n", err, ok)
 
-	sc = NewStatusError(nil)
+	sc = NewStatusCodeError(nil)
 	fmt.Printf("StatusCode.Ok()      : %v\n", sc.Ok())
 	fmt.Printf("StatusCode.IsError() : %v\n", sc.IsError())
 	fmt.Printf("StatusCode.Message() : %v\n", NilEmpty(sc.Message()))
@@ -89,8 +89,8 @@ func ExampleStatusError() {
 	//StatusCode(.error)   : [] [true]
 
 }
-func ExampleStatusErrors() {
-	sc := NewStatusError(errors.New("this is the FIRST error message"), errors.New("this is the SECOND error message"))
+func ExampleStatusCodeErrors() {
+	sc := NewStatusCodeError(errors.New("this is the FIRST error message"), errors.New("this is the SECOND error message"))
 	fmt.Printf("StatusCode.Ok()      : %v\n", sc.Ok())
 	fmt.Printf("StatusCode.IsError() : %v\n", sc.IsError())
 	fmt.Printf("StatusCode.Message() : %v\n", NilEmpty(sc.Message()))
@@ -113,7 +113,7 @@ func ExampleStatusErrors() {
 }
 
 func ExampleStatusErrorsAttrs() {
-	sc := NewStatusErrorAttrs(Attr{"first", errors.New("this is the FIRST error message")}, Attr{"second", errors.New("this is the SECOND error message")})
+	sc := NewStatusCodeErrorAttrs(Attr{"first", errors.New("this is the FIRST error message")}, Attr{"second", errors.New("this is the SECOND error message")})
 	fmt.Printf("StatusCode.Ok()      : %v\n", sc.Ok())
 	fmt.Printf("StatusCode.IsError() : %v\n", sc.IsError())
 	fmt.Printf("StatusCode.Error()   : %v\n", NilEmpty(sc.Error()))
@@ -140,7 +140,7 @@ func ExampleStatusErrorsAttrs() {
 }
 
 func ExampleStatusInvalidArgument() {
-	sc := NewStatusInvalidArgument(errors.New("this is an invalid argument error"))
+	sc := NewStatusCodeInvalidArgument(errors.New("this is an invalid argument error"))
 	fmt.Printf("StatusCode.Ok() : %v\n", sc.Ok())
 	fmt.Printf("StatusCode.InvalidArgument() : %v\n", sc.InvalidArgument())
 	fmt.Printf("StatusCode.IsError() : %v\n", sc.IsError())
@@ -159,7 +159,7 @@ func ExampleStatusInvalidArgument() {
 }
 
 func ExampleStatusDeadlineExceeded() {
-	sc := NewStatusDeadlineExceeded(errors.New("this is a deadline exceeded ERROR"))
+	sc := NewStatusCodeDeadlineExceeded(errors.New("this is a deadline exceeded ERROR"))
 	fmt.Printf("StatusCode.Ok() : %v\n", sc.Ok())
 	fmt.Printf("StatusCode.DeadlineExceeded() : %v\n", sc.DeadlineExceeded())
 	fmt.Printf("StatusCode.IsError() : %v\n", sc.IsError())

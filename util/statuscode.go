@@ -117,24 +117,24 @@ func (sc *statusCode) String() string {
 	return sc.Message()
 }
 
-func NewStatusOk() StatusCode {
+func NewStatusCodeOk() StatusCode {
 	return createStatusCode(StatusOk)
 }
 
-func NewStatusOptionalNotFound(isNull bool, msg string) StatusCode {
+func NewStatusCodeOptionalNotFound(isNull bool, msg string) StatusCode {
 	if isNull {
-		return NewStatusNotFound(msg)
+		return NewStatusCodeNotFound(msg)
 	}
-	return NewStatusOk()
+	return NewStatusCodeOk()
 }
 
-func NewStatusNotFound(msg string) StatusCode {
+func NewStatusCodeNotFound(msg string) StatusCode {
 	sc := createStatusCode(StatusNotFound)
 	sc.msg = msg
 	return sc
 }
 
-func NewStatusError(errs ...error) StatusCode {
+func NewStatusCodeError(errs ...error) StatusCode {
 	var sc = createStatusCode(StatusNotProvided)
 	for _, e := range errs {
 		if e == nil {
@@ -148,7 +148,7 @@ func NewStatusError(errs ...error) StatusCode {
 	return sc
 }
 
-func NewStatusErrorAttrs(errs ...Attr) StatusCode {
+func NewStatusCodeErrorAttrs(errs ...Attr) StatusCode {
 	var sc = createStatusCode(StatusNotProvided)
 	for _, attr := range errs {
 		if attr.Val == nil {
@@ -166,14 +166,14 @@ func NewStatusErrorAttrs(errs ...Attr) StatusCode {
 	return sc
 }
 
-func NewStatusInvalidArgument(err error) StatusCode {
+func NewStatusCodeInvalidArgument(err error) StatusCode {
 	return createStatusCodeError(StatusInvalidArgument, "", err)
 }
 
-func NewStatusDeadlineExceeded(err error) StatusCode {
+func NewStatusCodeDeadlineExceeded(err error) StatusCode {
 	return createStatusCodeError(StatusDeadlineExceeded, "", err)
 }
 
-func NewStatusAlreadyExists(err error) StatusCode {
+func NewStatusCodeAlreadyExists(err error) StatusCode {
 	return createStatusCodeError(StatusAlreadyExists, "", err)
 }
