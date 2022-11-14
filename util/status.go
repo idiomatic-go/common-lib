@@ -57,6 +57,11 @@ func NewStatusAlreadyExists(a any) Status {
 }
 
 func NewStatusError(err ...error) Status {
-	s := status{errs: NewErrorsList(err), grpc: NewgRPCStatus(StatusNotProvided, "")}
+	s := status{errs: NewErrorsList(err), grpc: nil}
+	if len(s.errs.Errors()) > 0 {
+		s.grpc = NewgRPCStatus(StatusNotProvided, "")
+	} else {
+		s.grpc = NewgRPCStatus(StatusOk, "")
+	}
 	return &s
 }

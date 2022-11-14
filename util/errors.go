@@ -44,20 +44,16 @@ func (e *errorList) Cat() string {
 }
 
 func NewErrors(errs ...error) Errors {
+	return NewErrorsList(errs)
+}
+
+func NewErrorsList(errs []error) Errors {
 	s := errorList{}
 	for _, e := range errs {
 		if e == nil {
 			continue
 		}
 		s.errs = append(s.errs, e)
-	}
-	return &s
-}
-
-func NewErrorsList(errs []error) Errors {
-	s := errorList{}
-	if errs != nil {
-		s.errs = append(s.errs, errs...)
 	}
 	return &s
 }
