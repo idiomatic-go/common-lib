@@ -17,6 +17,14 @@ func (s *grpcStatus) InvalidArgument() bool {
 	return s.code == StatusInvalidArgument
 }
 
+func (s *grpcStatus) Unauthenticated() bool {
+	return s.code == StatusUnauthenticated
+}
+
+func (s *grpcStatus) PermissionDenied() bool {
+	return s.code == StatusPermissionDenied
+}
+
 func (s *grpcStatus) NotFound() bool {
 	return s.code == StatusNotFound
 }
@@ -27,6 +35,10 @@ func (s *grpcStatus) DeadlineExceeded() bool {
 
 func (s *grpcStatus) AlreadyExists() bool {
 	return s.code == StatusAlreadyExists
+}
+
+func (s *grpcStatus) Cancelled() bool {
+	return s.code == StatusCancelled
 }
 
 func (s *grpcStatus) Internal() bool {

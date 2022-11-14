@@ -61,8 +61,11 @@ type VariableLookup = func(name string) (value string, err error)
 type gRPCStatus interface {
 	Ok() bool
 	InvalidArgument() bool
+	Unauthenticated() bool
+	PermissionDenied() bool
 	NotFound() bool
 	DeadlineExceeded() bool
+	Cancelled() bool
 	AlreadyExists() bool
 	Internal() bool
 	Code() int32

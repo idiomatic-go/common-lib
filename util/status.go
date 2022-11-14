@@ -17,9 +17,12 @@ func (s *status) String() string {
 // Ok - gRPC interface implementation
 func (s *status) Ok() bool               { return s.grpc.Ok() }
 func (s *status) InvalidArgument() bool  { return s.grpc.InvalidArgument() }
+func (s *status) Unauthenticated() bool  { return s.grpc.Unauthenticated() }
+func (s *status) PermissionDenied() bool { return s.grpc.PermissionDenied() }
 func (s *status) NotFound() bool         { return s.grpc.NotFound() }
 func (s *status) DeadlineExceeded() bool { return s.grpc.DeadlineExceeded() }
 func (s *status) AlreadyExists() bool    { return s.grpc.AlreadyExists() }
+func (s *status) Cancelled() bool        { return s.grpc.Cancelled() }
 func (s *status) Internal() bool         { return s.grpc.Internal() }
 func (s *status) Code() int32            { return s.grpc.Code() }
 func (s *status) Message() string        { return s.grpc.Message() }
@@ -46,6 +49,14 @@ func NewStatusInvalidArgument(a any) Status {
 	return NewStatusCode(StatusInvalidArgument, a)
 }
 
+func NewStatusUnauthenticated(a any) Status {
+	return NewStatusCode(StatusUnauthenticated, a)
+}
+
+func NewStatusPermissionDenied(a any) Status {
+	return NewStatusCode(StatusPermissionDenied, a)
+}
+
 func NewStatusNotFound(a any) Status {
 	return NewStatusCode(StatusNotFound, a)
 }
@@ -56,6 +67,10 @@ func NewStatusDeadlineExceeded(a any) Status {
 
 func NewStatusAlreadyExists(a any) Status {
 	return NewStatusCode(StatusAlreadyExists, a)
+}
+
+func NewStatusCancelled(a any) Status {
+	return NewStatusCode(StatusCancelled, a)
 }
 
 func NewStatusError(err ...error) Status {
