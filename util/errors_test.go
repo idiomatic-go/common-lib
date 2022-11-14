@@ -13,14 +13,13 @@ func ExampleNewErrors() {
 	fmt.Printf("Errors : %v\n", errs.Errors())
 	errs.Add(errors.New("third error"))
 	fmt.Printf("Errors : %v\n", errs.Errors())
-	fmt.Printf("Cat    : %v\n", errs.Cat())
+	//fmt.Printf("Cat    : %v\n", errs.Cat())
 
 	//Output:
 	//IsError: true
-	//Error  : first error
+	//Error  : first error : second error
 	//Errors : [first error second error]
 	//Errors : [first error second error third error]
-	//Cat    : first error : second error : third error
 }
 
 func ExampleNewErrorsList() {
@@ -29,13 +28,13 @@ func ExampleNewErrorsList() {
 	fmt.Printf("IsError: %v\n", errs.IsError())
 	fmt.Printf("Error  : %v\n", errs)
 	fmt.Printf("Errors : %v\n", errs.Errors())
-	fmt.Printf("Cat    : %v\n", errs.Cat())
+	//fmt.Printf("Cat    : %v\n", errs.Cat())
 
 	//Output:
 	//IsError: true
-	//Error  : first error
+	//Error  : first error : second error
 	//Errors : [first error second error]
-	//Cat    : first error : second error
+
 }
 
 func ExampleNewErrorsHandled() {
@@ -52,7 +51,7 @@ func ExampleNewErrorsHandled() {
 
 	//Output:
 	//IsError: true
-	//Error  : first error
+	//Error  : first error : second error
 	//Errors : [first error second error]
 	//IsError: false
 	//Errors : []

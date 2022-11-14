@@ -12,7 +12,7 @@ func (e *errorList) Error() string {
 	if !e.IsError() {
 		return ""
 	}
-	return e.errs[0].Error()
+	return e.Cat()
 }
 
 func (e *errorList) IsError() bool { return len(e.errs) != 0 }

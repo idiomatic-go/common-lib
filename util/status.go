@@ -34,7 +34,6 @@ func (s *status) Error() string   { return s.errs.Error() }
 func (s *status) IsError() bool   { return s.errs.IsError() }
 func (s *status) Errors() []error { return s.errs.Errors() }
 func (s *status) Add(err error)   { s.errs.Add(err) }
-func (s *status) Cat() string     { return s.errs.Cat() }
 func (s *status) Handled()        { s.errs.Handled() }
 
 // HttpStatus - convert gRPC -> Http

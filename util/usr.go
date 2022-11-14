@@ -81,7 +81,6 @@ type Errors interface {
 	IsError() bool
 	Errors() []error
 	Add(err error)
-	Cat() string
 	Handled()
 }
 
