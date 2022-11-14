@@ -1,8 +1,9 @@
 package util
 
 type status struct {
-	errs Errors
-	grpc gRPCStatus
+	errs  Errors
+	errs2 Errors
+	grpc  gRPCStatus
 }
 
 // String - fmt.Stringer interface implementation
@@ -34,7 +35,12 @@ func (s *status) Error() string   { return s.errs.Error() }
 func (s *status) IsError() bool   { return s.errs.IsError() }
 func (s *status) Errors() []error { return s.errs.Errors() }
 func (s *status) Add(err error)   { s.errs.Add(err) }
-func (s *status) Handled()        { s.errs.Handled() }
+
+// Handled - update to reflect that the errors have already been handled
+func (s *status) Handled() Status {
+	s.errs2 = s.errs
+	return &status{errs: newErrors(), grpc: s.grpc}
+}
 
 // HttpStatus - convert gRPC -> Http
 func (s *status) HttpStatus() int {

@@ -88,11 +88,11 @@ func ExampleStatusErrorHandled() {
 	fmt.Printf("Status.IsError()  : %v\n", sc.IsError())
 	fmt.Printf("Status.Errors()   : %v\n", sc.Errors())
 
-	sc.Handled()
-	fmt.Printf("Status.Ok()       : %v\n", sc.Ok())
-	fmt.Printf("Status.Internal() : %v\n", sc.Internal())
-	fmt.Printf("Status.IsError()  : %v\n", sc.IsError())
-	fmt.Printf("Status.Errors()   : %v\n", sc.Errors())
+	s2 := sc.Handled()
+	fmt.Printf("Status.Ok()       : %v\n", s2.Ok())
+	fmt.Printf("Status.Internal() : %v\n", s2.Internal())
+	fmt.Printf("Status.IsError()  : %v\n", s2.IsError())
+	fmt.Printf("Status.Errors()   : %v\n", s2.Errors())
 
 	//Output:
 	//Status.Ok()       : false
@@ -101,6 +101,36 @@ func ExampleStatusErrorHandled() {
 	//Status.Errors()   : [this is the FIRST error message this is the SECOND error message]
 	//Status.Ok()       : false
 	//Status.Internal() : true
+	//Status.IsError()  : false
+	//Status.Errors()   : []
+
+}
+
+func ExampleStatusErrorHandledNotFound() {
+	sc := NewStatusNotFound(errors.New("resource NOT FOUND error message"))
+
+	fmt.Printf("Status.Ok()       : %v\n", sc.Ok())
+	fmt.Printf("Status.Internal() : %v\n", sc.Internal())
+	fmt.Printf("Status.NotFound() : %v\n", sc.NotFound())
+	fmt.Printf("Status.IsError()  : %v\n", sc.IsError())
+	fmt.Printf("Status.Errors()   : %v\n", sc.Errors())
+
+	s2 := sc.Handled()
+	fmt.Printf("Status.Ok()       : %v\n", s2.Ok())
+	fmt.Printf("Status.Internal() : %v\n", s2.Internal())
+	fmt.Printf("Status.NotFound() : %v\n", sc.NotFound())
+	fmt.Printf("Status.IsError()  : %v\n", s2.IsError())
+	fmt.Printf("Status.Errors()   : %v\n", s2.Errors())
+
+	//Output:
+	//Status.Ok()       : false
+	//Status.Internal() : false
+	//Status.NotFound() : true
+	//Status.IsError()  : true
+	//Status.Errors()   : [resource NOT FOUND error message]
+	//Status.Ok()       : false
+	//Status.Internal() : false
+	//Status.NotFound() : true
 	//Status.IsError()  : false
 	//Status.Errors()   : []
 

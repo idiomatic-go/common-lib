@@ -43,9 +43,9 @@ func (e *errorList) Cat() string {
 	return sb.String()
 }
 
-func (e *errorList) Handled() {
-	e.errs = nil
-}
+//func (e *errorList) Handled() {
+//	e.errs = nil
+//}
 
 func NewErrors(errs ...error) Errors {
 	return NewErrorsList(errs)

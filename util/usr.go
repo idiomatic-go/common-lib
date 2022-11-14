@@ -81,7 +81,6 @@ type Errors interface {
 	IsError() bool
 	Errors() []error
 	Add(err error)
-	Handled()
 }
 
 type Status interface {
@@ -89,6 +88,7 @@ type Status interface {
 	gRPCStatus
 	Errors
 	HttpStatus() int
+	Handled() Status
 }
 
 type StatusCode interface {

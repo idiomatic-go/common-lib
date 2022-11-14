@@ -37,6 +37,8 @@ func ExampleNewErrorsList() {
 
 }
 
+/*
+
 func ExampleNewErrorsHandled() {
 	errs := NewErrorsList([]error{errors.New("first error"), errors.New("second error")})
 
@@ -58,6 +60,8 @@ func ExampleNewErrorsHandled() {
 
 }
 
+
+*/
 func ExampleNewErrorsAny() {
 	errs := NewErrorsAny("should not be an error")
 
