@@ -7,7 +7,7 @@ import (
 
 func NilEmpty(s string) string {
 	if s == "" {
-		return NilString
+		return "<nil>"
 	}
 	return s
 }

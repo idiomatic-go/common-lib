@@ -40,3 +40,11 @@ var LogContextPrint ContextDefaultFmt = func(ctx context.Context, v ...any) {
 var LogContextPrintf ContextSpecifiedFmt = func(ctx context.Context, specifier string, v ...any) {
 	logxt.LogPrintf(specifier, v)
 }
+
+var LogPrint DefaultFmt = func(v ...any) {
+	log.Print(v)
+}
+
+var LogPrintf SpecifiedFmt = func(specifier string, v ...any) {
+	log.Printf(specifier, v)
+}
