@@ -87,6 +87,9 @@ type Credentials func() (username string, password string, err error)
 
 type MessageHandler func(msg Message)
 
+// VariableLookup - type used in template.go
+type VariableLookup = func(name string) (value string, err error)
+
 const (
 	// gRPC status codes
 	// https://grpc.github.io/grpc/core/md_doc_statuscodes.html
