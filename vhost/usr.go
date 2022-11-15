@@ -148,8 +148,11 @@ type Status interface {
 	HandledNewCode(code int32, msg string) Status
 }
 
-type Response struct {
-	Status  Status
-	Content any
-	Headers any
+type Response interface {
+	IsContentNil() bool
+	IsContentSerialized() bool
+	ContentBytes() (buf []byte, ok bool)
+	Content() any
+	Headers() any
+	Status() Status
 }
