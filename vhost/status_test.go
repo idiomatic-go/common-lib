@@ -5,6 +5,13 @@ import (
 	"fmt"
 )
 
+func NilEmpty(s string) string {
+	if s == "" {
+		return NilString
+	}
+	return s
+}
+
 func ExampleStatusOk() {
 	sc := NewStatusOk()
 
