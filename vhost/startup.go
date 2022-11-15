@@ -3,7 +3,6 @@ package vhost
 import (
 	"errors"
 	"fmt"
-	"github.com/idiomatic-go/common-lib/logxt"
 	"time"
 )
 
@@ -87,19 +86,19 @@ func Startup(ticks int, override messageMap) bool {
 	toSend := createToSend(override)
 	err := validateToSend(toSend)
 	if err != nil {
-		logxt.LogPrintf("%v", err)
+		LogPrintf("%v", err)
 		return false
 	}
 	err = sendMessages(toSend)
 	if err != nil {
-		logxt.LogPrintf("%v", err)
+		LogPrintf("%v", err)
 		Shutdown()
 		return false
 	}
 	var count = 1
 	for {
 		if count > maxStartupIterations {
-			logxt.LogPrintf("startup failure %v, max iterations exceeded: %v", directory.notSuccessfulStatus(), count)
+			LogPrintf("startup failure %v, max iterations exceeded: %v", directory.notSuccessfulStatus(), count)
 			Shutdown()
 			return false
 		}
@@ -107,18 +106,18 @@ func Startup(ticks int, override messageMap) bool {
 		// Check the startup status of the directory, continue if a package is still in startup
 		uri := directory.inProgress()
 		if uri != "" {
-			logxt.LogPrintf("startup in progress: continuing: %v", uri)
+			LogPrintf("startup in progress: continuing: %v", uri)
 			count++
 			continue
 		}
 		// All the current messages have been sent, so lets check for failure.
 		fail := directory.failure()
 		if fail != "" {
-			logxt.LogPrintf("startup failure: status on: %v", fail)
+			LogPrintf("startup failure: status on: %v", fail)
 			Shutdown()
 			return false
 		}
-		logxt.LogPrintf("startup successful: %v", count)
+		LogPrintf("startup successful: %v", count)
 		break
 	}
 	return true
@@ -177,12 +176,12 @@ func receive(q *Queue) {
 			}
 			if msg.Event == StartupEvent {
 				if !directory.setStatus(msg.From, msg.Status) {
-					logxt.LogPrintf("Startup failure: unable to set startup status from package: %v", msg.From)
+					LogPrintf("Startup failure: unable to set startup status from package: %v", msg.From)
 				}
 			} else {
 				//q.Enqueue(msg)
 				// All messages that are received must have valid processing, otherwise log an error
-				logxt.LogPrintf("vhost message received error : unable to process message, no mapping for event : %v", msg)
+				LogPrintf("vhost message received error : unable to process message, no mapping for event : %v", msg)
 			}
 		}
 	}

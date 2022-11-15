@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/idiomatic-go/common-lib/fse"
-	"github.com/idiomatic-go/common-lib/util"
 	"io/fs"
 )
 
@@ -30,7 +29,7 @@ func ReadFile(name string) ([]byte, error) {
 	if fsys == nil {
 		return nil, errors.New("invalid argument : file system has not mounted")
 	}
-	s, err := util.ExpandTemplate(name, lookupEnv)
+	s, err := ExpandTemplate(name, lookupEnv)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +39,7 @@ func ReadFile(name string) ([]byte, error) {
 		return buf, err1
 	}
 	// Override to determine if a template was used.
-	s, err1 = util.ExpandTemplate(name, lookupTest)
+	s, err1 = ExpandTemplate(name, lookupTest)
 	if err1 != nil {
 		return nil, err1
 	}
