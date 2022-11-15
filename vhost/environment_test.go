@@ -19,7 +19,7 @@ func ExampleDevEnv() {
 }
 
 func ExampleDevEnvOverride() {
-	vhost.IsDevEnv = func() bool { return false }
+	vhost.OverrideIsDevEnv(func() bool { return false })
 	fmt.Println(vhost.IsDevEnv())
 	vhost.SetEnv("dev")
 	fmt.Println(vhost.IsDevEnv())

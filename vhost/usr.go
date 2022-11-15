@@ -6,24 +6,24 @@ import (
 
 // Environment
 const (
-	DevEnv        = "dev"
-	RuntimeEnvKey = "RUNTIME_ENV"
+	devEnv        = "dev"
+	runtimeEnvKey = "RUNTIME_ENV"
 )
 
 // FuncBool - type to allow environment determination
 type FuncBool func() bool
 
 // OverrideRuntimeEnvKey - allows configuration
-func OverrideRuntimeEnvKey(k string) {
-	if k != "" {
-		runtimeKey = k
-	}
-}
+//func OverrideRuntimeEnvKey(k string) {
+//	if k != "" {
+//		runtimeKey = k
+//	}
+//}
 
 // OverrideIsDevEnv - function to override dev environment determination
 func OverrideIsDevEnv(fn FuncBool) {
 	if fn != nil {
-		IsDevEnv = fn
+		isDevEnv = fn
 	}
 }
 

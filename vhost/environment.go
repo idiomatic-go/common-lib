@@ -5,24 +5,28 @@ import (
 	"strings"
 )
 
-var runtimeKey string = RuntimeEnvKey
-var IsDevEnv FuncBool
+var runtimeKey string = runtimeEnvKey
+var isDevEnv FuncBool
 
 func init() {
-	IsDevEnv = func() bool {
+	isDevEnv = func() bool {
 		target := GetEnv()
-		if len(target) == 0 || strings.EqualFold(target, DevEnv) {
+		if len(target) == 0 || strings.EqualFold(target, devEnv) {
 			return true
 		}
 		return false
 	}
 }
 
+func IsDevEnv() bool {
+	return isDevEnv()
+}
+
 // GetEnv - function to get the vhost runtime environment
 func GetEnv() string {
 	s := os.Getenv(runtimeKey)
 	if s == "" {
-		return DevEnv
+		return devEnv
 	}
 	return s
 }
