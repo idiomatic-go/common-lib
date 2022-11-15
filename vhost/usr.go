@@ -2,15 +2,16 @@ package vhost
 
 import (
 	"fmt"
-	"os"
 )
 
 // Environment
 const (
-	DevEnv         = "dev"
-	EnvTemplateVar = "{env}"
-	RuntimeEnvKey  = "RUNTIME_ENV"
+	DevEnv        = "dev"
+	RuntimeEnvKey = "RUNTIME_ENV"
 )
+
+// FuncBool - type to allow environment determination
+type FuncBool func() bool
 
 // OverrideRuntimeEnvKey - allows configuration
 func OverrideRuntimeEnvKey(k string) {
@@ -19,25 +20,8 @@ func OverrideRuntimeEnvKey(k string) {
 	}
 }
 
-// GetEnv - function to get the vhost runtime environment
-func GetEnv() string {
-	s := os.Getenv(runtimeKey)
-	if s == "" {
-		return DevEnv
-	}
-	return s
-}
-
-// SetEnv - function to set the vhost runtime environment
-func SetEnv(s string) {
-	os.Setenv(runtimeKey, s)
-}
-
-// EnvValid - type to allow override of dev environment determination
-type EnvValid func() bool
-
 // OverrideIsDevEnv - function to override dev environment determination
-func OverrideIsDevEnv(fn EnvValid) {
+func OverrideIsDevEnv(fn FuncBool) {
 	if fn != nil {
 		IsDevEnv = fn
 	}
@@ -86,6 +70,10 @@ type Message struct {
 type Credentials func() (username string, password string, err error)
 
 type MessageHandler func(msg Message)
+
+const (
+	EnvTemplateVar = "{env}"
+)
 
 // VariableLookup - type used in template.go
 type VariableLookup = func(name string) (value string, err error)

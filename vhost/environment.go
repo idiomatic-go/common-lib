@@ -1,11 +1,12 @@
 package vhost
 
 import (
+	"os"
 	"strings"
 )
 
 var runtimeKey string = RuntimeEnvKey
-var IsDevEnv EnvValid
+var IsDevEnv FuncBool
 
 func init() {
 	IsDevEnv = func() bool {
@@ -15,6 +16,20 @@ func init() {
 		}
 		return false
 	}
+}
+
+// GetEnv - function to get the vhost runtime environment
+func GetEnv() string {
+	s := os.Getenv(runtimeKey)
+	if s == "" {
+		return DevEnv
+	}
+	return s
+}
+
+// SetEnv - function to set the vhost runtime environment
+func SetEnv(s string) {
+	os.Setenv(runtimeKey, s)
 }
 
 //var IsDevEnv EnvValid = func() bool {
