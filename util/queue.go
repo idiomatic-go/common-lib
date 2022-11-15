@@ -1,8 +1,18 @@
-package vhost
+package util
 
 import (
 	"sync"
 )
+
+const ErrorEvent = "event:error"
+
+type Message struct {
+	To      string // Uri of the destination package
+	Event   string
+	From    string // Uri of package that is sending the message
+	Status  int32
+	Content []any
+}
 
 type Queue struct {
 	msgs []Message

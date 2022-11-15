@@ -10,12 +10,10 @@ var maxStartupIterations = DefaultMaxStartupIterations
 
 // Response methods
 var resp chan Message
-var q *Queue
 
 func init() {
 	resp = make(chan Message, 100)
-	q = CreateQueue()
-	go receive(q)
+	go receive()
 }
 
 // IsPackageStartupSuccessful - determine if a package was successfully started
@@ -166,7 +164,7 @@ func sendMessages(msgs messageMap) error {
 	return nil
 }
 
-func receive(q *Queue) {
+func receive() {
 	for {
 		select {
 		case msg, open := <-resp:
