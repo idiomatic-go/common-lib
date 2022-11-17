@@ -3,7 +3,6 @@ package vhost
 import (
 	"context"
 	"fmt"
-	"github.com/idiomatic-go/common-lib/logxt"
 	"log"
 )
 
@@ -26,6 +25,14 @@ var LogDebugf SpecifiedFmt = func(specifier string, v ...any) {
 	}
 }
 
+var LogPrint DefaultFmt = func(v ...any) {
+	log.Print(v)
+}
+
+var LogPrintf SpecifiedFmt = func(specifier string, v ...any) {
+	log.Printf(specifier, v)
+}
+
 // ContextDefaultFmt - logging function type
 type ContextDefaultFmt func(ctx context.Context, v ...any)
 
@@ -34,17 +41,9 @@ type ContextSpecifiedFmt func(ctx context.Context, specifier string, v ...any)
 
 var LogContextPrint ContextDefaultFmt = func(ctx context.Context, v ...any) {
 	u := []any{ContextRequestId(ctx)}
-	logxt.LogPrintf("%v", append(u, v))
+	LogPrintf("%v", append(u, v))
 }
 
 var LogContextPrintf ContextSpecifiedFmt = func(ctx context.Context, specifier string, v ...any) {
-	logxt.LogPrintf(specifier, v)
-}
-
-var LogPrint DefaultFmt = func(v ...any) {
-	log.Print(v)
-}
-
-var LogPrintf SpecifiedFmt = func(specifier string, v ...any) {
-	log.Printf(specifier, v)
+	LogPrintf(specifier, v)
 }

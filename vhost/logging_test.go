@@ -1,11 +1,9 @@
 package vhost_test
 
-import (
-	"github.com/idiomatic-go/common-lib/logxt"
-)
+import "github.com/idiomatic-go/common-lib/vhost"
 
 func ExamplePrint() {
-	logxt.LogPrint("test string")
+	vhost.LogPrint("test string")
 
 	// Output:
 }

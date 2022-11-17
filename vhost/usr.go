@@ -2,6 +2,7 @@ package vhost
 
 import (
 	"fmt"
+	"time"
 )
 
 // Environment
@@ -38,38 +39,37 @@ type DefaultFmt func(v ...any)
 // SpecifiedFmt - logging function type
 type SpecifiedFmt func(specifier string, v ...any)
 
+/*
 const (
-	DefaultMaxStartupIterations = 4
-
 	StartupEvent  = "event:startup"
 	ShutdownEvent = "event:shutdown"
-	ACKEvent      = "event:ack"
 	ErrorEvent    = "event:error"
-	HostFrom      = "vhost"
-
-	StatusEmpty      = int32(0)
-	StatusInProgress = int32(1)
-	StatusSuccessful = int32(2)
-	StatusFailure    = int32(3)
+	RestartEvent  = "event:restart"
+	FailoverEvent = "event:failover"
+	FailbackEvent = "event:failback"
+	PingEvent     = "event:ping"
+	ProfileEvent  = "event:profile"
+	VirtualHost   = "vhost"
 )
 
+
+*/
 func OverrideMaxStartupIterations(count int) {
 	if count > 0 {
 		maxStartupIterations = count
 	}
 }
 
-type Message struct {
+type Message_OLD struct {
 	To      string // Uri of the destination package
-	Event   string
 	From    string // Uri of package that is sending the message
-	Status  int32
-	Content []any
+	Event   string
+	Content any
+	Status
+	CreateTS time.Time
 }
 
 type Credentials func() (username string, password string, err error)
-
-type MessageHandler func(msg Message)
 
 const (
 	EnvTemplateVar = "{env}"
@@ -81,8 +81,9 @@ type VariableLookup = func(name string) (value string, err error)
 const (
 	// gRPC status codes
 	// https://grpc.github.io/grpc/core/md_doc_statuscodes.html
-	StatusInvalidContent     = int32(-2) // Content is not available or is of the wrong type, usually found via unmarshalling
-	StatusNotProvided        = int32(-1) // No status available, usually on error.
+	StatusInProgress     = int32(-3) // A request has started
+	StatusInvalidContent = int32(-2) // Content is not available or is of the wrong type, usually found via unmarshalling
+	//StatusNotProvided        = int32(-1) // No status available, usually on error.
 	StatusOk                 = int32(0)  // Not an error; returned on success.
 	StatusCancelled          = int32(1)  // The operation was cancelled, typically by the caller.
 	StatusUnknown            = int32(2)  // Unknown error. For example, this error may be returned when a Status value received from another address space belongs to an error space that is not known in this address space. Also errors raised by APIs that do not return enough error information may be converted to this error.

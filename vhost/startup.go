@@ -2,19 +2,13 @@ package vhost
 
 import (
 	"errors"
-	"fmt"
+	"github.com/idiomatic-go/common-lib/eventing"
 	"time"
 )
 
-var maxStartupIterations = DefaultMaxStartupIterations
+type MessageMap map[string]eventing.Message
 
-// Response methods
-var resp chan Message
-
-func init() {
-	resp = make(chan Message, 100)
-	go receive()
-}
+var maxStartupIterations = 4 //DefaultMaxStartupIterations
 
 // IsPackageStartupSuccessful - determine if a package was successfully started
 func IsPackageStartupSuccessful(uri string) bool {
@@ -24,11 +18,11 @@ func IsPackageStartupSuccessful(uri string) bool {
 			return false
 		}
 		count++
-		status := directory.getStatus(uri)
+		status := eventing.Directory.GetStatus(uri, eventing.StartupEvent)
 		switch status {
-		case StatusSuccessful:
+		case StatusOk:
 			return true
-		case StatusFailure:
+		case StatusInternal:
 			return false
 		default:
 			time.Sleep(time.Second * time.Duration(1))
@@ -37,23 +31,24 @@ func IsPackageStartupSuccessful(uri string) bool {
 }
 
 // RegisterPackage - function to register a package uri
-func RegisterPackage(uri string, c chan Message, dependents []string) error {
+func RegisterPackage(uri string, c chan eventing.Message) error {
 	if uri == "" {
 		return errors.New("startup RegisterPackage() error : uri is empty")
 	}
 	if c == nil {
 		return errors.New("startup RegisterPackage() error : channel is nil")
 	}
-	registerPackageUnchecked(uri, c, dependents)
+	registerPackageUnchecked(uri, c)
 	return nil
 }
 
-func registerPackageUnchecked(uri string, c chan Message, dependents []string) error {
-	directory.put(&entry{uri: uri, c: c, dependents: dependents})
+func registerPackageUnchecked(uri string, c chan eventing.Message) error {
+	eventing.Directory.Put(uri, c)
 	return nil
 }
 
 // UnregisterPackage - function to unregister a package
+/*
 func unregisterPackage(uri string) {
 	if uri == "" {
 		return
@@ -67,49 +62,53 @@ func unregisterPackage(uri string) {
 	}
 }
 
+*/
+
 // Shutdown - virtual host shutdown
 func Shutdown() {
-	for k := range directory.data() {
-		SendShutdownMessage(k, HostFrom)
-		unregisterPackage(k)
-	}
+	eventing.Directory.Broadcast(eventing.ShutdownEvent, eventing.StatusNotProvided)
+	//for k := range directory.data() {
+	//	SendShutdownMessage(k, VirtualHost)
+	//	unregisterPackage(k)
+	//}
+	eventing.Directory.Shutdown()
 }
 
 // Startup - virtual host startup
-func Startup(ticks int, override messageMap) bool {
-	packages := directory.count()
+func Startup(ticks int, override MessageMap) bool {
+	packages := eventing.Directory.Count()
 	if packages == 0 {
 		return true
 	}
 	toSend := createToSend(override)
-	err := validateToSend(toSend)
-	if err != nil {
-		LogPrintf("%v", err)
-		return false
-	}
-	err = sendMessages(toSend)
-	if err != nil {
-		LogPrintf("%v", err)
-		Shutdown()
-		return false
-	}
+	//err := validateToSend(toSend)
+	//if err != nil {
+	//	LogPrintf("%v", err)
+	//	return false
+	//}
+	sendMessages(toSend)
+	//if err != nil {
+	//	LogPrintf("%v", err)
+	//	Shutdown()
+	//	return false
+	//}
 	var count = 1
 	for {
 		if count > maxStartupIterations {
-			LogPrintf("startup failure %v, max iterations exceeded: %v", directory.notSuccessfulStatus(), count)
+			//LogPrintf("startup failure %v, max iterations exceeded: %v", directory.notSuccessfulStatus(StartupEvent), count)
 			Shutdown()
 			return false
 		}
 		time.Sleep(time.Second * time.Duration(ticks))
 		// Check the startup status of the directory, continue if a package is still in startup
-		uri := directory.inProgress()
+		uri := eventing.Directory.FindStatus(eventing.StartupEvent, StatusInProgress)
 		if uri != "" {
 			LogPrintf("startup in progress: continuing: %v", uri)
 			count++
 			continue
 		}
 		// All the current messages have been sent, so lets check for failure.
-		fail := directory.failure()
+		fail := eventing.Directory.FindStatus(eventing.StartupEvent, StatusInternal)
 		if fail != "" {
 			LogPrintf("startup failure: status on: %v", fail)
 			Shutdown()
@@ -121,66 +120,51 @@ func Startup(ticks int, override messageMap) bool {
 	return true
 }
 
-func createToSend(msgs messageMap) messageMap {
-	m := make(messageMap)
-	for k := range directory.data() {
+func createToSend(msgs MessageMap) MessageMap {
+	m := make(MessageMap)
+	for _, k := range eventing.Directory.Uri() {
 		if msgs != nil {
 			message, ok := msgs[k]
 			if ok {
-				message.Event = StartupEvent
-				message.From = HostFrom
-				message.Status = StatusEmpty
+				message.Event = eventing.StartupEvent
+				message.From = eventing.VirtualHost
+				message.Status = eventing.StatusNotProvided
 				m[k] = message
 				continue
 			}
 		}
-		e := directory.get(k)
-		if e != nil {
-			m[k] = CreateMessage(e.uri, StartupEvent, HostFrom, StatusEmpty, nil)
-		} else {
-			m[k] = CreateMessage("invalid:uri", StartupEvent, HostFrom, StatusEmpty, nil)
-		}
+		m[k] = eventing.CreateMessage(k, eventing.VirtualHost, eventing.StartupEvent, eventing.StatusNotProvided, nil)
 	}
 	return m
 }
 
-func validateToSend(toSend messageMap) error {
+/*
+func validateToSend(toSend MessageMap) error {
 	for k := range toSend {
-		e := directory.get(k)
-		if e == nil {
+		if !eventing.Directory.Exists(k) {
 			return errors.New(fmt.Sprintf("startup failure: directory entry does not exist for package uri: %v", k))
 		}
 	}
 	return nil
 }
 
-func sendMessages(msgs messageMap) error {
+*/
+
+func sendMessages(msgs MessageMap) {
 	for k := range msgs {
-		if !directory.setStatus(k, StatusInProgress) {
-			return errors.New(fmt.Sprintf("Startup failure: unable to set package %v startup status", k))
-		}
-		SendMessage(msgs[k])
+		//		if !eventing.Directory.Add(k, eventing.CreateMessage(eventing.VirtualHost, eventing.VirtualHost, eventing.StartupEvent, StatusInProgress, nil)) {
+		//			return errors.New(fmt.Sprintf("Startup failure: unable to set package %v startup status", k))
+		//		}
+		eventing.Directory.SendMessage(msgs[k])
+		eventing.Directory.Add(k, eventing.CreateMessage(eventing.VirtualHost, eventing.VirtualHost, eventing.StartupEvent, StatusInProgress, nil))
 	}
-	return nil
+	//return nil
 }
 
-func receive() {
-	for {
-		select {
-		case msg, open := <-resp:
-			// Exit on a closed channel
-			if !open {
-				return
-			}
-			if msg.Event == StartupEvent {
-				if !directory.setStatus(msg.From, msg.Status) {
-					LogPrintf("Startup failure: unable to set startup status from package: %v", msg.From)
-				}
-			} else {
-				//q.Enqueue(msg)
-				// All messages that are received must have valid processing, otherwise log an error
-				LogPrintf("vhost message received error : unable to process message, no mapping for event : %v", msg)
-			}
-		}
-	}
+func SendStartupSuccessfulResponse(from string) {
+	eventing.SendResponse(eventing.CreateMessage(eventing.VirtualHost, from, eventing.StartupEvent, StatusOk, nil))
+}
+
+func SendStartupFailureResponse(from string) {
+	eventing.SendResponse(eventing.CreateMessage(eventing.VirtualHost, from, eventing.StartupEvent, StatusInternal, nil))
 }

@@ -70,7 +70,6 @@ func (s *status) HttpStatus() int {
 	case StatusDeadlineExceeded:
 		code = 504
 	case StatusInvalidContent,
-		StatusNotProvided,
 		StatusCancelled,
 		StatusUnknown,
 		StatusAlreadyExists,
@@ -91,6 +90,11 @@ func NewStatusOk() Status {
 
 func NewStatusCode(code int32, a any) Status {
 	s := status{errs: NewErrorsAny(a), grpc: NewgRPCStatus(code, a)}
+	return &s
+}
+
+func NewStatusInProgress() Status {
+	s := status{errs: newErrors(), grpc: NewgRPCStatus(StatusInProgress, "")}
 	return &s
 }
 

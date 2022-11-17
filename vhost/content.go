@@ -1,19 +1,19 @@
 package vhost
 
+import "github.com/idiomatic-go/common-lib/eventing"
+
 // CreateCredentialsMessage - functions
-func CreateCredentialsMessage(to, event, sender string, fn Credentials) Message {
-	return CreateMessage(to, event, sender, 0, fn)
+func CreateCredentialsMessage(to, from, event string, fn Credentials) eventing.Message {
+	return eventing.CreateMessage(to, from, event, eventing.StatusNotProvided, fn)
 }
 
-func AccessCredentials(msg *Message) Credentials {
-	if msg == nil || msg.Content == nil || len(msg.Content) == 0 {
+func AccessCredentials(msg *eventing.Message) Credentials {
+	if msg == nil || msg.Content == nil {
 		return nil
 	}
-	for _, c := range msg.Content {
-		fn, ok := c.(Credentials)
-		if ok {
-			return fn
-		}
+	fn, ok := msg.Content.(Credentials)
+	if ok {
+		return fn
 	}
 	return nil
 }
