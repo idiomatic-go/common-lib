@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-var runtimeKey string = runtimeEnvKey
+var runtimeKey = runtimeEnvKey
 var isDevEnv FuncBool
 
 func init() {

@@ -67,10 +67,6 @@ func unregisterPackage(uri string) {
 // Shutdown - virtual host shutdown
 func Shutdown() {
 	eventing.Directory.Broadcast(eventing.ShutdownEvent, eventing.StatusNotProvided)
-	//for k := range directory.data() {
-	//	SendShutdownMessage(k, VirtualHost)
-	//	unregisterPackage(k)
-	//}
 	eventing.Directory.Shutdown()
 }
 
@@ -81,17 +77,7 @@ func Startup(ticks int, override MessageMap) bool {
 		return true
 	}
 	toSend := createToSend(override)
-	//err := validateToSend(toSend)
-	//if err != nil {
-	//	LogPrintf("%v", err)
-	//	return false
-	//}
 	sendMessages(toSend)
-	//if err != nil {
-	//	LogPrintf("%v", err)
-	//	Shutdown()
-	//	return false
-	//}
 	var count = 1
 	for {
 		if count > maxStartupIterations {
@@ -138,27 +124,11 @@ func createToSend(msgs MessageMap) MessageMap {
 	return m
 }
 
-/*
-func validateToSend(toSend MessageMap) error {
-	for k := range toSend {
-		if !eventing.Directory.Exists(k) {
-			return errors.New(fmt.Sprintf("startup failure: directory entry does not exist for package uri: %v", k))
-		}
-	}
-	return nil
-}
-
-*/
-
 func sendMessages(msgs MessageMap) {
 	for k := range msgs {
-		//		if !eventing.Directory.Add(k, eventing.CreateMessage(eventing.VirtualHost, eventing.VirtualHost, eventing.StartupEvent, StatusInProgress, nil)) {
-		//			return errors.New(fmt.Sprintf("Startup failure: unable to set package %v startup status", k))
-		//		}
 		eventing.Directory.SendMessage(msgs[k])
 		eventing.Directory.Add(k, eventing.CreateMessage(eventing.VirtualHost, eventing.VirtualHost, eventing.StartupEvent, StatusInProgress, nil))
 	}
-	//return nil
 }
 
 func SendStartupSuccessfulResponse(from string) {
