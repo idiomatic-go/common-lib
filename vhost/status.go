@@ -8,11 +8,13 @@ type status struct {
 
 // String - fmt.Stringer interface implementation
 func (s *status) String() string {
-	str := s.Message()
-	if str == "" {
-		str = s.Error()
+	if s.errs2 != nil {
+		return s.errs2.Error()
 	}
-	return str
+	if s.IsError() {
+		return s.Error()
+	}
+	return s.Message()
 }
 
 // Ok - gRPC interface implementation

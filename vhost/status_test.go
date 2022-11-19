@@ -94,22 +94,26 @@ func ExampleStatusErrorHandled() {
 	fmt.Printf("Status.Internal() : %v\n", sc.Internal())
 	fmt.Printf("Status.IsError()  : %v\n", sc.IsError())
 	fmt.Printf("Status.Errors()   : %v\n", sc.Errors())
+	fmt.Printf("Status.String()   : %v\n", sc.String())
 
 	s2 := sc.Handled()
 	fmt.Printf("Status.Ok()       : %v\n", s2.Ok())
 	fmt.Printf("Status.Internal() : %v\n", s2.Internal())
 	fmt.Printf("Status.IsError()  : %v\n", s2.IsError())
 	fmt.Printf("Status.Errors()   : %v\n", s2.Errors())
+	fmt.Printf("Status.String()   : %v\n", sc.String())
 
 	//Output:
 	//Status.Ok()       : false
 	//Status.Internal() : true
 	//Status.IsError()  : true
 	//Status.Errors()   : [this is the FIRST error message this is the SECOND error message]
+	//Status.String()   : this is the FIRST error message : this is the SECOND error message
 	//Status.Ok()       : false
 	//Status.Internal() : true
 	//Status.IsError()  : false
 	//Status.Errors()   : []
+	//Status.String()   : this is the FIRST error message : this is the SECOND error message
 
 }
 
