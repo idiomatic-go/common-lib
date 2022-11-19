@@ -134,7 +134,6 @@ type Status interface {
 	Errors
 	HttpStatus() int
 	Handled() Status
-	HandledNewCode(code int32, msg string) Status
 }
 
 type Response interface {
