@@ -25,6 +25,7 @@ type FuncBool func() bool
 func OverrideIsDevEnv(fn FuncBool) {
 	if fn != nil {
 		isDevEnv = fn
+		dev = IsDevEnv()
 	}
 }
 

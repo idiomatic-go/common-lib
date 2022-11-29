@@ -7,6 +7,11 @@ import (
 
 var runtimeKey = runtimeEnvKey
 var isDevEnv FuncBool
+var dev = true
+
+func IsDevEnvironment() bool {
+	return dev
+}
 
 func init() {
 	isDevEnv = func() bool {
@@ -16,6 +21,7 @@ func init() {
 		}
 		return false
 	}
+	dev = isDevEnv()
 }
 
 func IsDevEnv() bool {

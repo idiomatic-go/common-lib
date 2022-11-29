@@ -74,5 +74,5 @@ func ContextAnyContent(ctx context.Context) any {
 }
 
 func IsContextContent(ctx context.Context) bool {
-	return ContextAnyContent(ctx) != nil
+	return IsDevEnvironment() && ContextAnyContent(ctx) != nil
 }
