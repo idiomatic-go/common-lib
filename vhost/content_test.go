@@ -2,6 +2,7 @@ package vhost
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/idiomatic-go/common-lib/eventing"
 )
@@ -42,6 +43,16 @@ func ExampleProcessContentStatus() {
 
 	//Output:
 	//Status : true
+}
+
+func ExampleProcessContentError() {
+	err := errors.New("this is a test error")
+	ctx := ContextWithAnyContent(context.Background(), err)
+	_, s := ProcessContent[address](ctx)
+	fmt.Printf("Error : %v\n", s.Error())
+
+	//Output:
+	//Error : this is a test error
 }
 
 func ExampleProcessContentType() {

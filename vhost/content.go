@@ -44,6 +44,10 @@ func ProcessContent[T any](ctx context.Context) (T, Status) {
 	if status, ok := i.(Status); ok {
 		return t, status
 	}
+	// Code for err must be after Status as Status is an error
+	if err, ok := i.(error); ok {
+		return t, NewStatusError(err)
+	}
 	if t1, ok := i.(T); ok {
 		return t1, NewStatusOk()
 	}
