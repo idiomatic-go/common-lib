@@ -66,5 +66,13 @@ func ContextAnyContent(ctx context.Context) any {
 	if ctx == nil {
 		return nil
 	}
-	return ctx.Value(contentKey)
+	i := ctx.Value(contentKey)
+	if IsNil(i) {
+		return nil
+	}
+	return i
+}
+
+func IsContextContent(ctx context.Context) bool {
+	return ContextAnyContent(ctx) != nil
 }

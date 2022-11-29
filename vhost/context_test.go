@@ -17,8 +17,9 @@ func ExampleRequestId() {
 func ExampleAnyContent() {
 	status := NewStatusOk()
 	ctx := ContextWithAnyContent(context.Background(), status)
-	s := ContextAnyContent(ctx)
-	fmt.Printf("Status : %v\n", s)
+	if IsContextContent(ctx) {
+		fmt.Printf("Status : %v\n", ContextAnyContent(ctx))
+	}
 
 	//Output:
 	//Status :
