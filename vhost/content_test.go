@@ -7,10 +7,18 @@ import (
 	"github.com/idiomatic-go/common-lib/eventing"
 )
 
+type location interface {
+	Location() string
+}
+
 type address struct {
 	Name  string
 	Email string
 	Cell  string
+}
+
+func (a *address) Location() string {
+	return a.Name
 }
 
 func ExampleAccessCredentialsSuccess() {
@@ -33,10 +41,10 @@ func ExampleAccessCredentialsSlice() {
 	// Credentials Fn : true
 }
 
-func ExampleProcessContentStatus() {
+func ExampleProcessContextContentStatus() {
 	status := NewStatusOk()
 	ctx := ContextWithAnyContent(context.Background(), status)
-	t, s := ProcessContent[address](ctx)
+	t, s := ProcessContextContent[address](ctx)
 	if t.Cell != "" {
 	}
 	fmt.Printf("Status : %v\n", s.Ok())
@@ -45,20 +53,20 @@ func ExampleProcessContentStatus() {
 	//Status : true
 }
 
-func ExampleProcessContentError() {
+func ExampleProcessContextContentError() {
 	err := errors.New("this is a test error")
 	ctx := ContextWithAnyContent(context.Background(), err)
-	_, s := ProcessContent[address](ctx)
+	_, s := ProcessContextContent[address](ctx)
 	fmt.Printf("Error : %v\n", s.Error())
 
 	//Output:
 	//Error : this is a test error
 }
 
-func ExampleProcessContentType() {
+func ExampleProcessContextContentType() {
 	addr := address{Name: "Mark", Email: "mark@gmail.com", Cell: "123-456-7891"}
 	ctx := ContextWithAnyContent(context.Background(), addr)
-	t, s := ProcessContent[address](ctx)
+	t, s := ProcessContextContent[address](ctx)
 	if t.Cell != "" {
 	}
 	fmt.Printf("Address : %v\n", t)
@@ -66,5 +74,19 @@ func ExampleProcessContentType() {
 
 	//Output:
 	//Address : {Mark mark@gmail.com 123-456-7891}
+	//Status  : true
+}
+
+func ExampleProcessContentInterface() {
+	addr := address{Name: "Mark", Email: "mark@gmail.com", Cell: "123-456-7891"}
+	var loc location = &addr
+
+	ctx := ContextWithAnyContent(context.Background(), loc)
+	l, s := ProcessContent[location](ContextAnyContent(ctx))
+	fmt.Printf("Address : %v\n", l.Location())
+	fmt.Printf("Status  : %v\n", s.Ok())
+
+	//Output:
+	//Address : Mark
 	//Status  : true
 }

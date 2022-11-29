@@ -98,6 +98,11 @@ func NewStatusCode(code int32, a any) Status {
 	return &s
 }
 
+func NewStatusGRPC(grpcStatus gRPCStatus) Status {
+	s := status{errs: nil, grpc: grpcStatus}
+	return &s
+}
+
 func NewStatusInProgress() Status {
 	s := status{errs: newErrors(), grpc: NewgRPCStatus(StatusInProgress, "")}
 	return &s
