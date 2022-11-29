@@ -10,6 +10,16 @@ func ExampleRequestId() {
 	fmt.Printf("RequestId : %v\n", ContextRequestId(ctx))
 
 	//Output:
-	// RequestId : requestId
+	//RequestId : requestId
 
+}
+
+func ExampleAnyContent() {
+	status := NewStatusOk()
+	ctx := ContextWithAnyContent(context.Background(), status)
+	s := ContextAnyContent(ctx)
+	fmt.Printf("Status : %v\n", s)
+
+	//Output:
+	//Status :
 }

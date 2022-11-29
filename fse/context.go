@@ -7,32 +7,6 @@ import (
 	"strings"
 )
 
-/*
-type fsid struct{}
-
-var fskey fsid
-
-// ContextWithEmbeddedFS - creates a new Context with an embedded FS
-func ContextWithEmbeddedFS(ctx context.Context, fsys fs.FS) context.Context {
-	if ctx == nil {
-		ctx = context.Background()
-	}
-	return context.WithValue(ctx, fskey, fsys)
-}
-
-// ContextEmbeddedFS - return the embedded FS from a Context
-func ContextEmbeddedFS(ctx context.Context) fs.FS {
-	if ctx == nil {
-		return nil
-	}
-	i := ctx.Value(fskey)
-	if fsys, ok := i.(fs.FS); ok {
-		return fsys
-	}
-	return nil
-}
-*/
-
 type entryid struct{}
 
 var entrykey entryid

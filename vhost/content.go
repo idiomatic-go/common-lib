@@ -1,6 +1,13 @@
 package vhost
 
-import "github.com/idiomatic-go/common-lib/eventing"
+import (
+	"context"
+	"errors"
+	"fmt"
+	"github.com/idiomatic-go/common-lib/eventing"
+	"github.com/idiomatic-go/common-lib/fse"
+	"reflect"
+)
 
 // CreateCredentialsMessage - functions
 func CreateCredentialsMessage(to, from, event string, fn Credentials) eventing.Message {
@@ -16,4 +23,29 @@ func AccessCredentials(msg *eventing.Message) Credentials {
 		return fn
 	}
 	return nil
+}
+
+func ProcessContent[T any](ctx context.Context) (T, Status) {
+	var t T
+	if ctx == nil {
+		return t, NewStatusError(errors.New(fmt.Sprintf("vhost.ProcessContent internal error : context is nil")))
+	}
+	i := ctx.Value(contentKey)
+	if IsNil(i) {
+		return t, NewStatusError(errors.New(fmt.Sprintf("vhost.ProcessContent internal error : no content available")))
+	}
+	if buf, ok := i.(fse.Entry); ok {
+		t1, err := fse.ProcessEntry[T](&buf)
+		if err != nil {
+			return t, NewStatusError(err)
+		}
+		return t1, NewStatusOk()
+	}
+	if status, ok := i.(Status); ok {
+		return t, status
+	}
+	if t1, ok := i.(T); ok {
+		return t1, NewStatusOk()
+	}
+	return t, NewStatusError(errors.New(fmt.Sprintf("vhost.ProcessContent internal error : invalid content type : %v", reflect.TypeOf(i))))
 }

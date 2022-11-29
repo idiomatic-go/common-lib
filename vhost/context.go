@@ -1,14 +1,20 @@
 package vhost
 
-import "context"
+import (
+	"context"
+	"github.com/idiomatic-go/common-lib/fse"
+	"github.com/idiomatic-go/common-lib/logxt"
+	"io/fs"
+	"strings"
+)
 
 type requestid struct{}
 
-var key requestid
+var requestKey requestid
 
 // ContextWithRequestId - creates a new Context with a request id
 func ContextWithRequestId(ctx context.Context, requestId string) context.Context {
-	return context.WithValue(ctx, key, requestId)
+	return context.WithValue(ctx, requestKey, requestId)
 }
 
 // ContextRequestId - return the requestId from a Context
@@ -16,9 +22,49 @@ func ContextRequestId(ctx context.Context) string {
 	if ctx == nil {
 		return ""
 	}
-	i := ctx.Value(key)
+	i := ctx.Value(requestKey)
 	if requestId, ok := i.(string); ok {
 		return requestId
 	}
 	return ""
+}
+
+type contentid struct{}
+
+var contentKey contentid
+
+// ContextWithFSContent - creates a new Context with FS content
+func ContextWithFSContent(ctx context.Context, fs fs.FS, name string) context.Context {
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	if fs == nil {
+		logxt.LogDebugf("%v", "file system is nil")
+		return ctx
+	}
+	buf, err := fse.ReadFile(fs, name)
+	if err != nil {
+		logxt.LogDebugf("file system read error : %v", err)
+		return ctx
+	}
+	return context.WithValue(ctx, contentKey, fse.Entry{Name: strings.ToLower(name), Content: buf})
+}
+
+// ContextWithAnyContent - creates a new Context with FS content
+func ContextWithAnyContent(ctx context.Context, content any) context.Context {
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	if content == nil {
+		logxt.LogDebugf("%v", "content is nil")
+		return ctx
+	}
+	return context.WithValue(ctx, contentKey, content)
+}
+
+func ContextAnyContent(ctx context.Context) any {
+	if ctx == nil {
+		return nil
+	}
+	return ctx.Value(contentKey)
 }

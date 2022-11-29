@@ -73,10 +73,10 @@ func ExampleProcessContentError() {
 	fmt.Printf("Non Json    : %v\n", err)
 
 	//Output:
-	//Nil Context : invalid argument : context is nil
-	//Nil Entry   : no file system entry available
-	//Nil Content : no content available for entry name : resource/json/event-empty.json
-	//Non Json    : invalid content for json.Unmarshal() : resource/json/event-not-json.txt
+	//Nil Context : fse:ProcessContent internal error : context is nil
+	//Nil Entry   : fse:ProcessEntry internal error : no file system entry available
+	//Nil Content : fse:ProcessEntry internal error : no content available for entry name : resource/json/event-empty.json
+	//Non Json    : fse:ProcessEntry internal error : invalid content for json.Unmarshal() : resource/json/event-not-json.txt
 }
 
 func ExampleProcessContent() {
