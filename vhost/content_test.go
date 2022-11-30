@@ -21,6 +21,17 @@ func (a *address) Location() string {
 	return a.Name
 }
 
+type address2 struct {
+	Name  string
+	Email string
+	Cell  string
+	Zip   string
+}
+
+func init() {
+	//logxt.ToggleDebug(true)
+}
+
 func ExampleAccessCredentialsSuccess() {
 	msg := CreateCredentialsMessage("to:uri", "event", "sender", Credentials(func() (username string, password string, err error) { return "", "", nil }))
 	fmt.Printf("Credentials Fn : %v\n", AccessCredentials(&msg) != nil)
@@ -89,4 +100,24 @@ func ExampleProcessContentInterface() {
 	//Output:
 	//Address : Mark
 	//Status  : true
+}
+
+func ExampleProcessContentErrors() {
+	addr := address2{Name: "Mark", Email: "mark@gmail.com", Cell: "123-456-7891", Zip: "50436"}
+
+	ContextWithAnyContent(context.Background(), addr)
+	l, s := ProcessContent[address](nil)
+	fmt.Printf("Address : %v\n", l)
+	fmt.Printf("Ok      : %v\n", s.Ok())
+
+	ctx := ContextWithAnyContent(context.Background(), addr)
+	l, s = ProcessContent[address](ctx)
+	fmt.Printf("Address : %v\n", l)
+	fmt.Printf("Ok      : %v\n", s.Ok())
+
+	//Output:
+	//Address : {  }
+	//Ok      : false
+	//Address : {  }
+	//Ok      : false
 }

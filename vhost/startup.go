@@ -3,6 +3,7 @@ package vhost
 import (
 	"errors"
 	"github.com/idiomatic-go/common-lib/eventing"
+	"github.com/idiomatic-go/common-lib/logxt"
 	"time"
 )
 
@@ -89,18 +90,18 @@ func Startup(ticks int, override MessageMap) bool {
 		// Check the startup status of the directory, continue if a package is still in startup
 		uri := eventing.Directory.FindStatus(eventing.StartupEvent, StatusInProgress)
 		if uri != "" {
-			LogPrintf("startup in progress: continuing: %v", uri)
+			logxt.LogPrintf("startup in progress: continuing: %v\n", uri)
 			count++
 			continue
 		}
 		// All the current messages have been sent, so lets check for failure.
 		fail := eventing.Directory.FindStatus(eventing.StartupEvent, StatusInternal)
 		if fail != "" {
-			LogPrintf("startup failure: status on: %v", fail)
+			logxt.LogPrintf("startup failure: status on: %v\n", fail)
 			Shutdown()
 			return false
 		}
-		LogPrintf("startup successful: %v", count)
+		logxt.LogPrintf("startup successful: %v\n", count)
 		break
 	}
 	return true

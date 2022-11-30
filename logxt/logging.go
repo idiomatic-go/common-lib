@@ -13,13 +13,13 @@ func init() {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds | log.LUTC)
 }
 
-var LogDebug DefaultFmt = func(v ...any) {
+func LogDebug(v ...any) {
 	if debug {
-		fmt.Print(v)
+		fmt.Println(v)
 	}
 }
 
-var LogDebugf SpecifiedFmt = func(specifier string, v ...any) {
+func LogDebugf(specifier string, v ...any) {
 	if debug {
 		fmt.Printf(specifier, v)
 	}

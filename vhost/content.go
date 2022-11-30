@@ -29,8 +29,8 @@ func AccessCredentials(msg *eventing.Message) Credentials {
 func ProcessContent[T any](content any) (T, Status) {
 	var t T
 	if IsNil(content) {
-		status := NewStatusInvalidArgument(errors.New(fmt.Sprintf("vhost.ProcessContent internal error : no content available")))
-		logxt.LogDebugf("%v", status)
+		status := NewStatusInvalidArgument(errors.New("vhost.ProcessContent internal error : no content available"))
+		logxt.LogDebug(status)
 		return t, status
 	}
 	if buf, ok := content.(fse.Entry); ok {
@@ -53,8 +53,9 @@ func ProcessContent[T any](content any) (T, Status) {
 	if t1, ok := content.(T); ok {
 		return t1, NewStatusOk()
 	}
+	// TODO : update to relect contained type.
 	status := NewStatusInvalidArgument(errors.New(fmt.Sprintf("vhost.ProcessContent internal error : invalid content type : %v", reflect.TypeOf(content))))
-	logxt.LogDebugf("%v", status)
+	logxt.LogDebug(status)
 	return t, status
 }
 
@@ -62,13 +63,13 @@ func ProcessContextContent[T any](ctx context.Context) (T, Status) {
 	var t T
 	if ctx == nil {
 		status := NewStatusInvalidArgument(errors.New(fmt.Sprintf("vhost.ProcessContent internal error : context is nil")))
-		logxt.LogDebugf("%v", status)
+		logxt.LogDebug(status)
 		return t, status
 	}
 	i := ctx.Value(contentKey)
 	if IsNil(i) {
 		status := NewStatusInvalidArgument(errors.New(fmt.Sprintf("vhost.ProcessContent internal error : no content available")))
-		logxt.LogDebugf("%v", status)
+		logxt.LogDebug(status)
 		return t, status
 	}
 	return ProcessContent[T](i)

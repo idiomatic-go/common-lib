@@ -2,7 +2,6 @@ package vhost
 
 import (
 	"fmt"
-	"time"
 )
 
 // Environment
@@ -29,45 +28,10 @@ func OverrideIsDevEnv(fn FuncBool) {
 	}
 }
 
-// ToggleDebug - function to toggle the debug flag
-func ToggleDebug(v bool) {
-	debug = v
-}
-
-// DefaultFmt - logging function type
-type DefaultFmt func(v ...any)
-
-// SpecifiedFmt - logging function type
-type SpecifiedFmt func(specifier string, v ...any)
-
-/*
-const (
-	StartupEvent  = "event:startup"
-	ShutdownEvent = "event:shutdown"
-	ErrorEvent    = "event:error"
-	RestartEvent  = "event:restart"
-	FailoverEvent = "event:failover"
-	FailbackEvent = "event:failback"
-	PingEvent     = "event:ping"
-	ProfileEvent  = "event:profile"
-	VirtualHost   = "vhost"
-)
-
-
-*/
 func OverrideMaxStartupIterations(count int) {
 	if count > 0 {
 		maxStartupIterations = count
 	}
-}
-
-type Message_OLD struct {
-	To      string // Uri of the destination package
-	From    string // Uri of package that is sending the message
-	Event   string
-	Content any
-	Status
-	CreateTS time.Time
 }
 
 type Credentials func() (username string, password string, err error)
