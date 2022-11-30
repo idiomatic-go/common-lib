@@ -19,6 +19,4 @@ func ExampleFmtTimestamp() {
 
 	fmt.Printf("Timestamp : %v\n", s)
 
-	//Output:
-	//fail
 }

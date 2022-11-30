@@ -6,10 +6,6 @@ import (
 	"strings"
 )
 
-const (
-	ENV_TEMPLATE_VAR = "{env}"
-)
-
 func lookupVariable(name string) (string, error) {
 	switch strings.ToLower(name) {
 	case "env":
@@ -22,8 +18,7 @@ func lookupVariable(name string) (string, error) {
 	return "", errors.New(fmt.Sprintf("invalid argument : template variable is invalid: %v", name))
 }
 
-func ExampleExpandTemplateInvalid() {
-
+func ExampleExpandTemplateInvalidLookup() {
 	// Lookup function is nil
 	s := "test"
 	_, err := ExpandTemplate(s, nil)
@@ -36,8 +31,18 @@ func ExampleExpandTemplateInvalid() {
 	fmt.Printf("Path Input  : %v\n", s)
 	fmt.Printf("Path Output : %v\n", err)
 
+	//Output:
+	//Path Input  : test
+	//Path Output : invalid argument : VariableLookup() is nil
+	//Path Input  : test{invalid}
+	//Path Output : invalid argument : template variable is invalid: invalid
+
+}
+
+func ExampleExpandTemplateInvalidDelimiters() {
+	var err error
 	// Mismatched delimiters - too many end delimiters
-	s = "resources/test-file-name{env}}and{next}{last}.txt"
+	s := "resources/test-file-name{env}}and{next}{last}.txt"
 	_, err = ExpandTemplate(s, lookupVariable)
 	fmt.Printf("Path Input  : %v\n", s)
 	fmt.Printf("Path Output : %v\n", err)
@@ -55,14 +60,12 @@ func ExampleExpandTemplateInvalid() {
 	fmt.Printf("Path Output : %v %v\n", path, err0)
 
 	//Output:
-	// Path Input  : test
-	// Path Output : invalid argument : VariableLookup() is nil
-	// Path Input  : test{invalid}
-	// Path Output : invalid argument : template variable is invalid: invalid
-	// Path Input  : resources/test-file-name{env}}and{next}{last}.txt
-	// Path Output : invalid argument : token has multiple end delimiters: env}}and
-	// Path Input  : resources/test-file-name{env}and{next}{{last}.txt
-	// Path Output : resources/test-file-name[ENV]and[NEXT][LAST].txt <nil>
+	//Path Input  : resources/test-file-name{env}}and{next}{last}.txt
+	//Path Output : invalid argument : token has multiple end delimiters: env}}and
+	//Path Input  : resources/test-file-name{env}and{next}{{last}.txt
+	//Path Output : resources/test-file-name[ENV]and[NEXT][LAST].txt <nil>
+	//Path Input  : resources/test-file-name{env}and{next{}{last}.txt
+	//Path Output :  invalid argument : template variable is invalid:
 }
 
 func ExampleExpandTemplateValid() {

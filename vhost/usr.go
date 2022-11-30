@@ -10,8 +10,24 @@ const (
 	runtimeEnvKey = "RUNTIME_ENV"
 )
 
-// FuncBool - type to allow environment determination
+// FuncBool - type for niladic functions, functions with no parameters
 type FuncBool func() bool
+
+/*
+type Func func()
+
+type FuncBool func() bool
+
+// FuncStatus - type for functions with no parameters and a return status
+type FuncStatus func() error
+
+// FuncResponse - type for functions with no parameters and a return response
+type FuncResponse func() any
+
+type FuncValues func() ([]any, error)
+
+
+*/
 
 // OverrideRuntimeEnvKey - allows configuration
 //func OverrideRuntimeEnvKey(k string) {
@@ -35,13 +51,6 @@ func OverrideMaxStartupIterations(count int) {
 }
 
 type Credentials func() (username string, password string, err error)
-
-const (
-	EnvTemplateVar = "{env}"
-)
-
-// VariableLookup - type used in template.go
-type VariableLookup = func(name string) (value string, err error)
 
 const (
 	// gRPC status codes

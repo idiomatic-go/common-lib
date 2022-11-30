@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/idiomatic-go/common-lib/fse"
 	"github.com/idiomatic-go/common-lib/logxt"
+	"github.com/idiomatic-go/common-lib/util"
 	"io/fs"
 	"strings"
 )
@@ -67,7 +68,7 @@ func ContextContent(ctx context.Context) any {
 		return nil
 	}
 	i := ctx.Value(contentKey)
-	if IsNil(i) {
+	if util.IsNil(i) {
 		return nil
 	}
 	return i

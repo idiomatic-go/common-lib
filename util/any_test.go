@@ -7,7 +7,18 @@ type testStruct struct {
 	count int
 }
 
-func ExampleIsPointerl() {
+func ExampleIsNil() {
+	var i any
+
+	fmt.Printf("Nil any : %v\n", IsNil(i))
+	fmt.Printf("Wrapped nil Nil pointer : %v\n", IsNil(i))
+
+	//Output:
+	//Nil any : true
+	//Wrapped nil Nil pointer : true
+}
+
+func ExampleIsPointer() {
 	var i any
 	var s string
 	var data = testStruct{}
@@ -34,14 +45,4 @@ func ExampleIsPointerl() {
 	// struct * : true
 	// []byte : false
 
-}
-
-func _ExampleIsNil() {
-	var i any
-
-	fmt.Printf("Nil any : %v", IsNil(i))
-	fmt.Printf("Wrapped nil Nil pointer : %v", IsNil(i))
-
-	//Output:
-	// Nil pointer : true
 }

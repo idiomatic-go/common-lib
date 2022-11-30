@@ -7,6 +7,7 @@ import (
 	"github.com/idiomatic-go/common-lib/eventing"
 	"github.com/idiomatic-go/common-lib/fse"
 	"github.com/idiomatic-go/common-lib/logxt"
+	"github.com/idiomatic-go/common-lib/util"
 	"reflect"
 )
 
@@ -28,7 +29,7 @@ func AccessCredentials(msg *eventing.Message) Credentials {
 
 func ProcessContent[T any](content any) (T, Status) {
 	var t T
-	if IsNil(content) {
+	if util.IsNil(content) {
 		status := NewStatusInvalidArgument(errors.New("vhost.ProcessContent internal error : no content available"))
 		logxt.LogDebug(status)
 		return t, status
@@ -67,7 +68,7 @@ func ProcessContextContent[T any](ctx context.Context) (T, Status) {
 		return t, status
 	}
 	i := ctx.Value(contentKey)
-	if IsNil(i) {
+	if util.IsNil(i) {
 		status := NewStatusInvalidArgument(errors.New(fmt.Sprintf("vhost.ProcessContent internal error : no content available")))
 		logxt.LogDebug(status)
 		return t, status

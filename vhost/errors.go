@@ -1,6 +1,7 @@
 package vhost
 
 import (
+	"github.com/idiomatic-go/common-lib/util"
 	"strings"
 )
 
@@ -64,7 +65,7 @@ func NewErrorsList(errs []error) Errors {
 
 func NewErrorsAny(a any) Errors {
 	s := errorList{}
-	if IsNil(a) {
+	if util.IsNil(a) {
 		return &s
 	}
 	if err, ok := a.(error); ok {

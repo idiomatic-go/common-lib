@@ -1,5 +1,7 @@
 package vhost
 
+import "github.com/idiomatic-go/common-lib/util"
+
 type grpcStatus struct {
 	code int32
 	msg  string
@@ -58,7 +60,7 @@ func (s *grpcStatus) Code() int32 {
 }
 
 func NewgRPCStatus(code int32, msg any) gRPCStatus {
-	if IsNil(msg) {
+	if util.IsNil(msg) {
 		return creategRPCStatus(code, "")
 	}
 	if msg, ok := msg.(string); ok {
