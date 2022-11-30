@@ -14,11 +14,11 @@ func ExampleRequestId() {
 
 }
 
-func ExampleAnyContent() {
+func ExampleContent() {
 	status := NewStatusOk()
-	ctx := ContextWithAnyContent(context.Background(), status)
+	ctx := ContextWithContent(context.Background(), status)
 	if IsContextContent(ctx) {
-		fmt.Printf("Status : %v\n", ContextAnyContent(ctx))
+		fmt.Printf("Status : %v\n", ContextContent(ctx))
 	}
 
 	//Output:

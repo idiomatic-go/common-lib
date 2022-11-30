@@ -50,8 +50,8 @@ func ContextWithFSContent(ctx context.Context, fs fs.FS, name string) context.Co
 	return context.WithValue(ctx, contentKey, fse.Entry{Name: strings.ToLower(name), Content: buf})
 }
 
-// ContextWithAnyContent - creates a new Context with FS content
-func ContextWithAnyContent(ctx context.Context, content any) context.Context {
+// ContextWithContent - creates a new Context with content
+func ContextWithContent(ctx context.Context, content any) context.Context {
 	if ctx == nil {
 		ctx = context.Background()
 	}
@@ -62,7 +62,7 @@ func ContextWithAnyContent(ctx context.Context, content any) context.Context {
 	return context.WithValue(ctx, contentKey, content)
 }
 
-func ContextAnyContent(ctx context.Context) any {
+func ContextContent(ctx context.Context) any {
 	if ctx == nil {
 		return nil
 	}
@@ -74,5 +74,5 @@ func ContextAnyContent(ctx context.Context) any {
 }
 
 func IsContextContent(ctx context.Context) bool {
-	return IsDevEnvironment() && ContextAnyContent(ctx) != nil
+	return IsDevEnvironment() && ContextContent(ctx) != nil
 }

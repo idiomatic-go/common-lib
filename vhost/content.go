@@ -53,7 +53,7 @@ func ProcessContent[T any](content any) (T, Status) {
 	if t1, ok := content.(T); ok {
 		return t1, NewStatusOk()
 	}
-	// TODO : update to relect contained type.
+	// TODO : update to reflect contained type.
 	status := NewStatusInvalidArgument(errors.New(fmt.Sprintf("vhost.ProcessContent internal error : invalid content type : %v", reflect.TypeOf(content))))
 	logxt.LogDebug(status)
 	return t, status

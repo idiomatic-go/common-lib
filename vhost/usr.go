@@ -100,12 +100,3 @@ type Status interface {
 	HttpStatus() int
 	Handled() Status
 }
-
-type Response interface {
-	IsContentNil() bool
-	IsContentSerialized() bool
-	ContentBytes() (buf []byte, ok bool)
-	Content() any
-	Headers() any
-	Status() Status
-}
