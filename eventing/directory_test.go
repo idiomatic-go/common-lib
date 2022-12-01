@@ -15,7 +15,7 @@ func ExampleSyncMapInit() {
 	d2 := Directory.get(uri)
 	fmt.Printf("Entry : %v\n", d2)
 
-	entry := createTestEntry(uri, statusInProgress)
+	entry := createTestEntry(uri, StatusInProgress)
 	Directory.put(entry)
 	fmt.Printf("Count : %v\n", Directory.Count())
 	d2 = Directory.get(uri)

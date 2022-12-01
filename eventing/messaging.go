@@ -19,3 +19,7 @@ func SendResponse(msg Message) {
 func SendErrorResponse(from string, status int32) {
 	SendResponse(CreateMessage(VirtualHost, from, ErrorEvent, status, nil))
 }
+
+func SendSuccessfulStartupResponse(from string) {
+	SendResponse(CreateMessage(VirtualHost, from, StartupEvent, StatusOk, nil))
+}
