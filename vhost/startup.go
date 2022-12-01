@@ -2,6 +2,7 @@ package vhost
 
 import (
 	"errors"
+	"fmt"
 	"github.com/idiomatic-go/common-lib/eventing"
 	"github.com/idiomatic-go/common-lib/logxt"
 	"time"
@@ -72,10 +73,10 @@ func Shutdown() {
 }
 
 // Startup - virtual host startup
-func Startup(ticks int, override MessageMap) bool {
+func Startup(ticks int, override MessageMap) Status {
 	packages := eventing.Directory.Count()
 	if packages == 0 {
-		return true
+		return NewStatusOk()
 	}
 	toSend := createToSend(override)
 	sendMessages(toSend)
@@ -84,27 +85,26 @@ func Startup(ticks int, override MessageMap) bool {
 		if count > maxStartupIterations {
 			//LogPrintf("startup failure %v, max iterations exceeded: %v", directory.notSuccessfulStatus(StartupEvent), count)
 			Shutdown()
-			return false
+			return NewStatusError(errors.New(fmt.Sprintf("vhost.Startup failure %v, max iterations exceeded: %v", "", count)))
 		}
 		time.Sleep(time.Second * time.Duration(ticks))
 		// Check the startup status of the directory, continue if a package is still in startup
 		uri := eventing.Directory.FindStatus(eventing.StartupEvent, StatusInProgress)
 		if uri != "" {
-			logxt.LogPrintf("startup in progress: continuing: %v\n", uri)
+			logxt.LogPrintf("vhost.Startup in progress: continuing: %v\n", uri)
 			count++
 			continue
 		}
 		// All the current messages have been sent, so lets check for failure.
 		fail := eventing.Directory.FindStatus(eventing.StartupEvent, StatusInternal)
 		if fail != "" {
-			logxt.LogPrintf("startup failure: status on: %v\n", fail)
 			Shutdown()
-			return false
+			return NewStatusError(errors.New(fmt.Sprintf("vhost.Startup failure: status on: %v\n", fail)))
 		}
-		logxt.LogPrintf("startup successful: %v\n", count)
+		logxt.LogPrintf("vhost.Startup successful: %v\n", count)
 		break
 	}
-	return true
+	return NewStatusOk()
 }
 
 func createToSend(msgs MessageMap) MessageMap {
@@ -132,6 +132,7 @@ func sendMessages(msgs MessageMap) {
 	}
 }
 
+/*
 func SendStartupSuccessfulResponse(from string) {
 	eventing.SendResponse(eventing.CreateMessage(eventing.VirtualHost, from, eventing.StartupEvent, StatusOk, nil))
 }
@@ -139,3 +140,6 @@ func SendStartupSuccessfulResponse(from string) {
 func SendStartupFailureResponse(from string) {
 	eventing.SendResponse(eventing.CreateMessage(eventing.VirtualHost, from, eventing.StartupEvent, StatusInternal, nil))
 }
+
+
+*/
