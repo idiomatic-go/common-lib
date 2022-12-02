@@ -15,13 +15,13 @@ func HttpDo(ctx context.Context, method, url string, header http.Header, body io
 	}
 	req, err := http.NewRequestWithContext(ctx, method, url, body)
 	if err != nil {
-		logxt.LogPrintf("%v", err)
+		logxt.Debug(err)
 		return &ResponseStatus{RequestErr: err}
 	}
 	AddHeaders(req, header)
 	status := DoStatus(req)
 	if !status.IsSuccess() && status.FirstError() != nil {
-		logxt.LogPrintf("%v", status.FirstError())
+		logxt.Printf("%v", status.FirstError())
 	}
 	return status
 }
@@ -30,7 +30,7 @@ func HttpDo(ctx context.Context, method, url string, header http.Header, body io
 func HttpDoContent(ctx context.Context, method, url string, header http.Header, body io.Reader, content any) *ResponseStatus {
 	if content == nil {
 		err0 := errors.New("invalid argument: content interface{} is nil")
-		logxt.LogDebug("%v", err0)
+		logxt.Debug(err0)
 		return &ResponseStatus{RequestErr: err0}
 	}
 	status := HttpDo(ctx, method, url, header, body)
@@ -39,9 +39,9 @@ func HttpDoContent(ctx context.Context, method, url string, header http.Header, 
 	}
 	entity, _ := status.UnmarshalJson(content)
 	if status.FirstError() != nil {
-		logxt.LogPrintf("%v", status.FirstError())
+		logxt.Printf("%v", status.FirstError())
 		if body != nil {
-			logxt.LogDebug("%v", string(entity))
+			logxt.Debug(string(entity))
 		}
 	}
 	return status
