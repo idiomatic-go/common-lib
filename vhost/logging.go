@@ -7,9 +7,9 @@ import (
 
 func LogContextPrint(ctx context.Context, v ...any) {
 	u := []any{ContextRequestId(ctx)}
-	logxt.LogPrintf("%v\n", append(u, v))
+	logxt.Printf("%v\n", append(u, v))
 }
 
 func LogContextPrintf(ctx context.Context, specifier string, v ...any) {
-	logxt.LogPrintf(specifier, v)
+	logxt.Printf(specifier, v)
 }

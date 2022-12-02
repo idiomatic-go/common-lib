@@ -31,7 +31,7 @@ func ProcessContent[T any](content any) (T, Status) {
 	var t T
 	if util.IsNil(content) {
 		status := NewStatusInvalidArgument(errors.New("vhost.ProcessContent internal error : no content available"))
-		logxt.LogDebug(status)
+		logxt.Debug(status)
 		return t, status
 	}
 	if buf, ok := content.(fse.Entry); ok {
@@ -56,7 +56,7 @@ func ProcessContent[T any](content any) (T, Status) {
 	}
 	// TODO : update to reflect contained type.
 	status := NewStatusInvalidArgument(errors.New(fmt.Sprintf("vhost.ProcessContent internal error : invalid content type : %v", reflect.TypeOf(content))))
-	logxt.LogDebug(status)
+	logxt.Debug(status)
 	return t, status
 }
 
@@ -64,13 +64,13 @@ func ProcessContextContent[T any](ctx context.Context) (T, Status) {
 	var t T
 	if ctx == nil {
 		status := NewStatusInvalidArgument(errors.New(fmt.Sprintf("vhost.ProcessContent internal error : context is nil")))
-		logxt.LogDebug(status)
+		logxt.Debug(status)
 		return t, status
 	}
 	i := ctx.Value(contentKey)
 	if util.IsNil(i) {
 		status := NewStatusInvalidArgument(errors.New(fmt.Sprintf("vhost.ProcessContent internal error : no content available")))
-		logxt.LogDebug(status)
+		logxt.Debug(status)
 		return t, status
 	}
 	return ProcessContent[T](i)

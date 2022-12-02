@@ -5,7 +5,7 @@ import (
 )
 
 func ExamplePrint() {
-	logxt.LogPrint("test string")
+	logxt.Print("test string")
 
 	// Output:
 }

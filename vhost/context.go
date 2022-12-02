@@ -40,12 +40,12 @@ func ContextWithFSContent(ctx context.Context, fs fs.FS, name string) context.Co
 		ctx = context.Background()
 	}
 	if fs == nil {
-		logxt.LogDebugf("%v\n", "file system is nil")
+		logxt.Debugf("%v\n", "file system is nil")
 		return ctx
 	}
 	buf, err := fse.ReadFile(fs, name)
 	if err != nil {
-		logxt.LogDebugf("file system read error : %v\n", err)
+		logxt.Debugf("file system read error : %v\n", err)
 		return ctx
 	}
 	return context.WithValue(ctx, contentKey, fse.Entry{Name: strings.ToLower(name), Content: buf})
@@ -57,7 +57,7 @@ func ContextWithContent(ctx context.Context, content any) context.Context {
 		ctx = context.Background()
 	}
 	if content == nil {
-		logxt.LogDebugf("%v\n", "content is nil")
+		logxt.Debugf("%v\n", "content is nil")
 		return ctx
 	}
 	return context.WithValue(ctx, contentKey, content)

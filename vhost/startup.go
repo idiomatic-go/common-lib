@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/idiomatic-go/common-lib/eventing"
-	"log"
+	"github.com/idiomatic-go/common-lib/logxt"
 	"time"
 )
 
@@ -91,7 +91,7 @@ func Startup(ticks int, override MessageMap) Status {
 		// Check the startup status of the directory, continue if a package is still in startup
 		uri := eventing.Directory.FindStatus(eventing.StartupEvent, eventing.StatusInProgress)
 		if uri != "" {
-			log.Printf("vhost startup in progress: continuing: %v\n", uri)
+			logxt.Printf("vhost startup in progress: continuing: %v\n", uri)
 			count++
 			continue
 		}

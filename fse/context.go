@@ -17,12 +17,12 @@ func ContextWithContent(ctx context.Context, fs fs.FS, name string) context.Cont
 		ctx = context.Background()
 	}
 	if fs == nil {
-		logxt.LogDebugf("%v", "file system is nil")
+		logxt.Debugf("%v", "file system is nil")
 		return ctx
 	}
 	buf, err := ReadFile(fs, name)
 	if err != nil {
-		logxt.LogDebugf("file system read error : %v", err)
+		logxt.Debugf("file system read error : %v", err)
 		return ctx
 	}
 	return context.WithValue(ctx, entrykey, Entry{Name: strings.ToLower(name), Content: buf})

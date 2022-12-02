@@ -13,30 +13,30 @@ func init() {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds | log.LUTC)
 }
 
-func LogDebug(v ...any) {
+func Debug(v ...any) {
 	if debug {
-		fmt.Println(v)
+		fmt.Println(v...)
 	}
 }
 
-func LogDebugf(specifier string, v ...any) {
+func Debugf(specifier string, v ...any) {
 	if debug {
-		fmt.Printf(specifier, v)
+		fmt.Printf(specifier, v...)
 	}
 }
 
-var LogPanic DefaultFmt = func(v ...any) {
+var Panic DefaultFmt = func(v ...any) {
 	log.Panic(v)
 }
 
-var LogPanicf SpecifiedFmt = func(specifier string, v ...any) {
+var Panicf SpecifiedFmt = func(specifier string, v ...any) {
 	log.Panicf(specifier, v)
 }
 
-var LogPrint DefaultFmt = func(v ...any) {
+var Print DefaultFmt = func(v ...any) {
 	log.Print(v)
 }
 
-var LogPrintf SpecifiedFmt = func(specifier string, v ...any) {
+var Printf SpecifiedFmt = func(specifier string, v ...any) {
 	log.Printf(specifier, v)
 }
