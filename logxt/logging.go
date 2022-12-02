@@ -25,18 +25,18 @@ func Debugf(specifier string, v ...any) {
 	}
 }
 
-var Panic DefaultFmt = func(v ...any) {
-	log.Panic(v)
+func Panic(v ...any) {
+	log.Panic(v...)
 }
 
-var Panicf SpecifiedFmt = func(specifier string, v ...any) {
-	log.Panicf(specifier, v)
+func Panicf(specifier string, v ...any) {
+	log.Panicf(specifier, v...)
 }
 
-var Print DefaultFmt = func(v ...any) {
-	log.Print(v)
+func Print(v ...any) {
+	log.Print(v...)
 }
 
-var Printf SpecifiedFmt = func(specifier string, v ...any) {
-	log.Printf(specifier, v)
+func Printf(specifier string, v ...any) {
+	log.Printf(specifier, v...)
 }
