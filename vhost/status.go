@@ -32,6 +32,7 @@ func (s *status) AlreadyExists() bool    { return s.grpc.AlreadyExists() }
 func (s *status) Cancelled() bool        { return s.grpc.Cancelled() }
 
 func (s *status) Code() int32     { return s.grpc.Code() }
+func (s *status) IsMessage() bool { return s.grpc.Message() != "" }
 func (s *status) Message() string { return s.grpc.Message() }
 
 // Error - Errors interface implementation

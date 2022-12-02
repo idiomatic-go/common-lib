@@ -1,8 +1,6 @@
 package vhost
 
-import (
-	"fmt"
-)
+import "fmt"
 
 // Environment
 const (
@@ -90,6 +88,7 @@ type gRPCStatus interface {
 	AlreadyExists() bool
 
 	Code() int32
+	IsMessage() bool
 	Message() string
 }
 

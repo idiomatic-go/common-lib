@@ -51,6 +51,10 @@ func (s *grpcStatus) Cancelled() bool {
 	return s.code == StatusCancelled
 }
 
+func (s *grpcStatus) IsMessage() bool {
+	return s.msg != ""
+}
+
 func (s *grpcStatus) Message() string {
 	return s.msg
 }

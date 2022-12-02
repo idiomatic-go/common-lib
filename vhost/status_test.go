@@ -146,3 +146,18 @@ func ExampleStatusErrorHandledNotFound() {
 	//Status.Errors()   : []
 
 }
+
+/*
+func ExampleStatusStringer() {
+	status := NewStatusError(errors.New("this is a test message"))
+
+	fmt.Println("test", status)
+	//fmt.Printf("S       : %v\n", s)
+	fmt.Printf("Message : %v\n", status)
+
+	//Output:
+	//fail
+}
+
+
+*/
