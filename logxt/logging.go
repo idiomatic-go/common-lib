@@ -37,6 +37,10 @@ func Print(v ...any) {
 	log.Print(v...)
 }
 
+func Println(v ...any) {
+	log.Println(v...)
+}
+
 func Printf(specifier string, v ...any) {
 	log.Printf(specifier, v...)
 }
