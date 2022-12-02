@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/idiomatic-go/common-lib/eventing"
-	"github.com/idiomatic-go/common-lib/logxt"
+	"log"
 	"time"
 )
 
@@ -76,7 +76,7 @@ func Shutdown() {
 func Startup(ticks int, override MessageMap) Status {
 	packages := eventing.Directory.Count()
 	if packages == 0 {
-		return NewStatusOk()
+		return NewStatusOkMessage("vhost startup successful")
 	}
 	toSend := createToSend(override)
 	sendMessages(toSend)
@@ -85,13 +85,13 @@ func Startup(ticks int, override MessageMap) Status {
 		if count > maxStartupIterations {
 			//LogPrintf("startup failure %v, max iterations exceeded: %v", directory.notSuccessfulStatus(StartupEvent), count)
 			Shutdown()
-			return NewStatusError(errors.New(fmt.Sprintf("vhost.Startup failure %v, max iterations exceeded: %v", "", count)))
+			return NewStatusError(errors.New(fmt.Sprintf("vhost startup failure %v, max iterations exceeded: %v", "", count)))
 		}
 		time.Sleep(time.Second * time.Duration(ticks))
 		// Check the startup status of the directory, continue if a package is still in startup
-		uri := eventing.Directory.FindStatus(eventing.StartupEvent, StatusInProgress)
+		uri := eventing.Directory.FindStatus(eventing.StartupEvent, eventing.StatusInProgress)
 		if uri != "" {
-			logxt.LogPrintf("vhost.Startup in progress: continuing: %v\n", uri)
+			log.Printf("vhost startup in progress: continuing: %v\n", uri)
 			count++
 			continue
 		}
@@ -99,12 +99,11 @@ func Startup(ticks int, override MessageMap) Status {
 		fail := eventing.Directory.FindStatus(eventing.StartupEvent, StatusInternal)
 		if fail != "" {
 			Shutdown()
-			return NewStatusError(errors.New(fmt.Sprintf("vhost.Startup failure: status on: %v\n", fail)))
+			return NewStatusError(errors.New(fmt.Sprintf("vhost startup failure: status on: %v", fail)))
 		}
-		logxt.LogPrintf("vhost.Startup successful: %v\n", count)
 		break
 	}
-	return NewStatusOk()
+	return NewStatusOkMessage(fmt.Sprintf("vhost startup successful: %v", count))
 }
 
 func createToSend(msgs MessageMap) MessageMap {
@@ -128,11 +127,10 @@ func createToSend(msgs MessageMap) MessageMap {
 func sendMessages(msgs MessageMap) {
 	for k := range msgs {
 		eventing.Directory.SendMessage(msgs[k])
-		eventing.Directory.Add(k, eventing.CreateMessage(eventing.VirtualHost, eventing.VirtualHost, eventing.StartupEvent, StatusInProgress, nil))
+		eventing.Directory.Add(k, eventing.CreateMessage(eventing.VirtualHost, eventing.VirtualHost, eventing.StartupEvent, eventing.StatusInProgress, nil))
 	}
 }
 
-/*
 func SendStartupSuccessfulResponse(from string) {
 	eventing.SendResponse(eventing.CreateMessage(eventing.VirtualHost, from, eventing.StartupEvent, StatusOk, nil))
 }
@@ -140,6 +138,3 @@ func SendStartupSuccessfulResponse(from string) {
 func SendStartupFailureResponse(from string) {
 	eventing.SendResponse(eventing.CreateMessage(eventing.VirtualHost, from, eventing.StartupEvent, StatusInternal, nil))
 }
-
-
-*/

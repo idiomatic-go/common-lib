@@ -1,5 +1,7 @@
 package vhost
 
+import "github.com/idiomatic-go/common-lib/eventing"
+
 type status struct {
 	errs  Errors
 	errs2 Errors
@@ -93,6 +95,11 @@ func NewStatusOk() Status {
 	return &s
 }
 
+func NewStatusOkMessage(a any) Status {
+	s := status{errs: newErrors(), grpc: NewgRPCStatus(StatusOk, a)}
+	return &s
+}
+
 func NewStatusCode(code int32, a any) Status {
 	s := status{errs: NewErrorsAny(a), grpc: NewgRPCStatus(code, a)}
 	return &s
@@ -104,7 +111,7 @@ func NewStatusGRPC(grpcStatus gRPCStatus) Status {
 }
 
 func NewStatusInProgress() Status {
-	s := status{errs: newErrors(), grpc: NewgRPCStatus(StatusInProgress, "")}
+	s := status{errs: newErrors(), grpc: NewgRPCStatus(eventing.StatusInProgress, "")}
 	return &s
 }
 

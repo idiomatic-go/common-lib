@@ -55,9 +55,7 @@ type Credentials func() (username string, password string, err error)
 const (
 	// gRPC status codes
 	// https://grpc.github.io/grpc/core/md_doc_statuscodes.html
-	StatusInProgress     = int32(-3) // A request has started
-	StatusInvalidContent = int32(-2) // Content is not available or is of the wrong type, usually found via unmarshalling
-	//StatusNotProvided        = int32(-1) // No status available, usually on error.
+	StatusInvalidContent     = int32(-1) // Content is not available or is of the wrong type, usually found via unmarshalling
 	StatusOk                 = int32(0)  // Not an error; returned on success.
 	StatusCancelled          = int32(1)  // The operation was cancelled, typically by the caller.
 	StatusUnknown            = int32(2)  // Unknown error. For example, this error may be returned when a Status value received from another address space belongs to an error space that is not known in this address space. Also errors raised by APIs that do not return enough error information may be converted to this error.

@@ -15,10 +15,8 @@ const (
 	ProfileEvent   = "event:profile"
 	VirtualHost    = "vhost"
 
-	StatusNotProvided = -100
-	StatusOk          = 0  // Need to sink with gRPC Ok
-	StatusInternal    = 13 // Need to sink with gRPC Internal
-	StatusInProgress  = -3 // Need to sink with vhost StatusInProgress
+	StatusInProgress  = -100
+	StatusNotProvided = -101
 )
 
 type Message struct {

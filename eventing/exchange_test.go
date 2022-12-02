@@ -2,6 +2,12 @@ package eventing
 
 import "fmt"
 
+// Only used for testing, no need to declare elsewhere
+const (
+	statusOk       = 0  // Need to sink with gRPC Ok
+	statusInternal = 13 // Need to sink with gRPC Internal
+)
+
 func isStatus(msg *Message, status int32) bool {
 	if msg == nil {
 		return false
@@ -14,29 +20,29 @@ func ExampleExchange() {
 
 	fmt.Printf("Messages   : %v\n", exch.count(StartupEvent))
 	fmt.Printf("InProgress : %v\n", isStatus(exch.current(StartupEvent), StatusInProgress))
-	fmt.Printf("Failure    : %v\n", isStatus(exch.current(StartupEvent), StatusInternal))
-	fmt.Printf("Ok         : %v\n", isStatus(exch.current(StartupEvent), StatusOk))
+	fmt.Printf("Failure    : %v\n", isStatus(exch.current(StartupEvent), statusInternal))
+	fmt.Printf("Ok         : %v\n", isStatus(exch.current(StartupEvent), statusOk))
 
 	exch.add(CreateMessage(VirtualHost, "test:package", StartupEvent, StatusInProgress, nil))
 
 	fmt.Printf("Messages   : %v\n", exch.count(StartupEvent))
 	fmt.Printf("InProgress : %v\n", isStatus(exch.current(StartupEvent), StatusInProgress))
-	fmt.Printf("Failure    : %v\n", isStatus(exch.current(StartupEvent), StatusInternal))
-	fmt.Printf("Ok         : %v\n", isStatus(exch.current(StartupEvent), StatusOk))
+	fmt.Printf("Failure    : %v\n", isStatus(exch.current(StartupEvent), statusInternal))
+	fmt.Printf("Ok         : %v\n", isStatus(exch.current(StartupEvent), statusOk))
 
-	exch.add(CreateMessage(VirtualHost, "test:package", StartupEvent, StatusInternal, nil))
-
-	fmt.Printf("Messages   : %v\n", exch.count(StartupEvent))
-	fmt.Printf("InProgress : %v\n", isStatus(exch.current(StartupEvent), StatusInProgress))
-	fmt.Printf("Failure    : %v\n", isStatus(exch.current(StartupEvent), StatusInternal))
-	fmt.Printf("Ok         : %v\n", isStatus(exch.current(StartupEvent), StatusOk))
-
-	exch.add(CreateMessage(VirtualHost, "test:package", StartupEvent, StatusOk, nil))
+	exch.add(CreateMessage(VirtualHost, "test:package", StartupEvent, statusInternal, nil))
 
 	fmt.Printf("Messages   : %v\n", exch.count(StartupEvent))
 	fmt.Printf("InProgress : %v\n", isStatus(exch.current(StartupEvent), StatusInProgress))
-	fmt.Printf("Failure    : %v\n", isStatus(exch.current(StartupEvent), StatusInternal))
-	fmt.Printf("Ok         : %v\n", isStatus(exch.current(StartupEvent), StatusOk))
+	fmt.Printf("Failure    : %v\n", isStatus(exch.current(StartupEvent), statusInternal))
+	fmt.Printf("Ok         : %v\n", isStatus(exch.current(StartupEvent), statusOk))
+
+	exch.add(CreateMessage(VirtualHost, "test:package", StartupEvent, statusOk, nil))
+
+	fmt.Printf("Messages   : %v\n", exch.count(StartupEvent))
+	fmt.Printf("InProgress : %v\n", isStatus(exch.current(StartupEvent), StatusInProgress))
+	fmt.Printf("Failure    : %v\n", isStatus(exch.current(StartupEvent), statusInternal))
+	fmt.Printf("Ok         : %v\n", isStatus(exch.current(StartupEvent), statusOk))
 
 	//Output:
 	//Messages   : 0
