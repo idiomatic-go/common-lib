@@ -21,7 +21,7 @@ func HttpDo(ctx context.Context, method, url string, header http.Header, body io
 	AddHeaders(req, header)
 	status := DoStatus(req)
 	if !status.IsSuccess() && status.FirstError() != nil {
-		logxt.Printf("%v", status.FirstError())
+		logxt.Debugf("%v", status.FirstError())
 	}
 	return status
 }
@@ -39,7 +39,7 @@ func HttpDoContent(ctx context.Context, method, url string, header http.Header, 
 	}
 	entity, _ := status.UnmarshalJson(content)
 	if status.FirstError() != nil {
-		logxt.Printf("%v", status.FirstError())
+		logxt.Debugf("%v", status.FirstError())
 		if body != nil {
 			logxt.Debug(string(entity))
 		}

@@ -91,7 +91,7 @@ func Startup(ticks int, override MessageMap) Status {
 		// Check the startup status of the directory, continue if a package is still in startup
 		uri := eventing.Directory.FindStatus(eventing.StartupEvent, eventing.StatusInProgress)
 		if uri != "" {
-			logxt.Printf("vhost Startup in progress: continuing: %v\n", uri)
+			logxt.Debugf("vhost Startup in progress: continuing: %v\n", uri)
 			count++
 			continue
 		}

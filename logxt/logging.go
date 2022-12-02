@@ -40,3 +40,16 @@ func Print(v ...any) {
 func Printf(specifier string, v ...any) {
 	log.Printf(specifier, v...)
 }
+
+/*
+func LogContextPrint(ctx context.Context, v ...any) {
+	u := []any{ContextRequestId(ctx)}
+	Printf("%v\n", append(u, v))
+}
+
+func LogContextPrintf(ctx context.Context, specifier string, v ...any) {
+	Printf(specifier, v)
+}
+
+
+*/
