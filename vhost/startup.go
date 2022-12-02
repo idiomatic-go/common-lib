@@ -76,7 +76,7 @@ func Shutdown() {
 func Startup(ticks int, override MessageMap) Status {
 	packages := eventing.Directory.Count()
 	if packages == 0 {
-		return NewStatusOkMessage("vhost startup successful")
+		return NewStatusOkMessage("vhost Startup successful")
 	}
 	toSend := createToSend(override)
 	sendMessages(toSend)
@@ -103,7 +103,7 @@ func Startup(ticks int, override MessageMap) Status {
 		}
 		break
 	}
-	return NewStatusOkMessage(fmt.Sprintf("vhost startup successful: %v", count))
+	return NewStatusOkMessage(fmt.Sprintf("vhost Startup successful: %v", count))
 }
 
 func createToSend(msgs MessageMap) MessageMap {
