@@ -14,9 +14,9 @@ func FmtTimestamp(t time.Time) string {
 	t = t.UTC()
 	year, month, day := t.Date()
 	itoa(&buf, year, 4)
-	buf = append(buf, '/')
+	buf = append(buf, '-')
 	itoa(&buf, int(month), 2)
-	buf = append(buf, '/')
+	buf = append(buf, '-')
 	itoa(&buf, day, 2)
 	buf = append(buf, ' ')
 
@@ -30,7 +30,7 @@ func FmtTimestamp(t time.Time) string {
 	buf = append(buf, '.')
 	itoa(&buf, t.Nanosecond()/1e3, 6)
 	//}
-	buf = append(buf, ' ')
+	//buf = append(buf, ' ')
 	return string(buf)
 }
 
