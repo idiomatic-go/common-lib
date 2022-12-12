@@ -1,7 +1,7 @@
 package fncall
 
 type Status interface {
-	//String() string
+	String() string
 	gRPCStatus
 	Errors
 	HttpStatus() int
@@ -25,7 +25,7 @@ func (s *statusT) String() string {
 	if s.IsMessage() {
 		return s.Message()
 	}
-	return "Status"
+	return "fncall.Status"
 }
 
 // Ok - gRPC interface implementation

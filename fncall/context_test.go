@@ -18,9 +18,9 @@ func ExampleContent() {
 	status := NewStatusOk()
 	ctx := ContextWithContent(context.Background(), status)
 	if IsContextContent(ctx) {
-		fmt.Printf("Status : %v\n", status) //ContextContent(ctx))
+		fmt.Printf("Status : %v\n", status.String()) //ContextContent(ctx))
 	}
 
 	//Output:
-	//Status :
+	//Status : fncall.Status
 }
