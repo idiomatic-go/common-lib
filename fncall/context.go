@@ -53,13 +53,25 @@ func ContextContent(ctx context.Context) any {
 	return i
 }
 
-func IsContextContent(ctx context.Context) bool {
-	if ctx == nil {
+func IsContextContent(c context.Context) bool {
+	if c == nil {
 		return false
 	}
 	for {
-		switch ctx.(type) {
+		switch c.(type) {
 		case *valueCtx:
+			/*
+				if ctx != nil {
+					if ctx.val != nil {
+						if reflect.TypeOf(ctx.val) == reflect.TypeOf(t) {
+							return true
+						} else {
+							return false
+						}
+					}
+				}
+
+			*/
 			return true
 		default:
 			return false
